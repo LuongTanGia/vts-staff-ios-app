@@ -1,0 +1,68 @@
+//
+//  PhieuXuatListViewModel.swift
+//  VTS_STAFF
+//
+//  Created by Antigravity on 02/07/2026.
+//
+
+import Foundation
+import Combine
+
+@MainActor
+final class PhieuXuatListViewModel: ObservableObject {
+    @Published var state: VTSViewState<[TPhieuvc_Xuat_DanhSach]> = .idle
+    @Published var searchText: String = ""
+    @Published var fromDate: Date = Date().addingTimeInterval(-7*24*60*60)
+    @Published var toDate: Date = Date()
+    
+    private var allPhieu: [TPhieuvc_Xuat_DanhSach] = []
+    
+    var filteredPhieu: [TPhieuvc_Xuat_DanhSach] {
+        if searchText.isEmpty {
+            return allPhieu
+        }
+        let query = searchText.lowercased().folding(options: .diacriticInsensitive, locale: .current)
+        return allPhieu.filter { item in
+            let soPhieuMatch = item.soPhieu.lowercased().contains(query)
+            let soXeMatch = item.soXe.lowercased().contains(query)
+            let taiXeMatch = item.taiXe.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
+            let khachHangMatch = item.tenKhachHang.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
+            let hangHoaMatch = item.tenHangHoa.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
+            let ghiChuMatch = (item.ghiChu ?? "").lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
+            let trangThaiMatch = item.tenTrangThai.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
+            
+            return soPhieuMatch || soXeMatch || taiXeMatch || khachHangMatch || hangHoaMatch || ghiChuMatch || trangThaiMatch
+        }
+    }
+    
+    func loadData() async {
+        if case .loading = state { return }
+        
+        if case .success = state {
+            // Keep current data visible during background refresh
+        } else {
+            state = .loading
+        }
+        
+        do {
+            let response = try await PhieuXuatService.shared.danhSach(
+                dateFrom: fromDate.toDateOnlyString,
+                dateTo: toDate.toDateOnlyString
+            )
+            let list = response.DataResults ?? []
+            allPhieu = list
+            if list.isEmpty {
+                state = .empty
+            } else {
+                state = .success(list)
+            }
+        } catch {
+            state = .failure(error.localizedDescription)
+        }
+    }
+    
+    func loadDataIfNeeded() async {
+        if case .success = state { return }
+        await loadData()
+    }
+}
