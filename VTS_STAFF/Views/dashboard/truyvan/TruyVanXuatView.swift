@@ -153,7 +153,7 @@ struct TruyVanXuatView: View {
                                             .frame(maxHeight: .infinity)
                                             .border(Color.vtsBorder, width: 0.5)
                                         
-                                        Text(item.colName)
+                                        Text(item.colName ?? "")
                                             .padding(5)
                                             .frame(width: width * 0.6, alignment: .leading)
                                             .frame(maxHeight: .infinity)
@@ -170,7 +170,7 @@ struct TruyVanXuatView: View {
                                 )
                             } else if item.colDataType == 1 {
                                 return AnyView(
-                                    Text(item.colName)
+                                    Text(item.colName ?? "")
                                         .padding(5)
                                         .frame(width: width * 1, alignment: .center)
                                         .background(Color.green.opacity(0.5))

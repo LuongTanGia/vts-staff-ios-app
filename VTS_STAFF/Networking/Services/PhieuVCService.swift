@@ -26,13 +26,8 @@ final class PhieuGiaCongService {
     private let base = "/api/phieuvc_giacong"
     
     func danhSach(dateFrom: String, dateTo: String) async throws -> APIListResponse<TPhieuvc_Giacong_DanhSach> {
-        do {
-            let body = Params_DateFromTo_Base(dateFrom: dateFrom, dateTo: dateTo)
-            return try await net.post(path: "\(base)/DanhSach", body: body)
-        } catch {
-            print("⚠️ API PhieuGiaCong.danhSach failed, falling back to mock data: \(error.localizedDescription)")
-            return getMockGiaCongData()
-        }
+        let body = Params_DateFromTo_Base(dateFrom: dateFrom, dateTo: dateTo)
+        return try await net.post(path: "\(base)/DanhSach", body: body)
     }
     
     private func getMockGiaCongData() -> APIListResponse<TPhieuvc_Giacong_DanhSach> {
@@ -175,13 +170,8 @@ final class PhieuNhapService {
     private let base = "/api/phieuvc_nhap"
     
     func danhSach(dateFrom: String, dateTo: String) async throws -> APIListResponse<TPhieuvc_Nhap_DanhSach> {
-        do {
-            return try await net.post(path: "\(base)/DanhSach",
-                                      body: Params_DateFromTo_Base(dateFrom: dateFrom, dateTo: dateTo))
-        } catch {
-            print("⚠️ API PhieuNhap.danhSach failed, falling back to mock data: \(error.localizedDescription)")
-            return getMockNhapData()
-        }
+        return try await net.post(path: "\(base)/DanhSach",
+                                  body: Params_DateFromTo_Base(dateFrom: dateFrom, dateTo: dateTo))
     }
     
     private func getMockNhapData() -> APIListResponse<TPhieuvc_Nhap_DanhSach> {
@@ -263,13 +253,8 @@ final class PhieuXuatService {
     private let base = "/api/phieuvc_xuat"
     
     func danhSach(dateFrom: String, dateTo: String) async throws -> APIListResponse<TPhieuvc_Xuat_DanhSach> {
-        do {
-            return try await net.post(path: "\(base)/DanhSach",
-                                      body: Params_DateFromTo_Base(dateFrom: dateFrom, dateTo: dateTo))
-        } catch {
-            print("⚠️ API PhieuXuat.danhSach failed, falling back to mock data: \(error.localizedDescription)")
-            return getMockXuatData()
-        }
+        return try await net.post(path: "\(base)/DanhSach",
+                                  body: Params_DateFromTo_Base(dateFrom: dateFrom, dateTo: dateTo))
     }
     
     private func getMockXuatData() -> APIListResponse<TPhieuvc_Xuat_DanhSach> {

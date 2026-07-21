@@ -65,14 +65,7 @@ final class PhieuGiaCongDetailViewModel: ObservableObject {
                 if let found = listResponse.DataResults?.first(where: { $0.soPhieu == soPhieu }) {
                     state = .success(found)
                 } else {
-                    state = .success(TPhieuvc_Giacong_DanhSach(
-                        soPhieu: soPhieu, soPhieuInt: Int(soPhieu) ?? 0, ngay: Date().toAPIString,
-                        xeNgoai: false, soXe: "", taiXe: "", khachHang: "", tenKhachHang: "",
-                        hangHoa: "", tenHangHoa: "", trongLuongXe: 0, trongLuongHang: 0,
-                        hangHoaGC: nil, tenHangHoaGC: nil, trongLuongHangGC: 0,
-                        hangHoaTV: nil, tenHangHoaTV: nil, trongLuongHangTV: 0,
-                        ghiChu: nil, trangThai: "HT", tenTrangThai: "Hoàn thành"
-                    ))
+                    state = .empty
                 }
             } else {
                 state = .success(nil)

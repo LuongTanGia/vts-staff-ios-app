@@ -52,26 +52,21 @@ final class DashboardService {
             return getMockHomeData()
         }
         
-        do {
-            async let inOutRes = nhanVienInOut()
-            async let phongBanRes = nhanVienPhongBan()
-            async let chuyenXeRes = hangHoa_ChuyenXe()
-            async let hangNhapRes = hangNhap()
-            async let hangXuatRes = hangXuat()
-            
-            let (inOut, phongBan, chuyenXe, hangNhap, hangXuat) = try await (inOutRes, phongBanRes, chuyenXeRes, hangNhapRes, hangXuatRes)
-            
-            return HomeDashboardData(
-                nhanVienInOut: inOut.DataResults ?? [],
-                nhanVienPhongBan: phongBan.DataResults ?? [],
-                hangHoaChuyenXe: chuyenXe.DataResults ?? [],
-                hangNhap: hangNhap.DataResults ?? [],
-                hangXuat: hangXuat.DataResults ?? []
-            )
-        } catch {
-            print("⚠️ API Dashboard failed, falling back to mock data: \(error.localizedDescription)")
-            return getMockHomeData()
-        }
+        async let inOutRes = nhanVienInOut()
+        async let phongBanRes = nhanVienPhongBan()
+        async let chuyenXeRes = hangHoa_ChuyenXe()
+        async let hangNhapRes = hangNhap()
+        async let hangXuatRes = hangXuat()
+        
+        let (inOut, phongBan, chuyenXe, hangNhap, hangXuat) = try await (inOutRes, phongBanRes, chuyenXeRes, hangNhapRes, hangXuatRes)
+        
+        return HomeDashboardData(
+            nhanVienInOut: inOut.DataResults ?? [],
+            nhanVienPhongBan: phongBan.DataResults ?? [],
+            hangHoaChuyenXe: chuyenXe.DataResults ?? [],
+            hangNhap: hangNhap.DataResults ?? [],
+            hangXuat: hangXuat.DataResults ?? []
+        )
     }
     
     /// Sinh dữ liệu giả lập chất lượng cao cho trang Home

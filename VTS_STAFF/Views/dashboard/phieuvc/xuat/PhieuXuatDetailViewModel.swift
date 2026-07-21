@@ -65,12 +65,7 @@ final class PhieuXuatDetailViewModel: ObservableObject {
                 if let found = listResponse.DataResults?.first(where: { $0.soPhieu == soPhieu }) {
                     state = .success(found)
                 } else {
-                    state = .success(TPhieuvc_Xuat_DanhSach(
-                        soPhieu: soPhieu, soPhieuInt: Int(soPhieu) ?? 0, ngay: Date().toAPIString,
-                        xeNgoai: false, soXe: "", taiXe: "", khachHang: "", tenKhachHang: "",
-                        hangHoa: "", tenHangHoa: "", trongLuongXe: 0, trongLuongHang: 0,
-                        ghiChu: nil, trangThai: "HT", tenTrangThai: "Hoàn thành"
-                    ))
+                    state = .empty
                 }
             } else {
                 state = .success(nil)

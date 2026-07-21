@@ -67,13 +67,7 @@ final class PhieuNhapDetailViewModel: ObservableObject {
                 if let found = listResponse.DataResults?.first(where: { $0.soPhieu == soPhieu }) {
                     state = .success(found)
                 } else {
-                    // Fallback to a mock empty item with the code
-                    state = .success(TPhieuvc_Nhap_DanhSach(
-                        soPhieu: soPhieu, soPhieuInt: Int(soPhieu) ?? 0, ngay: Date().toAPIString,
-                        xeNgoai: false, soXe: "", khachHang: "", tenKhachHang: "", taiXe: "",
-                        hangHoa: "", tenHangHoa: "", trongLuongXe: 0, trongLuongHang: 0,
-                        ghiChu: nil, trangThai: "HT", tenTrangThai: "Hoàn thành"
-                    ))
+                    state = .empty
                 }
             } else {
                 state = .success(nil)
