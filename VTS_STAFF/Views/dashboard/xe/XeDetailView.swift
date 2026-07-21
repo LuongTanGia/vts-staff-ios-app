@@ -23,6 +23,12 @@ struct XeDetailView: View {
     @State private var ghiChu: String = ""
     @State private var isSaving: Bool = false
     
+    @State private var maError: String? = nil
+    @State private var tenError: String? = nil
+    @State private var loaiError: String? = nil
+    @State private var nhomError: String? = nil
+    @State private var taiXeError: String? = nil
+    
     private var hasEditPermission: Bool {
         AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_XE")?.edit == true
     }
@@ -52,23 +58,8 @@ struct XeDetailView: View {
             ) { details in
                 VStack(spacing: 0) {
                     // MARK: - Static Pinned Header Card
-                    if let details = details {
-                        profileHeaderCard(details: details)
-                            .background(Color.vtsPrimary)
-                    } else {
-                        VStack(spacing: 4) {
-                            Text("TẠO MỚI PHƯƠNG TIỆN")
-                                .font(.title3.bold())
-                                .foregroundColor(.white)
-                            Text("Nhập thông tin xe mới")
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.8))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 16)
+                    profileHeaderCard()
                         .background(Color.vtsPrimary)
-                    }
                     
                     // MARK: - Scrollable Details Area
                     ScrollView(showsIndicators: false) {
@@ -161,6 +152,31 @@ struct XeDetailView: View {
             primaryAction: { EmptyView() }
         )
         .toolbar(.hidden, for: .tabBar)
+        .onChange(of: ma) { _, newValue in
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                maError = nil
+            }
+        }
+        .onChange(of: ten) { _, newValue in
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                tenError = nil
+            }
+        }
+        .onChange(of: selectedLoai) { _, newValue in
+            if !newValue.isEmpty {
+                loaiError = nil
+            }
+        }
+        .onChange(of: selectedNhom) { _, newValue in
+            if !newValue.isEmpty {
+                nhomError = nil
+            }
+        }
+        .onChange(of: selectedTaiXe) { _, newValue in
+            if !newValue.isEmpty {
+                taiXeError = nil
+            }
+        }
         .onAppear {
             if viewModel.isNew {
                 if !hasAddPermission {
@@ -177,7 +193,7 @@ struct XeDetailView: View {
     // MARK: - Components
     
     @ViewBuilder
-    private func profileHeaderCard(details: TXe_ThongTin) -> some View {
+    private func profileHeaderCard() -> some View {
         VStack {
             HStack(spacing: 16) {
                 ZStack {
@@ -185,7 +201,7 @@ struct XeDetailView: View {
                         .fill(Color.white.opacity(0.15))
                         .frame(width: 60, height: 60)
                     
-                    Text(getInitials(name: details.ma))
+                    Text(getInitials(name: ma.isEmpty ? "XE" : ma))
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.white)
                 }
@@ -196,7 +212,7 @@ struct XeDetailView: View {
                 .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(details.ma)
+                    Text(ma.isEmpty ? (viewModel.isNew ? "Tạo mới Phương tiện" : "Chưa có biển số") : ma)
                         .font(.title3.bold())
                         .foregroundColor(.white)
                     
@@ -205,7 +221,7 @@ struct XeDetailView: View {
                             Text("Tên xe")
                                 .font(.system(size: 10))
                                 .foregroundColor(.white.opacity(0.6))
-                            Text(details.ten.isEmpty ? "—" : details.ten)
+                            Text(ten.isEmpty ? "—" : ten)
                                 .font(.subheadline.bold())
                                 .foregroundColor(.white)
                         }
@@ -219,8 +235,8 @@ struct XeDetailView: View {
                                 .font(.system(size: 10))
                                 .foregroundColor(.white.opacity(0.6))
                             
-                            let txTen = viewModel.taiXes.first(where: { $0.ma == details.taiXe })?.ten ?? details.taiXe
-                            Text(txTen.isEmpty ? "—" : txTen)
+                            let txTen = selectedTaiXe.isEmpty ? "—" : (viewModel.taiXes.first(where: { $0.ma == selectedTaiXe })?.ten ?? selectedTaiXe)
+                            Text(txTen)
                                 .font(.subheadline.bold())
                                 .foregroundColor(.white)
                         }
@@ -251,13 +267,15 @@ struct XeDetailView: View {
                     VTSLiquidTextField(
                         label: "Biển số",
                         text: $ma,
-                        isReadOnly: !viewModel.isNew
+                        isReadOnly: !viewModel.isNew,
+                        errorMessage: maError
                     )
                     
                     VTSLiquidTextField(
                         label: "Tên gợi nhớ của xe",
                         text: $ten,
-                        isReadOnly: false
+                        isReadOnly: false,
+                        errorMessage: tenError
                     )
                     
                     VTSLiquidPickerField(
@@ -267,7 +285,8 @@ struct XeDetailView: View {
                         displayName: { code in
                             if code.isEmpty { return "Không chọn" }
                             return viewModel.loaiXes.first(where: { $0.ma == code })?.ten ?? code
-                        }
+                        },
+                        errorMessage: loaiError
                     )
                     
                     VTSLiquidPickerField(
@@ -277,7 +296,8 @@ struct XeDetailView: View {
                         displayName: { code in
                             if code.isEmpty { return "Không chọn" }
                             return viewModel.nhomXes.first(where: { $0.ma == code })?.ten ?? code
-                        }
+                        },
+                        errorMessage: nhomError
                     )
                     
                     VTSLiquidPickerField(
@@ -287,7 +307,8 @@ struct XeDetailView: View {
                         displayName: { code in
                             if code.isEmpty { return "Không chọn" }
                             return viewModel.taiXes.first(where: { $0.ma == code })?.ten ?? code
-                        }
+                        },
+                        errorMessage: taiXeError
                     )
                 } else {
                     infoRow(label: "Biển số xe", value: details?.ma ?? "", icon: "number")
@@ -381,8 +402,45 @@ struct XeDetailView: View {
     }
     
     private func saveVehicle() async {
+        var hasError = false
+        
         if ma.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            router.showAlert(.alert, title: "Lỗi", subtitle: "Vui lòng nhập biển số xe.") {
+            maError = "Vui lòng nhập biển số xe"
+            hasError = true
+        } else {
+            maError = nil
+        }
+        
+        if ten.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            tenError = "Vui lòng nhập tên xe"
+            hasError = true
+        } else {
+            tenError = nil
+        }
+        
+        if selectedLoai.isEmpty {
+            loaiError = "Vui lòng chọn loại xe"
+            hasError = true
+        } else {
+            loaiError = nil
+        }
+        
+        if selectedNhom.isEmpty {
+            nhomError = "Vui lòng chọn nhóm xe"
+            hasError = true
+        } else {
+            nhomError = nil
+        }
+        
+        if selectedTaiXe.isEmpty {
+            taiXeError = "Vui lòng chọn tài xế"
+            hasError = true
+        } else {
+            taiXeError = nil
+        }
+        
+        if hasError {
+            router.showAlert(.alert, title: "Lỗi nhập liệu", subtitle: "Vui lòng hoàn thiện các trường thông tin bắt buộc.") {
                 Button("OK") {}
             }
             return

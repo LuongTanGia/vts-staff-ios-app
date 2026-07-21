@@ -19,16 +19,16 @@ final class KhachHangListViewModel: ObservableObject {
         if searchText.isEmpty {
             return allKhachHang
         }
-        let query = searchText.lowercased().folding(options: .diacriticInsensitive, locale: .current)
+        let query = searchText.normalized
         return allKhachHang.filter { kh in
-            let maMatch = kh.ma.lowercased().contains(query)
-            let tenMatch = kh.ten.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let diaChiMatch = (kh.diaChi ?? "").lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let mstMatch = (kh.mst ?? "").lowercased().contains(query)
-            let dienThoaiMatch = (kh.dienThoai ?? "").contains(query)
-            let emailMatch = (kh.email ?? "").lowercased().contains(query)
-            let nhomMatch = (kh.nhom ?? "").lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let loaiMatch = kh.loai.rawValue.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
+            let maMatch = kh.ma.normalized.contains(query)
+            let tenMatch = kh.ten.normalized.contains(query)
+            let diaChiMatch = (kh.diaChi ?? "").normalized.contains(query)
+            let mstMatch = (kh.mst ?? "").normalized.contains(query)
+            let dienThoaiMatch = (kh.dienThoai ?? "").normalized.contains(query)
+            let emailMatch = (kh.email ?? "").normalized.contains(query)
+            let nhomMatch = (kh.nhom ?? "").normalized.contains(query)
+            let loaiMatch = kh.loai.rawValue.normalized.contains(query)
             return maMatch || tenMatch || diaChiMatch || mstMatch || dienThoaiMatch || emailMatch || nhomMatch || loaiMatch
         }
     }

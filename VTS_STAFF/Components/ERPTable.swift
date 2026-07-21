@@ -349,17 +349,32 @@ private extension ERPTable {
         
         let cell = Group {
             if onRowTap != nil || onRowLongPress != nil || onRowAction != nil {
-                baseRow
+                let r = baseRow
                     .background(selectedRow == data.id ? Color.vtsPrimary.opacity(0.12) : Color.clear)
                     .contentShape(Rectangle())
-                    .onTapGesture {
+                
+                if let onRowTap = onRowTap, let onRowLongPress = onRowLongPress {
+                    r.onTapGesture {
                         selectedRow = data.id
-                        onRowTap?(data)
+                        onRowTap(data)
                     }
                     .onLongPressGesture {
                         selectedRow = data.id
-                        onRowLongPress?(data)
+                        onRowLongPress(data)
                     }
+                } else if let onRowTap = onRowTap {
+                    r.onTapGesture {
+                        selectedRow = data.id
+                        onRowTap(data)
+                    }
+                } else if let onRowLongPress = onRowLongPress {
+                    r.onLongPressGesture {
+                        selectedRow = data.id
+                        onRowLongPress(data)
+                    }
+                } else {
+                    r
+                }
             } else {
                 baseRow
             }

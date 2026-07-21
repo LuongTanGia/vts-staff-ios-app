@@ -26,10 +26,10 @@ final class TruyVanChuyenXeViewModel: ObservableObject {
         if searchText.isEmpty {
             return allData
         }
-        let query = searchText.lowercased().folding(options: .diacriticInsensitive, locale: .current)
+        let query = searchText.normalized
         return allData.filter { item in
-            let codeMatch = item.colCode.lowercased().contains(query)
-            let nameMatch = item.colName.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
+            let codeMatch = item.colCode.normalized.contains(query)
+            let nameMatch = item.colName.normalized.contains(query)
             return codeMatch || nameMatch
         }
     }

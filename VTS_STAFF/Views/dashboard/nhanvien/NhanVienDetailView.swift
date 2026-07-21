@@ -29,6 +29,14 @@ struct NhanVienDetailView: View {
     @State private var ghiChu: String = ""
     @State private var isSaving: Bool = false
     
+    @State private var hoError: String? = nil
+    @State private var tenError: String? = nil
+    @State private var ngaySinhError: String? = nil
+    @State private var cccdError: String? = nil
+
+    @State private var diaChiError: String? = nil
+    @State private var phuongXaError: String? = nil
+    
     private var hasEditPermission: Bool {
         AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_NHANVIEN")?.edit == true
     }
@@ -152,6 +160,37 @@ struct NhanVienDetailView: View {
             }
         )
         .toolbar(.hidden, for: .tabBar)
+        .onChange(of: emHo) { _, newValue in
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                hoError = nil
+            }
+        }
+        .onChange(of: emTen) { _, newValue in
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                tenError = nil
+            }
+        }
+        .onChange(of: emNgaySinhStr) { _, newValue in
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                ngaySinhError = nil
+            }
+        }
+        .onChange(of: emcccdppSo) { _, newValue in
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                cccdError = nil
+            }
+        }
+        
+        .onChange(of: emDiaChiSoDuong) { _, newValue in
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                diaChiError = nil
+            }
+        }
+        .onChange(of: emDiaChiPhuongXa) { _, newValue in
+            if !newValue.isEmpty {
+                phuongXaError = nil
+            }
+        }
         .onAppear {
             if isEditMode && !hasEditPermission {
                 isEditMode = false
@@ -171,7 +210,7 @@ struct NhanVienDetailView: View {
                         .fill(Color.white.opacity(0.15))
                         .frame(width: 60, height: 60)
                     
-                    Text(getInitials(name: getFullName(ho: details.emHo, ten: details.emTen)))
+                    Text(getInitials(name: getFullName(ho: emHo, ten: emTen)))
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(.white)
                 }
@@ -182,7 +221,8 @@ struct NhanVienDetailView: View {
                 .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(getFullName(ho: details.emHo, ten: details.emTen))
+                    let fullName = getFullName(ho: emHo, ten: emTen)
+                    Text(fullName.isEmpty ? "Nhân viên" : fullName)
                         .font(.title3.bold())
                         .foregroundColor(.white)
                     
@@ -234,13 +274,13 @@ struct NhanVienDetailView: View {
                 
                 if isEditMode {
                     HStack(spacing: 12) {
-                        VTSLiquidTextField(label: "Họ và tên đệm", text: $emHo, isReadOnly: false)
-                        VTSLiquidTextField(label: "Tên", text: $emTen, isReadOnly: false)
+                        VTSLiquidTextField(label: "Họ và tên đệm", text: $emHo, isReadOnly: false, errorMessage: hoError)
+                        VTSLiquidTextField(label: "Tên", text: $emTen, isReadOnly: false, errorMessage: tenError)
                             .frame(width: 120)
                     }
                     
                     HStack(spacing: 12) {
-                        VTSLiquidTextField(label: "Ngày sinh", text: $emNgaySinhStr, isReadOnly: false)
+                        VTSLiquidTextField(label: "Ngày sinh", text: $emNgaySinhStr, isReadOnly: false, errorMessage: ngaySinhError)
                         
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Giới tính")
@@ -255,7 +295,7 @@ struct NhanVienDetailView: View {
                         }
                     }
                     
-                    VTSLiquidTextField(label: "Số căn cước", text: $emcccdppSo, keyboardType: .numberPad, isReadOnly: false)
+                    VTSLiquidTextField(label: "Số căn cước", text: $emcccdppSo, keyboardType: .numberPad, isReadOnly: false, errorMessage: cccdError)
                 } else {
                     infoRow(label: "Họ và tên", value: getFullName(ho: details.emHo, ten: details.emTen), icon: "person.fill")
                     infoRow(label: "Giới tính", value: details.emGioiTinh == 0 ? "Nữ" : "Nam", icon: "figure.dress.line.vertical.figure.wave")
@@ -266,7 +306,7 @@ struct NhanVienDetailView: View {
                 if isEditMode {
                     VTSLiquidTextField(label: "Điện thoại liên hệ", text: $emDienThoai, keyboardType: .phonePad, isReadOnly: false)
                     VTSLiquidTextField(label: "Email", text: $emEmail, keyboardType: .emailAddress, isReadOnly: false)
-                    VTSLiquidTextField(label: "Số, đường", text: $emDiaChiSoDuong, isReadOnly: false)
+                    VTSLiquidTextField(label: "Số, đường", text: $emDiaChiSoDuong, isReadOnly: false, errorMessage: diaChiError)
                     
                     VTSLiquidPickerField(
                         label: "Phường, Xã",
@@ -295,7 +335,8 @@ struct NhanVienDetailView: View {
                                 return details.emDiaChiTenTinhThanh ?? ""
                             }
                             return ""
-                        }
+                        },
+                        errorMessage: phuongXaError
                     )
                     
                     VTSLiquidTextField(
@@ -423,6 +464,59 @@ struct NhanVienDetailView: View {
     }
     
     private func saveEmployeeDetails() async {
+        var hasError = false
+        
+        if emHo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            hoError = "Vui lòng nhập họ và tên đệm"
+            hasError = true
+        } else {
+            hoError = nil
+        }
+        
+        if emTen.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            tenError = "Vui lòng nhập tên"
+            hasError = true
+        } else {
+            tenError = nil
+        }
+        
+        if emNgaySinhStr.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            ngaySinhError = "Vui lòng nhập ngày sinh"
+            hasError = true
+        } else {
+            ngaySinhError = nil
+        }
+        
+        if emcccdppSo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            cccdError = "Vui lòng nhập số căn cước"
+            hasError = true
+        } else {
+            cccdError = nil
+        }
+        
+        
+        
+        if emDiaChiSoDuong.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            diaChiError = "Vui lòng nhập số nhà, tên đường"
+            hasError = true
+        } else {
+            diaChiError = nil
+        }
+        
+        if emDiaChiPhuongXa.isEmpty {
+            phuongXaError = "Vui lòng chọn phường xã"
+            hasError = true
+        } else {
+            phuongXaError = nil
+        }
+        
+        if hasError {
+            router.showAlert(.alert, title: "Lỗi nhập liệu", subtitle: "Vui lòng hoàn thiện các trường thông tin bắt buộc.") {
+                Button("OK") {}
+            }
+            return
+        }
+        
         isSaving = true
         defer { isSaving = false }
         

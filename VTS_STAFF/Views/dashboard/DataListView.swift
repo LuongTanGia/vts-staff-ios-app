@@ -18,9 +18,9 @@ struct DataListView: View {
     var groupedGroups: [(name: String, items: [TChucNangPhanQuyen])] {
         let excludedCodes = [
             "VTSSTAFF_DASBOARD_NHANVIEN",
-            "VTSSTAFF_DULIEU_PHIEUGIACONG",
-            "VTSSTAFF_DULIEU_PHIEUNHAP",
-            "VTSSTAFF_DULIEU_PHIEUXUAT"
+            "VTSSTAFF_MSG_XOAPHIEU",
+            "VTSSTAFF_MSG_TAOPHIEU",
+//            "VTSSTAFF_DULIEU_PHIEUXUAT"
         ]
         let groups = Dictionary(grouping: authManager.chucNangPhanQuyens.filter {  Fitem in
             !excludedCodes.contains(Fitem.maChucNang) && Fitem.visible && Fitem.view

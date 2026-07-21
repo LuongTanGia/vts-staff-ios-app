@@ -487,7 +487,7 @@ struct HomeView: View {
                     alignment: .leading,
                     render: { item, _ in
                         AnyView(
-                            Text(item.colName)
+                            Text(item.colName ?? "")
                                 .foregroundColor(.vtsTxtPrimary)
                         )
                     },
@@ -614,7 +614,7 @@ struct HomeView: View {
                                 .frame(width: width * 0.1, alignment: .center)
                                 .frame(maxHeight: .infinity)
                                 .border(Color.vtsBorder, width: 0.5)
-                            Text(item.colName)
+                            Text(item.colName ?? "")
                                 .padding(5)
                                 .frame(width: width * 0.6, alignment: .leading)
                                 .frame(maxHeight: .infinity)
@@ -635,7 +635,7 @@ struct HomeView: View {
                 }
                 if item.colDataType == 1 {
                     return AnyView(
-                        Text(item.colName)
+                        Text(item.colName ?? "")
                             .padding(5)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .background(.green.opacity(0.5))
@@ -665,7 +665,7 @@ struct HomeView: View {
                     alignment: .center,
                     render: { item, _ in
                         AnyView(
-                            Text(item.colCode)
+                            Text(item.colCode ?? "")
                                 .foregroundColor(.vtsTxtSecondary)
                         )
                     }
@@ -677,7 +677,7 @@ struct HomeView: View {
                     alignment: .leading,
                     render: { item, _ in
                         AnyView(
-                            Text(item.colName)
+                            Text(item.colName ?? "")
                                 .foregroundColor(.vtsTxtPrimary)
                         )
                     },
@@ -715,7 +715,7 @@ struct HomeView: View {
                                 .frame(width: width * 0.1, alignment: .center)
                                 .frame(maxHeight: .infinity)
                                 .border(Color.vtsBorder, width: 0.5)
-                            Text(item.colName)
+                            Text(item.colName ?? "")
                                 .padding(5)
                                 .frame(width: width * 0.6, alignment: .leading)
                                 .frame(maxHeight: .infinity)
@@ -736,7 +736,7 @@ struct HomeView: View {
                 }
                 if item.colDataType == 1 {
                     return AnyView(
-                        Text(item.colName)
+                        Text(item.colName ?? "")
                             .padding(5)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .background(.green.opacity(0.5))
@@ -766,7 +766,7 @@ struct HomeView: View {
                     alignment: .leading,
                     render: { item, _ in
                         AnyView(
-                            Text(item.colName)
+                            Text(item.colName ?? "")
                                 .foregroundColor(.vtsTxtPrimary)
                             
                         )

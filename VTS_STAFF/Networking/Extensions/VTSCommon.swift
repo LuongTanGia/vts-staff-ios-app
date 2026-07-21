@@ -96,6 +96,11 @@ public extension String {
             .replacingOccurrences(of: "Đ", with: "D")
     }
     
+    /// Trả về chuỗi đã viết thường và loại bỏ dấu tiếng Việt (phục vụ tìm kiếm không dấu)
+    var normalized: String {
+        return self.removeDiacritics().lowercased()
+    }
+    
     /// Parse chuỗi thành Date dựa vào format chỉ định
     /// - Parameter format: Định dạng ngày (Ví dụ: "yyyy-MM-dd HH:mm:ss")
     func toDate(format: String) -> Date? {

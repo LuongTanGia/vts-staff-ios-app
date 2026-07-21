@@ -102,10 +102,10 @@ struct TNhanVienInOutDataResult: Decodable, Sendable, Identifiable {
 // MARK: - TNhanVienPhongBanDataResult
 struct TNhanVienPhongBanDataResult: Decodable, Sendable, Identifiable {
     let colOrder: Int
-    let colCode, colName: String
+    let colCode, colName: String?
     let colValue, colValue0, colValue1: Int
     
-    var id: String { "phongban-\(colCode)-\(colOrder)" }
+    var id: String { "phongban-\(colCode ?? "")-\(colOrder)" }
     
     enum CodingKeys: String, CodingKey {
         case colOrder = "ColOrder"
@@ -121,10 +121,10 @@ struct TNhanVienPhongBanDataResult: Decodable, Sendable, Identifiable {
 struct THangHoa_ChuyenXeDataResult: Decodable, Sendable, Identifiable {
     let colType: String
     let colOrder: Int
-    let colCode, colName: String
+    let colCode, colName: String?
     let colValue1, colValue2, colValue3, colValue4: Int
     
-    var id: String { "chuyenxe-\(colType)-\(colCode)-\(colOrder)-\(colName)" }
+    var id: String { "chuyenxe-\(colType)-\(colCode ?? "")-\(colOrder)-\(colName ?? "")" }
     
     enum CodingKeys: String, CodingKey {
         case colType = "ColType"
@@ -145,10 +145,10 @@ struct THangNhapDataResult: Decodable, Sendable, Identifiable {
     let colType: String
     let colGroup: String
     let colOrder: Int
-    let colCode, colName: String
+    let colCode, colName: String?
     let colValue, colDataType: Int
     
-    var id: String { "nhap-\(colType)-\(colGroup)-\(colCode)-\(colOrder)-\(colDataType)-\(colName)" }
+    var id: String { "nhap-\(colType)-\(colGroup)-\(colCode ?? "")-\(colOrder)-\(colDataType)-\(colName ?? "")" }
     
     enum CodingKeys: String, CodingKey {
         case colType = "ColType"
@@ -168,10 +168,10 @@ struct THangXuatDataResult: Decodable, Sendable, Identifiable {
     let colType: String
     let colGroup: String
     let colOrder: Int
-    let colCode, colName: String
+    let colCode, colName: String?
     let colValue, colDataType: Int
     
-    var id: String { "xuat-\(colType)-\(colGroup)-\(colCode)-\(colOrder)-\(colDataType)-\(colName)" }
+    var id: String { "xuat-\(colType)-\(colGroup)-\(colCode ?? "")-\(colOrder)-\(colDataType)-\(colName ?? "")" }
     
     enum CodingKeys: String, CodingKey {
         case colType = "ColType"
@@ -245,8 +245,7 @@ struct TNhanVien_ThongTin: Decodable, Sendable {
 // MARK: - TXe_DanhSach
 struct TXe_DanhSach: Decodable, Sendable, Identifiable {
     let ma, ten, loai: String
-    let nhom: String?
-    let maTaiXe, taiXe: String
+    let nhom, maTaiXe, taiXe: String?
     
     var id: String { "xe-\(String(describing: ma))-\(String(describing: ten))" }
     
@@ -260,6 +259,8 @@ struct TXe_DanhSach: Decodable, Sendable, Identifiable {
     }
     
 }
+
+
 // MARK: - TXe_ThongTin
 struct TXe_ThongTin: Decodable, Sendable {
     let ma, ten, loai, tenLoai: String
@@ -348,9 +349,9 @@ struct TKhachhang_ThongTin: Decodable, Sendable {
 // MARK: - THangHoa_DanhSach
 struct THangHoa_DanhSach: Decodable, Sendable, Identifiable {
     let ma, ten: String
-    let loai: THangHoa_Loai
+    let loai: String?
     let nhom: String?
-    let dvt: THangHoa_Dvt
+    let dvt: String?
     let ghiChu: String?
     
     var id: String { "khachhang-\(String(describing: ma))-\(String(describing: ten))" }
@@ -365,15 +366,7 @@ struct THangHoa_DanhSach: Decodable, Sendable, Identifiable {
     }
 }
 
-enum THangHoa_Dvt: String, Codable {
-    case kg = "KG"
-    case lít = "LÍT"
-}
 
-enum THangHoa_Loai: String, Codable {
-    case dừa = "Dừa"
-    case than = "Than"
-}
 
 
 // MARK: - THangHoa_ThongTin

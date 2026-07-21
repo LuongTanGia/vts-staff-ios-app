@@ -25,9 +25,7 @@ final class HangHoaService {
     func danhSach() async throws -> APIListResponse<THangHoa_DanhSach> {
         if AuthManager.shared.isBypassActive {
             return APIListResponse(DataError: 0, DataErrorDescription: nil, DataResults: [
-                THangHoa_DanhSach(ma: "HH001", ten: "Dừa Xiêm Bến Tre", loai: .dừa, nhom: "Nông sản", dvt: .kg, ghiChu: "Dừa tươi loại 1"),
-                THangHoa_DanhSach(ma: "HH002", ten: "Than Củi Đước", loai: .than, nhom: "Chất đốt", dvt: .kg, ghiChu: "Than khô chất lượng cao"),
-                THangHoa_DanhSach(ma: "HH003", ten: "Dừa Sáp Cầu Kè", loai: .dừa, nhom: "Đặc sản", dvt: .kg, ghiChu: "Đặc sản Trà Vinh")
+                THangHoa_DanhSach(ma: "HH001", ten: "Dừa Xiêm Bến Tre", loai: "Dua", nhom: "Nông sản", dvt: "KG", ghiChu: "Dừa tươi loại 1")
             ])
         }
         return try await net.post(path: "/api/hanghoa/DanhSach")

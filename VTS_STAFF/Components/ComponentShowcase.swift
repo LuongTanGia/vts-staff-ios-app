@@ -8,8 +8,10 @@
 //
 
 import SwiftUI
+import SwiftfulRouting
 
 struct ComponentShowcaseView: View {
+    @Environment(\.router) private var router
     
     @State private var searchText   = ""
     @State private var selectedTag  = "Tất cả"
@@ -64,6 +66,11 @@ struct ComponentShowcaseView: View {
                             VTSButton("Làm mới",     icon: "arrow.clockwise", style: .secondary)  {}
                             VTSButton("Thêm mới",    icon: "plus",            style: .outline)    {}
                             VTSButton("Xoá phiếu",  icon: "trash",           style: .destructive) { showConfirm = true }
+                            VTSButton("Thử nghiệm OCR (Quét chữ)", icon: "doc.text.viewfinder", style: .outline, size: .large) {
+                                router.showScreen(.push) { _ in
+                                    OCRTestView()
+                                }
+                            }
                             HStack(spacing: 12) {
                                 VTSIconButton("plus",     style: .primary)     {}
                                 VTSIconButton("pencil")                         {}
@@ -210,5 +217,7 @@ struct ComponentShowcaseView: View {
 }
 
 #Preview {
-    ComponentShowcaseView()
+    RouterView { _ in
+        ComponentShowcaseView()
+    }
 }

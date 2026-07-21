@@ -19,12 +19,12 @@ final class NhanVienListViewModel: ObservableObject {
         if searchText.isEmpty {
             return allNhanVien
         }
-        let query = searchText.lowercased().folding(options: .diacriticInsensitive, locale: .current)
+        let query = searchText.normalized
         return allNhanVien.filter { nv in
-            let nameMatch = nv.emHoTen.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let codeMatch = nv.emid.lowercased().contains(query)
-            let phoneMatch = nv.emDienThoai.contains(query)
-            let deptMatch = nv.emTenPhongBanHH.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
+            let nameMatch = nv.emHoTen.normalized.contains(query)
+            let codeMatch = nv.emid.normalized.contains(query)
+            let phoneMatch = nv.emDienThoai.normalized.contains(query)
+            let deptMatch = nv.emTenPhongBanHH.normalized.contains(query)
             return nameMatch || codeMatch || phoneMatch || deptMatch
         }
     }

@@ -244,16 +244,16 @@ struct VTSListItemRow: View {
                 if let icon = leadingIcon {
                     ZStack {
                         Circle()
-                            .fill(accentColor.opacity(0.08))
+                            .fill(Color.vtsBg.opacity(0.08))
                             .frame(width: 42, height: 42)
                         
                         Circle()
-                            .stroke(accentColor.opacity(0.15), lineWidth: 1)
+                            .stroke(Color.vtsBg.opacity(0.15), lineWidth: 1)
                             .frame(width: 42, height: 42)
                         
                         Image(systemName: icon)
                             .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(accentColor)
+                            .foregroundColor(.vtsBg)
                     }
                 }
                 
@@ -261,12 +261,12 @@ struct VTSListItemRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
                         .font(.system(size: 15, weight: .bold, design: .rounded))
-                        .foregroundColor(.vtsTxtPrimary)
+                        .foregroundColor(.vtsBg)
                         .lineLimit(1)
                     if let subtitle {
                         Text(subtitle)
                             .font(.system(size: 12, weight: .regular, design: .rounded))
-                            .foregroundColor(.vtsTxtSecondary)
+                            .foregroundColor(.vtsBg)
                             .lineLimit(2)
                     }
                 }
@@ -281,19 +281,19 @@ struct VTSListItemRow: View {
                             .foregroundColor(.vtsTxtSecondary)
                     }
                     if let badge {
-                        VTSBadge(badge, color: accentColor)
+                        VTSBadge(badge, color: Color.vtsBg)
                     }
                 }
                 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(.vtsTxtTertiary)
+                    .foregroundColor(Color.vtsBg)
             }
             .padding(.horizontal, VTSSpacing.xl)
             .padding(.vertical, VTSSpacing.md)
             .background(
                 RoundedRectangle(cornerRadius: VTSRadius.md, style: .continuous)
-                    .fill(Color.vtsSurface)
+                    .fill(Color.vtsPrimary)
                     .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 4)
             )
             .overlay(

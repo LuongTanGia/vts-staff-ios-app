@@ -101,11 +101,6 @@ struct XeListView: View {
                                     
                                 ],
                                 defaultSortKey: "ma",
-                                onRowTap: { row in
-                                    router.showScreen(.push) { _ in
-                                        XeDetailView(maXe: row.ma, isEditMode: false)
-                                    }
-                                },
                                 onRowAction: { action, row in
                                     handleRowAction(action, row: row)
                                 },
@@ -113,7 +108,6 @@ struct XeListView: View {
                                     var list: [VTSRowAction] = []
                                     let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_XE")
                                     if perm?.view == true { list.append(.xem) }
-                                    if perm?.edit == true { list.append(.sua) }
                                     if perm?.del == true { list.append(.xoa) }
                                     return list
                                 }(),
@@ -167,7 +161,8 @@ struct XeListView: View {
                     } label: {
                         Image(systemName: showSearchBar ? "magnifyingglass.circle.fill" : "magnifyingglass")
                             .font(.title3)
-                            .foregroundColor(.primary)
+                            .foregroundColor(showSearchBar ? .primary : .white)
+                            .contentTransition(.symbolEffect(.replace))
                     }
                     
                     if AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_XE")?.add == true {
@@ -178,7 +173,8 @@ struct XeListView: View {
                         } label: {
                             Image(systemName: "plus")
                                 .font(.title3)
-                                .foregroundColor(.primary)
+                                .foregroundColor(showSearchBar ? .primary : .white)
+                                .symbolEffect(.bounce, value: showSearchBar)
                         }
                     }
                 }

@@ -23,6 +23,11 @@ struct HangHoaDetailView: View {
     @State private var ghiChu: String = ""
     @State private var isSaving: Bool = false
     
+    @State private var maError: String? = nil
+    @State private var tenError: String? = nil
+    @State private var dvtError: String? = nil
+
+    
     private var hasEditPermission: Bool {
         AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_HANGHOA")?.edit == true
     }
@@ -52,23 +57,8 @@ struct HangHoaDetailView: View {
             ) { details in
                 VStack(spacing: 0) {
                     // MARK: - Static Pinned Header Card
-                    if let details = details {
-                        profileHeaderCard(details: details)
-                            .background(Color.vtsPrimary)
-                    } else {
-                        VStack(spacing: 4) {
-                            Text("TẠO MỚI HÀNG HOÁ")
-                                .font(.title3.bold())
-                                .foregroundColor(.white)
-                            Text("Nhập thông tin sản phẩm mới")
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.8))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 16)
+                    profileHeaderCard()
                         .background(Color.vtsPrimary)
-                    }
                     
                     // MARK: - Scrollable Details Area
                     ScrollView(showsIndicators: false) {
@@ -162,6 +152,22 @@ struct HangHoaDetailView: View {
             primaryAction: { EmptyView() }
         )
         .toolbar(.hidden, for: .tabBar)
+        .onChange(of: ma) { _, newValue in
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                maError = nil
+            }
+        }
+        .onChange(of: ten) { _, newValue in
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                tenError = nil
+            }
+        }
+        .onChange(of: dvt) { _, newValue in
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                dvtError = nil
+            }
+        }
+        
         .onAppear {
             if viewModel.isNew {
                 if !hasAddPermission {
@@ -178,7 +184,7 @@ struct HangHoaDetailView: View {
     // MARK: - Components
     
     @ViewBuilder
-    private func profileHeaderCard(details: THangHoa_ThongTin) -> some View {
+    private func profileHeaderCard() -> some View {
         VStack {
             HStack(spacing: 16) {
                 ZStack {
@@ -186,7 +192,7 @@ struct HangHoaDetailView: View {
                         .fill(Color.white.opacity(0.15))
                         .frame(width: 60, height: 60)
                     
-                    Text(getInitials(name: details.ten ?? "HH"))
+                    Text(getInitials(name: ten.isEmpty ? "HH" : ten))
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(.white)
                 }
@@ -197,7 +203,7 @@ struct HangHoaDetailView: View {
                 .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(details.ten ?? "Hàng hoá")
+                    Text(ten.isEmpty ? (viewModel.isNew ? "Tạo mới Hàng hoá" : "Hàng hoá") : ten)
                         .font(.title3.bold())
                         .foregroundColor(.white)
                     
@@ -206,7 +212,7 @@ struct HangHoaDetailView: View {
                             Text("Đơn vị tính")
                                 .font(.system(size: 10))
                                 .foregroundColor(.white.opacity(0.6))
-                            Text(details.dvt ?? "—")
+                            Text(dvt.isEmpty ? "—" : dvt)
                                 .font(.subheadline.bold())
                                 .foregroundColor(.white)
                         }
@@ -219,7 +225,7 @@ struct HangHoaDetailView: View {
                             Text("Mã hàng hoá")
                                 .font(.system(size: 10))
                                 .foregroundColor(.white.opacity(0.6))
-                            Text(details.ma ?? "—")
+                            Text(ma.isEmpty ? "—" : ma)
                                 .font(.subheadline.bold())
                                 .foregroundColor(.white)
                         }
@@ -250,19 +256,22 @@ struct HangHoaDetailView: View {
                     VTSLiquidTextField(
                         label: "Mã hàng",
                         text: $ma,
-                        isReadOnly: !viewModel.isNew
+                        isReadOnly: !viewModel.isNew,
+                        errorMessage: maError
                     )
                     
                     VTSLiquidTextField(
                         label: "Tên hàng",
                         text: $ten,
-                        isReadOnly: false
+                        isReadOnly: false,
+                        errorMessage: tenError
                     )
                     
                     VTSLiquidTextField(
                         label: "ĐVT (Đơn vị tính)",
                         text: $dvt,
-                        isReadOnly: false
+                        isReadOnly: false,
+                        errorMessage: dvtError
                     )
                     
                     VTSLiquidPickerField(
@@ -272,7 +281,8 @@ struct HangHoaDetailView: View {
                         displayName: { code in
                             if code.isEmpty { return "Không chọn" }
                             return viewModel.loaiHHs.first(where: { $0.ma == code })?.ten ?? code
-                        }
+                        },
+                        
                     )
                     
                     VTSLiquidPickerField(
@@ -282,7 +292,8 @@ struct HangHoaDetailView: View {
                         displayName: { code in
                             if code.isEmpty { return "Không chọn" }
                             return viewModel.nhomHHs.first(where: { $0.ma == code })?.ten ?? code
-                        }
+                        },
+                        
                     )
                 } else {
                     infoRow(label: "Mã hàng", value: details?.ma ?? "", icon: "tag.fill")
@@ -374,8 +385,33 @@ struct HangHoaDetailView: View {
     }
     
     private func saveProduct() async {
+        var hasError = false
+        
         if ma.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            router.showAlert(.alert, title: "Lỗi", subtitle: "Vui lòng nhập mã hàng hóa.") {
+            maError = "Vui lòng nhập mã hàng hóa"
+            hasError = true
+        } else {
+            maError = nil
+        }
+        
+        if ten.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            tenError = "Vui lòng nhập tên hàng hóa"
+            hasError = true
+        } else {
+            tenError = nil
+        }
+        
+        if dvt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            dvtError = "Vui lòng nhập đơn vị tính"
+            hasError = true
+        } else {
+            dvtError = nil
+        }
+        
+        
+        
+        if hasError {
+            router.showAlert(.alert, title: "Lỗi nhập liệu", subtitle: "Vui lòng hoàn thiện các trường thông tin bắt buộc.") {
                 Button("OK") {}
             }
             return

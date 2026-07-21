@@ -29,6 +29,7 @@ struct VTSLiquidTextField: View {
     let isSecure: Bool
     let keyboardType: UIKeyboardType
     let isReadOnly: Bool
+    let errorMessage: String?
     
     @FocusState private var focused: Bool
     @State private var didCopy = false
@@ -39,7 +40,8 @@ struct VTSLiquidTextField: View {
         placeholder: String = "",
         isSecure: Bool = false,
         keyboardType: UIKeyboardType = .default,
-        isReadOnly: Bool = false
+        isReadOnly: Bool = false,
+        errorMessage: String? = nil
     ) {
         self.label       = label
         self._text       = text
@@ -47,81 +49,91 @@ struct VTSLiquidTextField: View {
         self.isSecure    = isSecure
         self.keyboardType = keyboardType
         self.isReadOnly  = isReadOnly
+        self.errorMessage = errorMessage
     }
     
     var shouldFloat: Bool { focused || !text.isEmpty }
     
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            // Background
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(
-                    isReadOnly
-                    ? AnyShapeStyle(Color.primary.opacity(0.07))
-                    : AnyShapeStyle(.regularMaterial)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(
-                            focused ? Color.vtsPrimary.opacity(0.8) : Color.primary.opacity(0.15),
-                            lineWidth: focused ? 1.5 : 1
-                        )
-                )
-                .animation(.easeInOut(duration: 0.15), value: focused)
-            
-            // Floating label
-            if !label.isEmpty {
-                Text(label)
-                    .font(shouldFloat
-                          ? .system(size: 11, weight: .medium)
-                          : .system(size: 15))
-                    .foregroundStyle(shouldFloat
-                                     ? (focused ? Color.vtsPrimary : Color.secondary)
-                                     : Color.secondary)
-                    .offset(y: shouldFloat ? 6 : 16)
-                    .padding(.horizontal, 14)
-                    .animation(.spring(response: 0.25, dampingFraction: 0.8), value: shouldFloat)
-            }
-            
-            // Input and Copy Button
-            HStack(spacing: 8) {
-                Group {
-                    if isSecure {
-                        SecureField("", text: $text)
-                    } else {
-                        TextField("", text: $text)
-                            .keyboardType(keyboardType)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
-                    }
-                }
-                .font(.system(size: 15))
-                .foregroundStyle(isReadOnly ? .secondary : .primary)
-                .focused($focused)
-                .disabled(isReadOnly)
+        VStack(alignment: .leading, spacing: 4) {
+            ZStack(alignment: .topLeading) {
+                // Background
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(
+                        isReadOnly
+                        ? AnyShapeStyle(Color.primary.opacity(0.07))
+                        : AnyShapeStyle(.regularMaterial)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(
+                                errorMessage != nil ? Color.red : (focused ? Color.vtsPrimary.opacity(0.8) : Color.primary.opacity(0.15)),
+                                lineWidth: (focused || errorMessage != nil) ? 1.5 : 1
+                            )
+                    )
+                    .animation(.easeInOut(duration: 0.15), value: focused)
                 
-                if isReadOnly && !text.isEmpty {
-                    Button {
-                        UIPasteboard.general.string = text
-                        withAnimation {
-                            didCopy = true
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                            didCopy = false
-                        }
-                    } label: {
-                        Image(systemName: didCopy ? "checkmark" : "doc.on.doc")
-                            .font(.system(size: 12))
-                            .foregroundStyle(didCopy ? .green : .secondary)
-                    }
-                    .buttonStyle(.plain)
+                // Floating label
+                if !label.isEmpty {
+                    Text(label)
+                        .font(shouldFloat
+                              ? .system(size: 11, weight: .medium)
+                              : .system(size: 15))
+                        .foregroundStyle(errorMessage != nil ? Color.red : (shouldFloat
+                                         ? (focused ? Color.vtsPrimary : Color.secondary)
+                                         : Color.secondary))
+                        .offset(y: shouldFloat ? 6 : 16)
+                        .padding(.horizontal, 14)
+                        .animation(.spring(response: 0.25, dampingFraction: 0.8), value: shouldFloat)
                 }
+                
+                // Input and Copy Button
+                HStack(spacing: 8) {
+                    Group {
+                        if isSecure {
+                            SecureField("", text: $text)
+                        } else {
+                            TextField("", text: $text)
+                                .keyboardType(keyboardType)
+                                .autocorrectionDisabled()
+                                .textInputAutocapitalization(.never)
+                        }
+                    }
+                    .font(.system(size: 15))
+                    .foregroundStyle(isReadOnly ? .secondary : .primary)
+                    .focused($focused)
+                    .disabled(isReadOnly)
+                    
+                    if isReadOnly && !text.isEmpty {
+                        Button {
+                            UIPasteboard.general.string = text
+                            withAnimation {
+                                didCopy = true
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                didCopy = false
+                            }
+                        } label: {
+                            Image(systemName: didCopy ? "checkmark" : "doc.on.doc")
+                                .font(.system(size: 12))
+                                .foregroundStyle(didCopy ? .green : .secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 14)
+                .padding(.top, label.isEmpty ? 14 : 24)
+                .padding(.bottom, 10)
             }
-            .padding(.horizontal, 14)
-            .padding(.top, label.isEmpty ? 14 : 24)
-            .padding(.bottom, 10)
+            .frame(minHeight: label.isEmpty ? 48 : 58)
+            
+            if let errorMessage {
+                Text(errorMessage)
+                    .font(.system(size: 11))
+                    .foregroundStyle(.red)
+                    .padding(.horizontal, 4)
+            }
         }
-        .frame(minHeight: label.isEmpty ? 48 : 58)
     }
 }
 
@@ -199,6 +211,7 @@ struct VTSLiquidPickerField<T: Hashable>: View {
     let displayName: (T) -> String
     let displaySubtitle: ((T) -> String)?
     let searchMatcher: ((T, String) -> Bool)?
+    let errorMessage: String?
     
     @State private var isSheetPresented = false
     @State private var searchText = ""
@@ -209,7 +222,8 @@ struct VTSLiquidPickerField<T: Hashable>: View {
         options: [T],
         displayName: @escaping (T) -> String,
         displaySubtitle: ((T) -> String)? = nil,
-        searchMatcher: ((T, String) -> Bool)? = nil
+        searchMatcher: ((T, String) -> Bool)? = nil,
+        errorMessage: String? = nil
     ) {
         self.label           = label
         self._selection      = selection
@@ -217,46 +231,59 @@ struct VTSLiquidPickerField<T: Hashable>: View {
         self.displayName     = displayName
         self.displaySubtitle = displaySubtitle
         self.searchMatcher   = searchMatcher
+        self.errorMessage    = errorMessage
     }
     
     var body: some View {
-        Button {
-            searchText = ""
-            isSheetPresented = true
-        } label: {
-            ZStack(alignment: .leading) {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(.regularMaterial)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(Color.primary.opacity(0.15), lineWidth: 1)
-                    )
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    if !label.isEmpty {
-                        Text(label)
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(.secondary)
-                    }
+        VStack(alignment: .leading, spacing: 4) {
+            Button {
+                searchText = ""
+                isSheetPresented = true
+            } label: {
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(.regularMaterial)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(
+                                    errorMessage != nil ? Color.red : Color.primary.opacity(0.15),
+                                    lineWidth: errorMessage != nil ? 1.5 : 1
+                                )
+                        )
                     
-                    HStack {
-                        Text(displayName(selection))
-                            .font(.system(size: 15))
-                            .foregroundColor(.primary)
-                            .lineLimit(1)
+                    VStack(alignment: .leading, spacing: 2) {
+                        if !label.isEmpty {
+                            Text(label)
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundStyle(errorMessage != nil ? Color.red : Color.secondary)
+                        }
                         
-                        Spacer()
-                        
-                        Image(systemName: "chevron.down")
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(.secondary)
+                        HStack {
+                            Text(displayName(selection))
+                                .font(.system(size: 15))
+                                .foregroundColor(.primary)
+                                .lineLimit(1)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.down")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(errorMessage != nil ? Color.red : .secondary)
+                        }
                     }
+                    .padding(.horizontal, 14)
                 }
-                .padding(.horizontal, 14)
+            }
+            .buttonStyle(PlainButtonStyle())
+            .frame(minHeight: label.isEmpty ? 48 : 58)
+            
+            if let errorMessage {
+                Text(errorMessage)
+                    .font(.system(size: 11))
+                    .foregroundStyle(.red)
+                    .padding(.horizontal, 4)
             }
         }
-        .buttonStyle(PlainButtonStyle())
-        .frame(minHeight: label.isEmpty ? 48 : 58)
         .sheet(isPresented: $isSheetPresented) {
             VStack(spacing: 0) {
                 // Header

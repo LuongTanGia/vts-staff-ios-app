@@ -94,3 +94,24 @@ extension Date {
         return (monday, sunday)
     }
 }
+
+extension String {
+    var toUIDateString: String {
+        if let date = Date.fromAPIString(self) {
+            let fmt = DateFormatter()
+            fmt.dateFormat = "dd/MM/yyyy"
+            return fmt.string(from: date)
+        }
+        if self.contains("T") {
+            let parts = self.components(separatedBy: "T")
+            if let first = parts.first {
+                let dateParts = first.components(separatedBy: "-")
+                if dateParts.count == 3 {
+                    return "\(dateParts[2])/\(dateParts[1])/\(dateParts[0])"
+                }
+            }
+        }
+        return self
+    }
+}
+

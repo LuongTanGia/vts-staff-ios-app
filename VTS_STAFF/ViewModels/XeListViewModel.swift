@@ -19,13 +19,13 @@ final class XeListViewModel: ObservableObject {
         if searchText.isEmpty {
             return allXe
         }
-        let query = searchText.lowercased().folding(options: .diacriticInsensitive, locale: .current)
+        let query = searchText.normalized
         return allXe.filter { xe in
-            let maMatch = xe.ma.lowercased().contains(query)
-            let tenMatch = xe.ten.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let loaiMatch = xe.loai.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let nhomMatch = (xe.nhom ?? "").lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let taiXeMatch = xe.taiXe.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
+            let maMatch = xe.ma.normalized.contains(query)
+            let tenMatch = xe.ten.normalized.contains(query)
+            let loaiMatch = xe.loai.normalized.contains(query)
+            let nhomMatch = (xe.nhom ?? "").normalized.contains(query)
+            let taiXeMatch = xe.taiXe?.normalized.contains(query) ?? false
             return maMatch || tenMatch || loaiMatch || nhomMatch || taiXeMatch
         }
     }

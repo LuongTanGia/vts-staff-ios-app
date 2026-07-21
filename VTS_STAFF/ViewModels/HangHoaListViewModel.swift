@@ -19,13 +19,13 @@ final class HangHoaListViewModel: ObservableObject {
         if searchText.isEmpty {
             return allHangHoa
         }
-        let query = searchText.lowercased().folding(options: .diacriticInsensitive, locale: .current)
+        let query = searchText.normalized
         return allHangHoa.filter { hh in
-            let maMatch = hh.ma.lowercased().contains(query)
-            let tenMatch = hh.ten.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let loaiMatch = hh.loai.rawValue.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let nhomMatch = (hh.nhom ?? "").lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let dvtMatch = hh.dvt.rawValue.lowercased().contains(query)
+            let maMatch = hh.ma.normalized.contains(query)
+            let tenMatch = hh.ten.normalized.contains(query)
+            let loaiMatch = hh.loai?.normalized.contains(query) ?? false
+            let nhomMatch = (hh.nhom ?? "").normalized.contains(query)
+            let dvtMatch = hh.dvt?.normalized.contains(query) ?? false
             return maMatch || tenMatch || loaiMatch || nhomMatch || dvtMatch
         }
     }

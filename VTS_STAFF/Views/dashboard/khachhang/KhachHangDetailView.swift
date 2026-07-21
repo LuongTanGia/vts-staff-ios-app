@@ -26,6 +26,10 @@ struct KhachHangDetailView: View {
     @State private var ghiChu: String = ""
     @State private var isSaving: Bool = false
     
+    @State private var maError: String? = nil
+    @State private var tenError: String? = nil
+    
+    
     private var hasEditPermission: Bool {
         AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_KHACHHANG")?.edit == true
     }
@@ -55,23 +59,8 @@ struct KhachHangDetailView: View {
             ) { details in
                 VStack(spacing: 0) {
                     // MARK: - Static Pinned Header Card
-                    if let details = details {
-                        profileHeaderCard(details: details)
-                            .background(Color.vtsPrimary)
-                    } else {
-                        VStack(spacing: 4) {
-                            Text("TẠO MỚI ĐỐI TÁC")
-                                .font(.title3.bold())
-                                .foregroundColor(.white)
-                            Text("Nhập thông tin chi tiết khách hàng")
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.8))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 16)
+                    profileHeaderCard()
                         .background(Color.vtsPrimary)
-                    }
                     
                     // MARK: - Scrollable Details Area
                     ScrollView(showsIndicators: false) {
@@ -164,6 +153,17 @@ struct KhachHangDetailView: View {
             primaryAction: { EmptyView() }
         )
         .toolbar(.hidden, for: .tabBar)
+        .onChange(of: ma) { _, newValue in
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                maError = nil
+            }
+        }
+        .onChange(of: ten) { _, newValue in
+            if !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                tenError = nil
+            }
+        }
+        
         .onAppear {
             if viewModel.isNew {
                 if !hasAddPermission {
@@ -180,7 +180,7 @@ struct KhachHangDetailView: View {
     // MARK: - Components
     
     @ViewBuilder
-    private func profileHeaderCard(details: TKhachhang_ThongTin) -> some View {
+    private func profileHeaderCard() -> some View {
         VStack {
             HStack(spacing: 16) {
                 ZStack {
@@ -188,7 +188,7 @@ struct KhachHangDetailView: View {
                         .fill(Color.white.opacity(0.15))
                         .frame(width: 60, height: 60)
                     
-                    Text(getInitials(name: details.ten ?? "KH"))
+                    Text(getInitials(name: ten.isEmpty ? "KH" : ten))
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(.white)
                 }
@@ -199,7 +199,7 @@ struct KhachHangDetailView: View {
                 .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(details.ten ?? "Khách hàng")
+                    Text(ten.isEmpty ? (viewModel.isNew ? "Tạo mới Đối tác" : "Khách hàng") : ten)
                         .font(.title3.bold())
                         .foregroundColor(.white)
                     
@@ -208,7 +208,8 @@ struct KhachHangDetailView: View {
                             Text("Loại khách")
                                 .font(.system(size: 10))
                                 .foregroundColor(.white.opacity(0.6))
-                            Text(details.loai ?? "—")
+                            let loaiTen = selectedLoai.isEmpty ? "—" : (viewModel.loaiKHs.first(where: { $0.ma == selectedLoai })?.ten ?? selectedLoai)
+                            Text(loaiTen)
                                 .font(.subheadline.bold())
                                 .foregroundColor(.white)
                         }
@@ -221,7 +222,7 @@ struct KhachHangDetailView: View {
                             Text("Mã đối tác")
                                 .font(.system(size: 10))
                                 .foregroundColor(.white.opacity(0.6))
-                            Text(details.ma ?? "—")
+                            Text(ma.isEmpty ? "—" : ma)
                                 .font(.subheadline.bold())
                                 .foregroundColor(.white)
                         }
@@ -252,19 +253,22 @@ struct KhachHangDetailView: View {
                     VTSLiquidTextField(
                         label: "Mã khách hàng",
                         text: $ma,
-                        isReadOnly: !viewModel.isNew
+                        isReadOnly: !viewModel.isNew,
+                        errorMessage: maError
                     )
                     
                     VTSLiquidTextField(
                         label: "Tên khách hàng",
                         text: $ten,
-                        isReadOnly: false
+                        isReadOnly: false,
+                        errorMessage: tenError
                     )
                     
                     VTSLiquidTextField(
                         label: "Địa chỉ",
                         text: $diaChi,
-                        isReadOnly: false
+                        isReadOnly: false,
+                       
                     )
                     
                     VTSLiquidTextField(
@@ -277,7 +281,8 @@ struct KhachHangDetailView: View {
                         label: "Điện thoại",
                         text: $dienThoai,
                         keyboardType: .phonePad,
-                        isReadOnly: false
+                        isReadOnly: false,
+                       
                     )
                     
                     VTSLiquidTextField(
@@ -294,7 +299,8 @@ struct KhachHangDetailView: View {
                         displayName: { code in
                             if code.isEmpty { return "Không chọn" }
                             return viewModel.loaiKHs.first(where: { $0.ma == code })?.ten ?? code
-                        }
+                        },
+                        
                     )
                     
                     VTSLiquidPickerField(
@@ -304,7 +310,8 @@ struct KhachHangDetailView: View {
                         displayName: { code in
                             if code.isEmpty { return "Không chọn" }
                             return viewModel.nhomKHs.first(where: { $0.ma == code })?.ten ?? code
-                        }
+                        },
+                        
                     )
                 } else {
                     infoRow(label: "Mã khách hàng", value: details?.ma ?? "", icon: "tag.fill")
@@ -402,8 +409,26 @@ struct KhachHangDetailView: View {
     }
     
     private func saveCustomer() async {
+        var hasError = false
+        
         if ma.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            router.showAlert(.alert, title: "Lỗi", subtitle: "Vui lòng nhập mã khách hàng.") {
+            maError = "Vui lòng nhập mã khách hàng"
+            hasError = true
+        } else {
+            maError = nil
+        }
+        
+        if ten.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            tenError = "Vui lòng nhập tên đối tác"
+            hasError = true
+        } else {
+            tenError = nil
+        }
+        
+     
+        
+        if hasError {
+            router.showAlert(.alert, title: "Lỗi nhập liệu", subtitle: "Vui lòng hoàn thiện các trường thông tin bắt buộc.") {
                 Button("OK") {}
             }
             return

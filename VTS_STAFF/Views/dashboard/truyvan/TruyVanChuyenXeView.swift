@@ -171,7 +171,8 @@ struct TruyVanChuyenXeView: View {
                 } label: {
                     Image(systemName: showSearchBar ? "magnifyingglass.circle.fill" : "magnifyingglass")
                         .font(.title3)
-                        .foregroundColor(.primary)
+                        .foregroundColor(showSearchBar ? .primary : .white)
+                        .contentTransition(.symbolEffect(.replace))
                 }
             },
             primaryAction: {

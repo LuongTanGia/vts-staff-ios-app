@@ -21,15 +21,15 @@ final class PhieuXuatListViewModel: ObservableObject {
         if searchText.isEmpty {
             return allPhieu
         }
-        let query = searchText.lowercased().folding(options: .diacriticInsensitive, locale: .current)
+        let query = searchText.normalized
         return allPhieu.filter { item in
-            let soPhieuMatch = item.soPhieu.lowercased().contains(query)
-            let soXeMatch = item.soXe.lowercased().contains(query)
-            let taiXeMatch = item.taiXe.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let khachHangMatch = item.tenKhachHang.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let hangHoaMatch = item.tenHangHoa.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let ghiChuMatch = (item.ghiChu ?? "").lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
-            let trangThaiMatch = item.tenTrangThai.lowercased().folding(options: .diacriticInsensitive, locale: .current).contains(query)
+            let soPhieuMatch = item.soPhieu.normalized.contains(query)
+            let soXeMatch = item.soXe.normalized.contains(query)
+            let taiXeMatch = item.taiXe.normalized.contains(query)
+            let khachHangMatch = item.tenKhachHang.normalized.contains(query)
+            let hangHoaMatch = item.tenHangHoa.normalized.contains(query)
+            let ghiChuMatch = (item.ghiChu ?? "").normalized.contains(query)
+            let trangThaiMatch = item.tenTrangThai.normalized.contains(query)
             
             return soPhieuMatch || soXeMatch || taiXeMatch || khachHangMatch || hangHoaMatch || ghiChuMatch || trangThaiMatch
         }

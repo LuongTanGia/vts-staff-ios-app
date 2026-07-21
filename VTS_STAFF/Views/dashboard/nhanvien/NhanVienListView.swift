@@ -101,30 +101,12 @@ struct NhanVienListView: View {
                                     
                                  ],
                                  defaultSortKey: "emTen",
-                                onRowTap: { row in
-                                    router.showScreen(.push) { _ in
-                                        NhanVienDetailView(maNV: row.emid, isEditMode: false)
-                                    }
-                                },
-                                onRowAction: { action, row in
-                                    if action == .xem {
-                                        router.showScreen(.push) { _ in
-                                            NhanVienDetailView(maNV: row.emid)
-                                        }
-                                    } else if action == .sua {
-                                        router.showScreen(.push) { _ in
-                                            NhanVienDetailView(maNV: row.emid, isEditMode: true)
-                                        }
-                                    }
-                                },
-                                actions: {
-                                    var list: [VTSRowAction] = []
-                                    let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_NHANVIEN")
-                                    if perm?.view == true { list.append(.xem) }
-                                    if perm?.edit == true { list.append(.sua) }
-                                    if perm?.del == true { list.append(.xoa) }
-                                    return list
-                                }(),
+                                 onRowLongPress: { row in
+                                     router.showScreen(.push) { _ in
+                                         NhanVienDetailView(maNV: row.emid, isEditMode: false)
+                                     }
+                                 },
+
                                 loadDataIfNeeded: {
                                     Task {
                                         await viewModel.loadDataIfNeeded()
@@ -172,12 +154,12 @@ struct NhanVienListView: View {
                 Button {
                     withAnimation(.easeInOut) {
                         showSearchBar.toggle()
-                        
                     }
                 } label: {
                     Image(systemName: showSearchBar ? "magnifyingglass.circle.fill" : "magnifyingglass")
                         .font(.title3)
-                        .foregroundColor(.primary)
+                        .foregroundColor(showSearchBar ? .primary : .white)
+                        .contentTransition(.symbolEffect(.replace))
                 }
             },
             primaryAction: {

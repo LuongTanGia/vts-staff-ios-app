@@ -81,10 +81,10 @@ struct HangHoaListView: View {
                                         alignment: .leading,
                                         render: { item, _ in
                                             AnyView(
-                                                Text(item.loai.rawValue)
+                                                Text(item.loai ?? "")
                                             )
                                         },
-                                        sorter: { $0.loai.rawValue.localizedCompare($1.loai.rawValue) == .orderedAscending }
+                                        sorter: { ($0.loai ?? "").localizedCompare($1.loai ?? "") == .orderedAscending }
                                     ),
                                     ERPColumn(
                                         title: AnyView(Text("ĐVT")),
@@ -93,19 +93,14 @@ struct HangHoaListView: View {
                                         alignment: .center,
                                         render: { item, _ in
                                             AnyView(
-                                                Text(item.dvt.rawValue)
+                                                Text(item.dvt ?? "")
                                             )
                                         },
-                                        sorter: { $0.dvt.rawValue.localizedCompare($1.dvt.rawValue) == .orderedAscending }
+                                        sorter: { ($0.dvt ?? "").localizedCompare($1.dvt ?? "") == .orderedAscending }
                                     ),
                                     
                                 ],
                                 defaultSortKey: "ten",
-                                onRowTap: { row in
-                                    router.showScreen(.push) { _ in
-                                        HangHoaDetailView(maHH: row.ma, isEditMode: false)
-                                    }
-                                },
                                 onRowAction: { action, row in
                                     handleRowAction(action, row: row)
                                 },
@@ -113,7 +108,6 @@ struct HangHoaListView: View {
                                     var list: [VTSRowAction] = []
                                     let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_HANGHOA")
                                     if perm?.view == true { list.append(.xem) }
-                                    if perm?.edit == true { list.append(.sua) }
                                     if perm?.del == true { list.append(.xoa) }
                                     return list
                                 }(),
@@ -167,7 +161,8 @@ struct HangHoaListView: View {
                     } label: {
                         Image(systemName: showSearchBar ? "magnifyingglass.circle.fill" : "magnifyingglass")
                             .font(.title3)
-                            .foregroundColor(.primary)
+                            .foregroundColor(showSearchBar ? .primary : .white)
+                            .contentTransition(.symbolEffect(.replace))
                     }
                     
                     if AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_HANGHOA")?.add == true {
@@ -178,7 +173,8 @@ struct HangHoaListView: View {
                         } label: {
                             Image(systemName: "plus")
                                 .font(.title3)
-                                .foregroundColor(.primary)
+                                .foregroundColor(showSearchBar ? .primary : .white)
+                                .symbolEffect(.bounce, value: showSearchBar)
                         }
                     }
                 }

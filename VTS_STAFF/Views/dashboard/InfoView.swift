@@ -154,6 +154,14 @@ struct InfoView: View {
                                     PolicyDocumentView(documentName: "privacy", title: "Chính sách bảo mật")
                                 }
                             })
+                            
+                            VTSDivider()
+                            
+                            policyRow(title: "Thành phần & Thử nghiệm OCR:", action: {
+                                router.showScreen(.push) { _ in
+                                    ComponentShowcaseView()
+                                }
+                            })
                         }
                         .background(
                             RoundedRectangle(cornerRadius: 24)

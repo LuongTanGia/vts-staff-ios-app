@@ -99,7 +99,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         
         // 1. Nếu đây là thông báo local do chính App tự tạo để hiển thị banner, cho phép hiển thị
         if userInfo["isLocalNotification"] as? Bool == true {
-            completionHandler([[.banner, .sound, .badge]])
+            completionHandler([.banner, .list, .sound, .badge])
             return
         }
         
@@ -132,7 +132,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             completionHandler([])
         } else {
             // Trường hợp thông báo remote thông thường khác có sẵn aps.alert
-            completionHandler([[.banner, .sound, .badge]])
+            completionHandler([.banner, .list, .sound, .badge])
         }
     }
 
@@ -145,6 +145,49 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         let userInfo = response.notification.request.content.userInfo
         print("Notification tapped: \(userInfo)")
         completionHandler()
+    }
+
+    // MARK: - Xử lý thông báo đẩy chạy ngầm (Background) hoặc tắt ứng dụng hoàn toàn (Closed/Terminated)
+    func application(
+        _ application: UIApplication,
+        didReceiveRemoteNotification userInfo: [AnyHashable : Any],
+        fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+    ) {
+        print("Background/Terminated remote notification received: \(userInfo)")
+        
+        // Nếu app đang active ở Foreground, bỏ qua vì willPresent đã xử lý
+        if application.applicationState == .active {
+            completionHandler(.noData)
+            return
+        }
+        
+        // Nếu là thông báo remote từ Firebase có custom payload: MsgTitle & MsgData
+        if let msgTitle = userInfo["MsgTitle"] as? String {
+            let content = UNMutableNotificationContent()
+            content.title = msgTitle
+            content.body = userInfo["MsgData"] as? String ?? ""
+            content.sound = UNNotificationSound.default
+            
+            var localUserInfo = userInfo
+            localUserInfo["isLocalNotification"] = true
+            content.userInfo = localUserInfo
+            
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+            let request = UNNotificationRequest(
+                identifier: UUID().uuidString,
+                content: content,
+                trigger: trigger
+            )
+            
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error = error {
+                    print("❌ Error presenting background local notification: \(error)")
+                }
+            }
+            completionHandler(.newData)
+        } else {
+            completionHandler(.noData)
+        }
     }
 
 }
