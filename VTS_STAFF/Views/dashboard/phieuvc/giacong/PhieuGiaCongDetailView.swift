@@ -437,7 +437,7 @@ struct PhieuGiaCongDetailView: View {
         hangHoaTV = details.hangHoaTV ?? ""
         trongLuongHangTV = String(details.trongLuongHangTV)
         ghiChu = details.ghiChu ?? ""
-        trangThai = details.trangThai
+        trangThai = details.trangThai ?? ""
     }
     
     private func validateForm() -> Bool {
