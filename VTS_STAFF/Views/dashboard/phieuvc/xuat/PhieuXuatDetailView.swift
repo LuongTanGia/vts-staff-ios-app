@@ -380,14 +380,14 @@ struct PhieuXuatDetailView: View {
     private func populateFields(with details: TPhieuvc_Xuat_DanhSach) {
         ngay = Date.fromAPIString(details.ngay) ?? Date()
         xeNgoai = details.xeNgoai
-        soXe = details.soXe
-        taiXe = details.taiXe
-        khachHang = details.khachHang
+        soXe = details.soXe ?? ""
+        taiXe = details.taiXe ?? ""
+        khachHang = details.khachHang ?? ""
         hangHoa = details.hangHoa
         trongLuongXe = String(Int(details.trongLuongXe))
         trongLuongHang = String(Int(details.trongLuongHang))
         ghiChu = details.ghiChu ?? ""
-        trangThai = details.trangThai
+        trangThai = details.trangThai ?? ""
     }
     
     private func validateForm() -> Bool {

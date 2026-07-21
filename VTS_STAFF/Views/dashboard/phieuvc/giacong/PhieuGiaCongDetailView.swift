@@ -426,9 +426,9 @@ struct PhieuGiaCongDetailView: View {
     private func populateFields(with details: TPhieuvc_Giacong_DanhSach) {
         ngay = Date.fromAPIString(details.ngay) ?? Date()
         xeNgoai = details.xeNgoai
-        soXe = details.soXe
-        taiXe = details.taiXe
-        khachHang = details.khachHang
+        soXe = details.soXe ?? ""
+        taiXe = details.taiXe ?? ""
+        khachHang = details.khachHang ?? ""
         hangHoa = details.hangHoa
         trongLuongXe = String(details.trongLuongXe)
         trongLuongHang = String(details.trongLuongHang)
