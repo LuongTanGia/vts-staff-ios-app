@@ -394,23 +394,29 @@ struct THangHoa_ThongTin: Codable {
     }
 }
 
-// MARK: - Phieuvc_Giacong_DanhSach
+
+
+// MARK: - Phieuvc_Nhap_DanhSach
 struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
     let soPhieu: String
     let soPhieuInt: Int
     let ngay: String
     let xeNgoai: Bool
-    let soXe: String
-    let taiXe: String
-    let khachHang, tenKhachHang, hangHoa, tenHangHoa: String
+    let soXe: String?
+    let taiXe: String?
+    let khachHang, tenKhachHang: String?
+    let hangHoa, tenHangHoa: String
+    let dvt: String?
     let trongLuongXe, trongLuongHang: Int
     let hangHoaGC, tenHangHoaGC: String?
+    let dvtgc: String?
     let trongLuongHangGC: Int
     let hangHoaTV, tenHangHoaTV: String?
+    let dvttv: String?
     let trongLuongHangTV: Int
     let ghiChu: String?
-    let trangThai: String
-    let tenTrangThai: String
+    let trangThai: String?
+    let tenTrangThai: String?
     
     var id: String { "\(String(describing: taiXe))-\(String(describing: soPhieu))-\(String(describing: tenTrangThai))" }
     
@@ -425,90 +431,29 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
         case tenKhachHang = "TenKhachHang"
         case hangHoa = "HangHoa"
         case tenHangHoa = "TenHangHoa"
+        case dvt = "DVT"
         case trongLuongXe = "TrongLuongXe"
         case trongLuongHang = "TrongLuongHang"
         case hangHoaGC = "HangHoaGC"
         case tenHangHoaGC = "TenHangHoaGC"
+        case dvtgc = "DVTGC"
         case trongLuongHangGC = "TrongLuongHangGC"
         case hangHoaTV = "HangHoaTV"
         case tenHangHoaTV = "TenHangHoaTV"
+        case dvttv = "DVTTV"
         case trongLuongHangTV = "TrongLuongHangTV"
         case ghiChu = "GhiChu"
         case trangThai = "TrangThai"
         case tenTrangThai = "TenTrangThai"
     }
+    
+    
+    
+    
 }
 
-
-// MARK: - Phieuvc_Nhap_DanhSach
-struct TPhieuvc_Nhap_DanhSach: Decodable, Sendable, Identifiable {
-    let soPhieu: String
-    let soPhieuInt: Int
-    let ngay: String
-    let xeNgoai: Bool
-    let soXe, khachHang, tenKhachHang, taiXe: String
-    let hangHoa, tenHangHoa: String
-    let trongLuongXe, trongLuongHang: Double
-    let ghiChu: String?
-    let trangThai: String
-    let tenTrangThai: String
-    
-    var id: String { "\(String(describing: taiXe))-\(String(describing: soPhieu))-\(String(describing: tenTrangThai))" }
-    
-    
-    enum CodingKeys: String, CodingKey {
-        case soPhieu = "SoPhieu"
-        case soPhieuInt = "SoPhieuInt"
-        case ngay = "Ngay"
-        case xeNgoai = "XeNgoai"
-        case soXe = "SoXe"
-        case khachHang = "KhachHang"
-        case tenKhachHang = "TenKhachHang"
-        case taiXe = "TaiXe"
-        case hangHoa = "HangHoa"
-        case tenHangHoa = "TenHangHoa"
-        case trongLuongXe = "TrongLuongXe"
-        case trongLuongHang = "TrongLuongHang"
-        case ghiChu = "GhiChu"
-        case trangThai = "TrangThai"
-        case tenTrangThai = "TenTrangThai"
-    }
-}
-
-// MARK: - Phieuvc_Xuat_DanhSach
-struct TPhieuvc_Xuat_DanhSach: Decodable, Sendable, Identifiable {
-    let soPhieu: String
-    let soPhieuInt: Int
-    let ngay: String
-    let xeNgoai: Bool
-    let soXe, taiXe, khachHang, tenKhachHang: String
-    let hangHoa, tenHangHoa: String
-    let trongLuongXe, trongLuongHang: Double
-    let ghiChu: String?
-    let trangThai, tenTrangThai: String
-
-    
-    var id: String { "\(String(describing: taiXe))-\(String(describing: soPhieu))-\(String(describing: tenTrangThai))" }
-    
-    enum CodingKeys: String, CodingKey {
-        case soPhieu = "SoPhieu"
-        case soPhieuInt = "SoPhieuInt"
-        case ngay = "Ngay"
-        case xeNgoai = "XeNgoai"
-        case soXe = "SoXe"
-        case taiXe = "TaiXe"
-        case khachHang = "KhachHang"
-        case tenKhachHang = "TenKhachHang"
-        case hangHoa = "HangHoa"
-        case tenHangHoa = "TenHangHoa"
-        case trongLuongXe = "TrongLuongXe"
-        case trongLuongHang = "TrongLuongHang"
-        case ghiChu = "GhiChu"
-        case trangThai = "TrangThai"
-        case tenTrangThai = "TenTrangThai"
-    }
-}
-
+typealias TPhieuvc_Nhap_DanhSach = TPhieuvc_Giacong_DanhSach
+typealias TPhieuvc_Xuat_DanhSach = TPhieuvc_Giacong_DanhSach
 
 
 

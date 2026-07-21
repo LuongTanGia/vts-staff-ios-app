@@ -24,12 +24,12 @@ final class PhieuGiaCongListViewModel: ObservableObject {
         let query = searchText.normalized
         return allPhieu.filter { item in
             let soPhieuMatch = item.soPhieu.normalized.contains(query)
-            let soXeMatch = item.soXe.normalized.contains(query)
-            let taiXeMatch = item.taiXe.normalized.contains(query)
-            let khachHangMatch = item.tenKhachHang.normalized.contains(query)
+            let soXeMatch = item.soXe?.normalized.contains(query) ?? false
+            let taiXeMatch = item.taiXe?.normalized.contains(query) ?? false
+            let khachHangMatch = item.tenKhachHang?.normalized.contains(query) ?? false
             let hangHoaMatch = item.tenHangHoa.normalized.contains(query)
             let ghiChuMatch = (item.ghiChu ?? "").normalized.contains(query)
-            let trangThaiMatch = item.tenTrangThai.normalized.contains(query)
+            let trangThaiMatch = item.tenTrangThai?.normalized.contains(query) ?? false
             
             return soPhieuMatch || soXeMatch || taiXeMatch || khachHangMatch || hangHoaMatch || ghiChuMatch || trangThaiMatch
         }

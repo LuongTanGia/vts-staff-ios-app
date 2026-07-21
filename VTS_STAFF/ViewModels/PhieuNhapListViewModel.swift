@@ -10,26 +10,26 @@ import Combine
 
 @MainActor
 final class PhieuNhapListViewModel: ObservableObject {
-    @Published var state: VTSViewState<[TPhieuvc_Nhap_DanhSach]> = .idle
+    @Published var state: VTSViewState<[TPhieuvc_Giacong_DanhSach]> = .idle
     @Published var searchText: String = ""
     @Published var fromDate: Date = Date().addingTimeInterval(-7*24*60*60)
     @Published var toDate: Date = Date()
     
-    private var allPhieu: [TPhieuvc_Nhap_DanhSach] = []
+    private var allPhieu: [TPhieuvc_Giacong_DanhSach] = []
     
-    var filteredPhieu: [TPhieuvc_Nhap_DanhSach] {
+    var filteredPhieu: [TPhieuvc_Giacong_DanhSach] {
         if searchText.isEmpty {
             return allPhieu
         }
         let query = searchText.normalized
         return allPhieu.filter { item in
             let soPhieuMatch = item.soPhieu.normalized.contains(query)
-            let soXeMatch = item.soXe.normalized.contains(query)
-            let taiXeMatch = item.taiXe.normalized.contains(query)
-            let khachHangMatch = item.tenKhachHang.normalized.contains(query)
+            let soXeMatch = item.soXe?.normalized.contains(query) ?? false
+            let taiXeMatch = item.taiXe?.normalized.contains(query)  ?? false
+            let khachHangMatch = item.tenKhachHang?.normalized.contains(query)  ?? false
             let hangHoaMatch = item.tenHangHoa.normalized.contains(query)
             let ghiChuMatch = (item.ghiChu ?? "").normalized.contains(query)
-            let trangThaiMatch = item.tenTrangThai.normalized.contains(query)
+            let trangThaiMatch = item.tenTrangThai?.normalized.contains(query)  ?? false
             
             return soPhieuMatch || soXeMatch || taiXeMatch || khachHangMatch || hangHoaMatch || ghiChuMatch || trangThaiMatch
         }

@@ -66,7 +66,7 @@ final class PhieuNhapService {
     private let net = NetworkManager.shared
     private let base = "/api/phieuvc_nhap"
     
-    func danhSach(dateFrom: String, dateTo: String) async throws -> APIListResponse<TPhieuvc_Nhap_DanhSach> {
+    func danhSach(dateFrom: String, dateTo: String) async throws -> APIListResponse<TPhieuvc_Giacong_DanhSach> {
         return try await net.post(path: "\(base)/DanhSach",
                                   body: Params_DateFromTo_Base(dateFrom: dateFrom, dateTo: dateTo))
     }
@@ -107,7 +107,7 @@ final class PhieuXuatService {
     private let net = NetworkManager.shared
     private let base = "/api/phieuvc_xuat"
     
-    func danhSach(dateFrom: String, dateTo: String) async throws -> APIListResponse<TPhieuvc_Xuat_DanhSach> {
+    func danhSach(dateFrom: String, dateTo: String) async throws -> APIListResponse<TPhieuvc_Giacong_DanhSach> {
         return try await net.post(path: "\(base)/DanhSach",
                                   body: Params_DateFromTo_Base(dateFrom: dateFrom, dateTo: dateTo))
     }
