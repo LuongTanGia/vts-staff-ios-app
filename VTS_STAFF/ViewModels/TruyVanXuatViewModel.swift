@@ -51,7 +51,7 @@ final class TruyVanXuatViewModel: ObservableObject {
                     dateFrom: fromDate.toDateOnlyString,
                     dateTo: toDate.toDateOnlyString
                 )
-                let list = (response.DataResults ?? []).organizedByGroup()
+                let list = response.DataResults ?? []
                 allDataByItem = list
                 stateByItem = list.isEmpty ? .empty : .success(list)
             } else {
@@ -59,7 +59,7 @@ final class TruyVanXuatViewModel: ObservableObject {
                     dateFrom: fromDate.toDateOnlyString,
                     dateTo: toDate.toDateOnlyString
                 )
-                let list = (response.DataResults ?? []).organizedByGroup()
+                let list = response.DataResults ?? []
                 allDataByCus = list
                 stateByCus = list.isEmpty ? .empty : .success(list)
             }

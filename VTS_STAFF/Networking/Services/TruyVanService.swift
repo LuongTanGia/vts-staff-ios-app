@@ -86,45 +86,45 @@ final class TruyVanService {
     
     private func getMockHangNhap_ByItem() -> APIListResponse<THangNhap_ByCus> {
         let results = [
-            THangNhap_ByCus(colGroupCode: "ST", colGroupName: "SẮT THÉP XÂY DỰNG", colCode: "", colName: "SẮT THÉP XÂY DỰNG", colValue: 0, colDataType: 1),
-            THangNhap_ByCus(colGroupCode: "ST", colGroupName: "SẮT THÉP XÂY DỰNG", colCode: "ST01", colName: "Thép cuộn phi 6", colValue: 450, colDataType: 0),
-            THangNhap_ByCus(colGroupCode: "ST", colGroupName: "SẮT THÉP XÂY DỰNG", colCode: "ST02", colName: "Thép thanh vằn D10", colValue: 380, colDataType: 0),
-            THangNhap_ByCus(colGroupCode: "NS", colGroupName: "NÔNG SẢN XUẤT KHẨU", colCode: "", colName: "NÔNG SẢN XUẤT KHẨU", colValue: 0, colDataType: 1),
-            THangNhap_ByCus(colGroupCode: "NS", colGroupName: "NÔNG SẢN XUẤT KHẨU", colCode: "NS01", colName: "Gạo thơm Jasmine", colValue: 620, colDataType: 0),
-            THangNhap_ByCus(colGroupCode: "NS", colGroupName: "NÔNG SẢN XUẤT KHẨU", colCode: "NS02", colName: "Cà phê hạt Robusta", colValue: 450, colDataType: 0)
+            THangNhap_ByCus(colGroup: "Sắt thép", colOrder: 1, colCode: "", colName: "SẮT THÉP XÂY DỰNG", colValue: 0.0, colDataType: 1),
+            THangNhap_ByCus(colGroup: "Sắt thép", colOrder: 1, colCode: "ST01", colName: "Thép cuộn phi 6", colValue: 450.0, colDataType: 0),
+            THangNhap_ByCus(colGroup: "Sắt thép", colOrder: 2, colCode: "ST02", colName: "Thép thanh vằn D10", colValue: 380.0, colDataType: 0),
+            THangNhap_ByCus(colGroup: "Nông sản", colOrder: 2, colCode: "", colName: "NÔNG SẢN XUẤT KHẨU", colValue: 0.0, colDataType: 1),
+            THangNhap_ByCus(colGroup: "Nông sản", colOrder: 1, colCode: "NS01", colName: "Gạo thơm Jasmine", colValue: 620.0, colDataType: 0),
+            THangNhap_ByCus(colGroup: "Nông sản", colOrder: 2, colCode: "NS02", colName: "Cà phê hạt Robusta", colValue: 450.0, colDataType: 0)
         ]
         return APIListResponse(DataError: 0, DataErrorDescription: nil, DataResults: results)
     }
     
     private func getMockHangNhap_ByCus() -> APIListResponse<THangNhap_ByCus> {
         let results = [
-            THangNhap_ByCus(colGroupCode: "MN", colGroupName: "KHU VỰC MIỀN NAM", colCode: "", colName: "KHU VỰC MIỀN NAM", colValue: 0, colDataType: 1),
-            THangNhap_ByCus(colGroupCode: "MN", colGroupName: "KHU VỰC MIỀN NAM", colCode: "KH001", colName: "Công ty Cổ phần Tép Việt", colValue: 720, colDataType: 0),
-            THangNhap_ByCus(colGroupCode: "MN", colGroupName: "KHU VỰC MIỀN NAM", colCode: "KH002", colName: "Tổng kho logistics Sóng Thần", colValue: 480, colDataType: 0),
-            THangNhap_ByCus(colGroupCode: "MB", colGroupName: "KHU VỰC MIỀN BẮC", colCode: "", colName: "KHU VỰC MIỀN BẮC", colValue: 0, colDataType: 1),
-            THangNhap_ByCus(colGroupCode: "MB", colGroupName: "KHU VỰC MIỀN BẮC", colCode: "KH003", colName: "Nhà máy bê tông Hải Phòng", colValue: 510, colDataType: 0)
+            THangNhap_ByCus(colGroup: "Miền Nam", colOrder: 1, colCode: "", colName: "KHU VỰC MIỀN NAM", colValue: 0.0, colDataType: 1),
+            THangNhap_ByCus(colGroup: "Miền Nam", colOrder: 1, colCode: "KH001", colName: "Công ty Cổ phần Tép Việt", colValue: 720.0, colDataType: 0),
+            THangNhap_ByCus(colGroup: "Miền Nam", colOrder: 2, colCode: "KH002", colName: "Tổng kho logistics Sóng Thần", colValue: 480.0, colDataType: 0),
+            THangNhap_ByCus(colGroup: "Miền Bắc", colOrder: 2, colCode: "", colName: "KHU VỰC MIỀN BẮC", colValue: 0.0, colDataType: 1),
+            THangNhap_ByCus(colGroup: "Miền Bắc", colOrder: 1, colCode: "KH003", colName: "Nhà máy bê tông Hải Phòng", colValue: 510.0, colDataType: 0)
         ]
         return APIListResponse(DataError: 0, DataErrorDescription: nil, DataResults: results)
     }
     
     private func getMockHangXuat_ByItem() -> APIListResponse<THangNhap_ByCus> {
         let results = [
-            THangNhap_ByCus(colGroupCode: "VLXD", colGroupName: "VẬT LIỆU XÂY DỰNG", colCode: "", colName: "VẬT LIỆU XÂY DỰNG", colValue: 0, colDataType: 1),
-            THangNhap_ByCus(colGroupCode: "VLXD", colGroupName: "VẬT LIỆU XÂY DỰNG", colCode: "XM01", colName: "Xi măng Hà Tiên PCB40", colValue: 950, colDataType: 0),
-            THangNhap_ByCus(colGroupCode: "VLXD", colGroupName: "VẬT LIỆU XÂY DỰNG", colCode: "XM02", colName: "Cát xây dựng tô", colValue: 1200, colDataType: 0),
-            THangNhap_ByCus(colGroupCode: "BH", colGroupName: "HÀNG TIÊU DÙNG", colCode: "", colName: "HÀNG TIÊU DÙNG", colValue: 0, colDataType: 1),
-            THangNhap_ByCus(colGroupCode: "BH", colGroupName: "HÀNG TIÊU DÙNG", colCode: "BH01", colName: "Nước khoáng đóng chai", colValue: 350, colDataType: 0)
+            THangNhap_ByCus(colGroup: "VLXD", colOrder: 1, colCode: "", colName: "VẬT LIỆU XÂY DỰNG", colValue: 0.0, colDataType: 1),
+            THangNhap_ByCus(colGroup: "VLXD", colOrder: 1, colCode: "XM01", colName: "Xi măng Hà Tiên PCB40", colValue: 950.0, colDataType: 0),
+            THangNhap_ByCus(colGroup: "VLXD", colOrder: 2, colCode: "XM02", colName: "Cát xây dựng tô", colValue: 1200.0, colDataType: 0),
+            THangNhap_ByCus(colGroup: "Bách hoá", colOrder: 2, colCode: "", colName: "HÀNG TIÊU DÙNG", colValue: 0.0, colDataType: 1),
+            THangNhap_ByCus(colGroup: "Bách hoá", colOrder: 1, colCode: "BH01", colName: "Nước khoáng đóng chai", colValue: 350.0, colDataType: 0)
         ]
         return APIListResponse(DataError: 0, DataErrorDescription: nil, DataResults: results)
     }
     
     private func getMockHangXuat_ByCus() -> APIListResponse<THangNhap_ByCus> {
         let results = [
-            THangNhap_ByCus(colGroupCode: "VIP", colGroupName: "ĐỐI TÁC CHIẾN LƯỢC", colCode: "", colName: "ĐỐI TÁC CHIẾN LƯỢC", colValue: 0, colDataType: 1),
-            THangNhap_ByCus(colGroupCode: "VIP", colGroupName: "ĐỐI TÁC CHIẾN LƯỢC", colCode: "KH004", colName: "Tập đoàn Hòa Phát", colValue: 1150, colDataType: 0),
-            THangNhap_ByCus(colGroupCode: "VIP", colGroupName: "ĐỐI TÁC CHIẾN LƯỢC", colCode: "KH005", colName: "Tổng công ty Xây dựng Coteccons", colValue: 820, colDataType: 0),
-            THangNhap_ByCus(colGroupCode: "NORMAL", colGroupName: "ĐỐI TÁC VỪA VÀ NHỎ", colCode: "", colName: "ĐỐI TÁC VỪA VÀ NHỎ", colValue: 0, colDataType: 1),
-            THangNhap_ByCus(colGroupCode: "NORMAL", colGroupName: "ĐỐI TÁC VỪA VÀ NHỎ", colCode: "KH006", colName: "Cửa hàng VLXD Thanh Xuân", colValue: 140, colDataType: 0)
+            THangNhap_ByCus(colGroup: "Khách VIP", colOrder: 1, colCode: "", colName: "ĐỐI TÁC CHIẾN LƯỢC", colValue: 0.0, colDataType: 1),
+            THangNhap_ByCus(colGroup: "Khách VIP", colOrder: 1, colCode: "KH004", colName: "Tập đoàn Hòa Phát", colValue: 1150.0, colDataType: 0),
+            THangNhap_ByCus(colGroup: "Khách VIP", colOrder: 2, colCode: "KH005", colName: "Tổng công ty Xây dựng Coteccons", colValue: 820.0, colDataType: 0),
+            THangNhap_ByCus(colGroup: "Khách thường", colOrder: 2, colCode: "", colName: "ĐỐI TÁC VỪA VÀ NHỎ", colValue: 0.0, colDataType: 1),
+            THangNhap_ByCus(colGroup: "Khách thường", colOrder: 1, colCode: "KH006", colName: "Cửa hàng VLXD Thanh Xuân", colValue: 140.0, colDataType: 0)
         ]
         return APIListResponse(DataError: 0, DataErrorDescription: nil, DataResults: results)
     }
@@ -152,74 +152,20 @@ struct THangHoa_ChuyenXe: Codable, Identifiable {
 
 // MARK: - THangNhap_ByCus
 struct THangNhap_ByCus: Codable, Identifiable {
-    
-    let colGroupCode, colGroupName, colCode, colName: String?
-    let colValue, colDataType: Int
-    
-    var id: String { "\(colGroupCode ?? "")-\(colGroupName ?? "")-\(colCode ?? "")-\(colName ?? "")-\(colDataType)-\(colValue)" }
-    
+    let colGroup: String
+    let colOrder: Int
+    let colCode, colName: String
+    let colValue: Double
+    let colDataType: Int
+
+    var id: String { "\(colGroup)-\(colCode)-\(colOrder)-\(colDataType)" }
+
     enum CodingKeys: String, CodingKey {
-        case colGroupCode = "ColGroupCode"
-        case colGroupName = "ColGroupName"
+        case colGroup = "ColGroup"
+        case colOrder = "ColOrder"
         case colCode = "ColCode"
         case colName = "ColName"
         case colValue = "ColValue"
         case colDataType = "ColDataType"
     }
 }
-
-// MARK: - THangNhap_ByCus Grouping Extension
-extension Array where Element == THangNhap_ByCus {
-    /// Nhóm các phần tử `THangNhap_ByCus` theo nhóm (ColGroupCode/ColGroupName):
-    /// Đặt dòng tiêu đề nhóm (`colDataType == 1`) lên đầu nhóm,
-    /// theo sau là các chi tiết (`colDataType == 0`) của nhóm đó.
-    func organizedByGroup() -> [THangNhap_ByCus] {
-        var groupOrderKeys: [String] = []
-        var groupHeaders: [String: THangNhap_ByCus] = [:]
-        var groupChildren: [String: [THangNhap_ByCus]] = [:]
-        
-        for item in self {
-            let codeKey = item.colGroupCode?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            let nameKey = item.colGroupName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            let key = "\(codeKey)__\(nameKey)"
-            
-            if !groupOrderKeys.contains(key) {
-                groupOrderKeys.append(key)
-            }
-            
-            if item.colDataType == 1 {
-                groupHeaders[key] = item
-            } else {
-                groupChildren[key, default: []].append(item)
-            }
-        }
-        
-        var result: [THangNhap_ByCus] = []
-        for key in groupOrderKeys {
-            let children = groupChildren[key] ?? []
-            
-            if let header = groupHeaders[key] {
-                result.append(header)
-            } else if !children.isEmpty {
-                let first = children[0]
-                let nameText = (first.colGroupName?.isEmpty == false) ? first.colGroupName : first.colGroupCode
-                let groupTitle = (nameText?.isEmpty == false) ? nameText! : "Chưa phân nhóm"
-                let sumValue = children.reduce(0) { $0 + $1.colValue }
-                let syntheticHeader = THangNhap_ByCus(
-                    colGroupCode: first.colGroupCode,
-                    colGroupName: first.colGroupName,
-                    colCode: first.colGroupCode,
-                    colName: groupTitle,
-                    colValue: sumValue,
-                    colDataType: 1
-                )
-                result.append(syntheticHeader)
-            }
-            
-            result.append(contentsOf: children)
-        }
-        
-        return result
-    }
-}
-

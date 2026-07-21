@@ -147,13 +147,13 @@ struct TruyVanNhapView: View {
                             if item.colDataType == 0 {
                                 return AnyView(
                                     HStack(spacing: 0) {
-                                        Text(item.colCode ?? "")
+                                        Text(String(item.colOrder))
                                             .padding(5)
                                             .frame(width: width * 0.1, alignment: .center)
                                             .frame(maxHeight: .infinity)
                                             .border(Color.vtsBorder, width: 0.5)
                                         
-                                        Text(item.colName ?? "")
+                                        Text(item.colName)
                                             .padding(5)
                                             .frame(width: width * 0.6, alignment: .leading)
                                             .frame(maxHeight: .infinity)
@@ -169,26 +169,12 @@ struct TruyVanNhapView: View {
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 )
                             } else if item.colDataType == 1 {
-                                let nameText = (item.colName?.isEmpty == false ? item.colName : item.colGroupName)?.trimmingCharacters(in: .whitespacesAndNewlines)
-                                let groupTitle = (nameText?.isEmpty == false) ? nameText! : "Chưa phân nhóm"
                                 return AnyView(
-                                    HStack(spacing: 0) {
-                                        Text(groupTitle)
-                                            .font(.caption.bold())
-                                            .padding(5)
-                                            .frame(width: width * 0.7, alignment: .leading)
-                                            .frame(maxHeight: .infinity)
-                                            .border(Color.vtsBorder, width: 0.5)
-                                        
-                                        Text(item.colValue.toFormattedString(maxDecimals: 0))
-                                            .font(.caption.bold())
-                                            .padding(5)
-                                            .frame(width: width * 0.3, alignment: .trailing)
-                                            .frame(maxHeight: .infinity)
-                                            .border(Color.vtsBorder, width: 0.5)
-                                    }
-                                    .background(Color.green.opacity(0.25))
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    Text(item.colName)
+                                        .padding(5)
+                                        .frame(width: width * 1, alignment: .center)
+                                        .background(Color.green.opacity(0.5))
+                                        .border(Color.vtsBorder, width: 0.5)
                                 )
                             }
                             return nil
