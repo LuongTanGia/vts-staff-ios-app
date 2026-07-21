@@ -404,21 +404,26 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
     let xeNgoai: Bool
     let soXe: String?
     let taiXe: String?
-    let khachHang, tenKhachHang: String?
-    let hangHoa, tenHangHoa: String
+    let khachHang: String?
+    let tenKhachHang: String?
+    let hangHoa: String
+    let tenHangHoa: String
     let dvt: String?
-    let trongLuongXe, trongLuongHang: Int
-    let hangHoaGC, tenHangHoaGC: String?
+    let trongLuongXe: Double
+    let trongLuongHang: Double
+    let hangHoaGC: String?
+    let tenHangHoaGC: String?
     let dvtgc: String?
-    let trongLuongHangGC: Int
-    let hangHoaTV, tenHangHoaTV: String?
+    let trongLuongHangGC: Double
+    let hangHoaTV: String?
+    let tenHangHoaTV: String?
     let dvttv: String?
-    let trongLuongHangTV: Int
+    let trongLuongHangTV: Double
     let ghiChu: String?
     let trangThai: String?
     let tenTrangThai: String?
     
-    var id: String { "\(String(describing: taiXe))-\(String(describing: soPhieu))-\(String(describing: tenTrangThai))" }
+    var id: String { "\(taiXe ?? "")-\(soPhieu)-\(tenTrangThai ?? "")" }
     
     enum CodingKeys: String, CodingKey {
         case soPhieu = "SoPhieu"
@@ -447,9 +452,116 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
         case tenTrangThai = "TenTrangThai"
     }
     
+    init(
+        soPhieu: String = "",
+        soPhieuInt: Int = 0,
+        ngay: String = "",
+        xeNgoai: Bool = false,
+        soXe: String? = nil,
+        taiXe: String? = nil,
+        khachHang: String? = nil,
+        tenKhachHang: String? = nil,
+        hangHoa: String = "",
+        tenHangHoa: String = "",
+        dvt: String? = nil,
+        trongLuongXe: Double = 0,
+        trongLuongHang: Double = 0,
+        hangHoaGC: String? = nil,
+        tenHangHoaGC: String? = nil,
+        dvtgc: String? = nil,
+        trongLuongHangGC: Double = 0,
+        hangHoaTV: String? = nil,
+        tenHangHoaTV: String? = nil,
+        dvttv: String? = nil,
+        trongLuongHangTV: Double = 0,
+        ghiChu: String? = nil,
+        trangThai: String? = nil,
+        tenTrangThai: String? = nil
+    ) {
+        self.soPhieu = soPhieu
+        self.soPhieuInt = soPhieuInt
+        self.ngay = ngay
+        self.xeNgoai = xeNgoai
+        self.soXe = soXe
+        self.taiXe = taiXe
+        self.khachHang = khachHang
+        self.tenKhachHang = tenKhachHang
+        self.hangHoa = hangHoa
+        self.tenHangHoa = tenHangHoa
+        self.dvt = dvt
+        self.trongLuongXe = trongLuongXe
+        self.trongLuongHang = trongLuongHang
+        self.hangHoaGC = hangHoaGC
+        self.tenHangHoaGC = tenHangHoaGC
+        self.dvtgc = dvtgc
+        self.trongLuongHangGC = trongLuongHangGC
+        self.hangHoaTV = hangHoaTV
+        self.tenHangHoaTV = tenHangHoaTV
+        self.dvttv = dvttv
+        self.trongLuongHangTV = trongLuongHangTV
+        self.ghiChu = ghiChu
+        self.trangThai = trangThai
+        self.tenTrangThai = tenTrangThai
+    }
     
-    
-    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.soPhieu = (try? container.decodeIfPresent(String.self, forKey: .soPhieu)) ?? ""
+        self.soPhieuInt = (try? container.decodeIfPresent(Int.self, forKey: .soPhieuInt)) ?? 0
+        self.ngay = (try? container.decodeIfPresent(String.self, forKey: .ngay)) ?? ""
+        self.xeNgoai = (try? container.decodeIfPresent(Bool.self, forKey: .xeNgoai)) ?? false
+        self.soXe = try? container.decodeIfPresent(String.self, forKey: .soXe)
+        self.taiXe = try? container.decodeIfPresent(String.self, forKey: .taiXe)
+        self.khachHang = try? container.decodeIfPresent(String.self, forKey: .khachHang)
+        self.tenKhachHang = try? container.decodeIfPresent(String.self, forKey: .tenKhachHang)
+        self.hangHoa = (try? container.decodeIfPresent(String.self, forKey: .hangHoa)) ?? ""
+        self.tenHangHoa = (try? container.decodeIfPresent(String.self, forKey: .tenHangHoa)) ?? ""
+        self.dvt = try? container.decodeIfPresent(String.self, forKey: .dvt)
+        
+        if let dXe = try? container.decodeIfPresent(Double.self, forKey: .trongLuongXe) {
+            self.trongLuongXe = dXe
+        } else if let iXe = try? container.decodeIfPresent(Int.self, forKey: .trongLuongXe) {
+            self.trongLuongXe = Double(iXe)
+        } else {
+            self.trongLuongXe = 0
+        }
+        
+        if let dHang = try? container.decodeIfPresent(Double.self, forKey: .trongLuongHang) {
+            self.trongLuongHang = dHang
+        } else if let iHang = try? container.decodeIfPresent(Int.self, forKey: .trongLuongHang) {
+            self.trongLuongHang = Double(iHang)
+        } else {
+            self.trongLuongHang = 0
+        }
+        
+        self.hangHoaGC = try? container.decodeIfPresent(String.self, forKey: .hangHoaGC)
+        self.tenHangHoaGC = try? container.decodeIfPresent(String.self, forKey: .tenHangHoaGC)
+        self.dvtgc = try? container.decodeIfPresent(String.self, forKey: .dvtgc)
+        
+        if let dGC = try? container.decodeIfPresent(Double.self, forKey: .trongLuongHangGC) {
+            self.trongLuongHangGC = dGC
+        } else if let iGC = try? container.decodeIfPresent(Int.self, forKey: .trongLuongHangGC) {
+            self.trongLuongHangGC = Double(iGC)
+        } else {
+            self.trongLuongHangGC = 0
+        }
+        
+        self.hangHoaTV = try? container.decodeIfPresent(String.self, forKey: .hangHoaTV)
+        self.tenHangHoaTV = try? container.decodeIfPresent(String.self, forKey: .tenHangHoaTV)
+        self.dvttv = try? container.decodeIfPresent(String.self, forKey: .dvttv)
+        
+        if let dTV = try? container.decodeIfPresent(Double.self, forKey: .trongLuongHangTV) {
+            self.trongLuongHangTV = dTV
+        } else if let iTV = try? container.decodeIfPresent(Int.self, forKey: .trongLuongHangTV) {
+            self.trongLuongHangTV = Double(iTV)
+        } else {
+            self.trongLuongHangTV = 0
+        }
+        
+        self.ghiChu = try? container.decodeIfPresent(String.self, forKey: .ghiChu)
+        self.trangThai = try? container.decodeIfPresent(String.self, forKey: .trangThai)
+        self.tenTrangThai = try? container.decodeIfPresent(String.self, forKey: .tenTrangThai)
+    }
 }
 
 typealias TPhieuvc_Nhap_DanhSach = TPhieuvc_Giacong_DanhSach

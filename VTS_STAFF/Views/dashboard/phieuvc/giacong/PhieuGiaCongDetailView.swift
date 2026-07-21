@@ -253,9 +253,9 @@ struct PhieuGiaCongDetailView: View {
                 infoRow(label: "Số phiếu", value: d.soPhieu, icon: "number")
                 infoRow(label: "Ngày lập phiếu", value: d.ngay.toUIDateString, icon: "calendar")
                 infoRow(label: "Xe ngoài", value: d.xeNgoai ? "Có" : "Không", icon: "car.2.fill")
-                infoRow(label: "Số xe", value: d.soXe, icon: "car.fill")
-                infoRow(label: "Tài xế", value: d.taiXe, icon: "person.fill")
-                infoRow(label: "Khách hàng", value: d.tenKhachHang.isEmpty ? d.khachHang : d.tenKhachHang, icon: "building.2.fill")
+                infoRow(label: "Số xe", value: d.soXe ?? "", icon: "car.fill")
+                infoRow(label: "Tài xế", value: d.taiXe ?? "", icon: "person.fill")
+                infoRow(label: "Khách hàng", value: (((d.tenKhachHang?.isEmpty) != nil) ? d.khachHang : d.tenKhachHang) ?? "", icon: "building.2.fill")
                 infoRow(label: "Hàng hoá", value: d.tenHangHoa.isEmpty ? d.hangHoa : d.tenHangHoa, icon: "shippingbox.fill")
                 infoRow(label: "Trọng lượng xe", value: "\(d.trongLuongXe) kg", icon: "scalemass.fill")
                 infoRow(label: "Trọng lượng hàng", value: "\(d.trongLuongHang) kg", icon: "scalemass")
@@ -267,7 +267,7 @@ struct PhieuGiaCongDetailView: View {
                     infoRow(label: "Trọng lượng hàng thu hồi", value: "\(d.trongLuongHangTV) kg", icon: "scalemass")
                 }
                 
-                infoRow(label: "Trạng thái", value: d.tenTrangThai, icon: "info.circle.fill")
+                infoRow(label: "Trạng thái", value: d.tenTrangThai ?? "", icon: "info.circle.fill")
                 infoRow(label: "Ghi chú", value: d.ghiChu ?? "", icon: "note.text")
             } else {
                 VTSLiquidDateTimeField(label: "Ngày lập phiếu", date: $ngay, displayStyle: .dateTime)

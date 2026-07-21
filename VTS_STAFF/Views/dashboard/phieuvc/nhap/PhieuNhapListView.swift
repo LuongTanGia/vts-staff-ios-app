@@ -92,7 +92,7 @@ struct PhieuNhapListView: View {
                         }
                         
                         // Bottom Statistics Footer
-                        let totalWeight = filtered.reduce(0.0) { $0 + $1.trongLuongHang }
+                        let totalWeight = filtered.reduce(0.0) { $0 + Double($1.trongLuongHang) ?? 0.0 }
                         HStack(spacing: 0) {
                             Text("Tổng cộng \(filtered.count) phiếu")
                                 .font(.system(size: 15, weight: .bold))
@@ -199,7 +199,7 @@ struct PhieuNhapCardView: View {
                     Text("Số xe:")
                         .font(.vtsCallout)
                         .foregroundColor(.vtsTxtSecondary)
-                    Text(item.soXe)
+                    Text(item.soXe ?? "")
                         .font(.system(size: 15, weight: .bold, design: .rounded))
                         .foregroundColor(.vtsPrimary)
                 }
@@ -210,7 +210,7 @@ struct PhieuNhapCardView: View {
                 Text("Tài xế:")
                     .font(.vtsCallout)
                     .foregroundColor(.vtsTxtSecondary)
-                Text(item.taiXe)
+                Text(item.taiXe ?? "")
                     .font(.system(size: 15, weight: .medium, design: .rounded))
                     .foregroundColor(.vtsPrimary)
                 Spacer()
@@ -242,7 +242,7 @@ struct PhieuNhapCardView: View {
                 Text("Khách hàng:")
                     .font(.vtsCallout)
                     .foregroundColor(.vtsTxtSecondary)
-                Text(item.tenKhachHang)
+                Text(item.tenKhachHang ?? "")
                     .font(.system(size: 15, weight: .medium, design: .rounded))
                     .foregroundColor(.vtsPrimary)
                     .multilineTextAlignment(.leading)
