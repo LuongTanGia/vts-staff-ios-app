@@ -132,9 +132,9 @@ struct NhanVienListView: View {
                         }
                     }
                 }
+                
+                VTSCompanyFooter()
             }
-            
-            
         }
         
         .task {

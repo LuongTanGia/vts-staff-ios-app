@@ -73,6 +73,8 @@ struct NhanVienDetailView: View {
                         .padding(.horizontal, VTSSpacing.sm)
                         .padding(.vertical, 16)
                     }
+                    
+                    VTSCompanyFooter()
                 }
                 .onAppear {
                     populateFields(with: details)

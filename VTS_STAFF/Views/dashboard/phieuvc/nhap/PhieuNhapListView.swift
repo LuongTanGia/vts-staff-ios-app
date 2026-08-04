@@ -92,7 +92,7 @@ struct PhieuNhapListView: View {
                         }
                         
                         // Bottom Statistics Footer
-                        let totalWeight = filtered.reduce(0.0) { $0 + Double($1.trongLuongHang) ?? 0.0 }
+                        let totalWeight = filtered.reduce(0.0) { $0 + Double($1.trongLuongHang) }
                         HStack(spacing: 0) {
                             Text("Tổng cộng \(filtered.count) phiếu")
                                 .font(.system(size: 15, weight: .bold))
@@ -108,6 +108,8 @@ struct PhieuNhapListView: View {
                         .background(Color.vtsPrimary)
                     }
                 }
+                
+                VTSCompanyFooter()
             }
         }
         .task {
@@ -137,9 +139,9 @@ struct PhieuNhapListView: View {
                     
                     if AuthManager.shared.getPermission(for: "VTSSTAFF_DULIEU_PHIEUNHAP")?.add == true {
                         Button {
-//                            router.showScreen(.push) { _ in
-//                                PhieuNhapDetailView(soPhieu: nil, isEditMode: true)
-//                            }
+                            router.showScreen(.push) { _ in
+                                PhieuNhapDetailView(soPhieu: nil, isEditMode: true)
+                            }
                         } label: {
                             Image(systemName: "plus")
                                 .font(.title3)

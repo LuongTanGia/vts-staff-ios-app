@@ -15,7 +15,7 @@ import SwiftUI
 
 public extension Color {
     // Brand
-    public static let vtsPrimary     = Color(hex: "003258")  // Deep navy (md_theme_primary)
+    public static let vtsPrimary     = Color(hex: "00497C")  // Deep navy (md_theme_primary)
     public static let vtsSecondary   = Color(hex: "565C67")  // Slate gray (md_theme_secondary)
     public static let vtsAccent      = Color(hex: "00497C")  // Primary container (md_theme_primaryContainer)
     

@@ -133,12 +133,11 @@ struct XeListView: View {
                                 rowHeight: 40,
                                 disableVerticalScrolling: false
                             )
-                            
                         }
-                        
-                        
                     }
                 }
+                
+                VTSCompanyFooter()
             }
         }
         .task {

@@ -136,6 +136,8 @@ struct HangHoaListView: View {
                         }
                     }
                 }
+                
+                VTSCompanyFooter()
             }
         }
         .task {

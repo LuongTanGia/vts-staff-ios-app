@@ -367,38 +367,32 @@ struct VTSCompanyFooter: View {
     }
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .center, spacing: 10) {
             // Logo placeholder (thay bằng Image("vts_logo") nếu có asset)
-            ZStack {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(Color.vtsPrimary)
-                    .frame(width: 44, height: 44)
-                Text("VTS")
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-            }
+            
+            Image("logoFooter")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 100)
+                .padding(.horizontal, 15)
+                .padding(.vertical, 5)
+                .background(Color.vtsBg)
+            
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(companyName)
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.white)
                 Text(address)
                     .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.8))
                     .lineLimit(2)
             }
             
             Spacer()
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .background(.regularMaterial)
-        .overlay(
-            Rectangle()
-                .fill(Color.primary.opacity(0.08))
-                .frame(height: 1),
-            alignment: .top
-        )
+        .background(Color.vtsPrimary)
+        .frame(height: 0)
     }
 }
 
@@ -435,8 +429,8 @@ struct VTSCompanyFooter: View {
         }
         .preferredColorScheme(.dark)
         
-        // FAB
-        VTSLiquidFAB { }
-            .padding(24)
+//        // FAB
+//        VTSLiquidFAB { }
+//            .padding(24)
     }
 }

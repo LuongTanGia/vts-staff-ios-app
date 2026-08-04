@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftfulRouting
+import PhotosUI
 
 struct PhieuXuatDetailView: View {
     @Environment(\.router) private var router
@@ -17,16 +18,26 @@ struct PhieuXuatDetailView: View {
     
     // Form fields State
     @State private var ngay: Date = Date()
-    @State private var soThamChieu: String = ""
     @State private var xeNgoai: Bool = false
-    @State private var soXe: String = ""
+    @State private var soXeNgoai: String = ""
+    @State private var soXeNha: String = ""
     @State private var taiXe: String = ""
     @State private var khachHang: String = ""
     @State private var hangHoa: String = ""
-    @State private var trongLuongXe: String = ""
     @State private var trongLuongHang: String = ""
+    @State private var thoiGianCanHang: Date = Date()
     @State private var ghiChu: String = ""
     @State private var trangThai: String = "HT"
+    
+    // Image states
+    @State private var hinh01: UIImage? = nil
+    @State private var hinh02: UIImage? = nil
+    @State private var showingImagePickerForSlot: Int? = nil // 1 or 2
+    @State private var photoPickerItem: PhotosPickerItem? = nil
+    @State private var showingCameraForSlot: Int? = nil // 1 or 2
+    @State private var showingFullscreenImage: UIImage? = nil
+    @State private var showingActionSheetForSlot: Int? = nil // 1 or 2
+    
     @State private var isSaving: Bool = false
     
     // Errors state
@@ -34,7 +45,6 @@ struct PhieuXuatDetailView: View {
     @State private var taiXeError: String? = nil
     @State private var hangHoaError: String? = nil
     @State private var khachHangError: String? = nil
-    @State private var trongLuongXeError: String? = nil
     @State private var trongLuongHangError: String? = nil
     
     private var hasEditPermission: Bool {
@@ -69,16 +79,9 @@ struct PhieuXuatDetailView: View {
                 }
             ) { details in
                 VStack(spacing: 0) {
-                    // Pinned Header Card
-                    profileHeaderCard(details: details)
-                        .background(Color.vtsPrimary)
-                    
-                    // Scrollable Form details
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 16) {
                             formFieldsCard(details: details)
-                            
-
                             
                             if !viewModel.isNew && isEditMode && hasDeletePermission {
                                 Button(role: .destructive) {
@@ -111,6 +114,8 @@ struct PhieuXuatDetailView: View {
                         .padding(.horizontal, VTSSpacing.sm)
                         .padding(.vertical, 16)
                     }
+                    
+                    VTSCompanyFooter()
                 }
                 .onAppear {
                     if let details = details {
@@ -129,8 +134,8 @@ struct PhieuXuatDetailView: View {
         }
         .customToolbar(
             isPrimaryActionVisible: false,
-            title: "",
-            subtitle: viewModel.isNew ? "Thêm phiếu xuất" : (isEditMode ? "Chỉnh sửa phiếu xuất" : "Thông tin phiếu xuất"),
+            title: "VTS-Staff",
+            subtitle: "Thông tin chuyến hàng giao",
             isWhiteText: true,
             leading: {},
             trailing: {
@@ -165,14 +170,14 @@ struct PhieuXuatDetailView: View {
                             HStack(spacing: 6) {
                                 if isSaving {
                                     ProgressView()
-                                        .tint(.primary)
+                                        .tint(.white)
                                 } else {
                                     Image(systemName: "checkmark")
                                     Text("Lưu")
                                         .font(.vtsHeadline)
                                 }
                             }
-                            .foregroundColor(.primary)
+                            .foregroundColor(.white)
                         }
                         .disabled(isSaving)
                     }
@@ -188,7 +193,7 @@ struct PhieuXuatDetailView: View {
                                 Text("Sửa")
                                     .font(.vtsHeadline)
                             }
-                            .foregroundColor(.primary)
+                            .foregroundColor(.white)
                         }
                     }
                 }
@@ -198,241 +203,330 @@ struct PhieuXuatDetailView: View {
             }
         )
         .toolbar(.hidden, for: .tabBar)
-    }
-    
-    @ViewBuilder
-    private func profileHeaderCard(details: TPhieuvc_Xuat_DanhSach?) -> some View {
-        VStack {
-            HStack(spacing: 16) {
-                ZStack {
-                    Circle()
-                        .fill(Color.white.opacity(0.15))
-                        .frame(width: 54, height: 54)
-                    Image(systemName: "doc.text.fill")
-                        .font(.system(size: 22))
-                        .foregroundColor(.white)
-                }
-                .overlay(
-                    Circle()
-                        .stroke(Color.white.opacity(0.35), lineWidth: 1.5)
-                )
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(viewModel.isNew ? "Phiếu xuất mới" : "Số: \(details?.soPhieu ?? "")")
-                        .font(.title3.bold())
-                        .foregroundColor(.white)
-                    
-                    HStack(spacing: 8) {
-                        Text(viewModel.isNew ? "Trạng thái: Mới" : "Trạng thái: \(details?.tenTrangThai ?? "")")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.white.opacity(0.8))
-                        
-                        Circle()
-                            .fill(Color.green)
-                            .frame(width: 6, height: 6)
+        .photosPicker(isPresented: Binding(
+            get: { showingImagePickerForSlot != nil },
+            set: { if !$0 { showingImagePickerForSlot = nil } }
+        ), selection: $photoPickerItem, matching: .images)
+        .onChange(of: photoPickerItem) { item in
+            Task {
+                if let data = try? await item?.loadTransferable(type: Data.self),
+                   let img = UIImage(data: data) {
+                    await MainActor.run {
+                        if showingImagePickerForSlot == 1 {
+                            hinh01 = img
+                        } else if showingImagePickerForSlot == 2 {
+                            hinh02 = img
+                        }
+                        showingImagePickerForSlot = nil
+                        photoPickerItem = nil
                     }
                 }
-                Spacer()
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 16)
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { showingCameraForSlot != nil },
+            set: { if !$0 { showingCameraForSlot = nil } }
+        )) {
+            let slot = showingCameraForSlot
+            CameraView { capturedImg in
+                if slot == 1 {
+                    hinh01 = capturedImg
+                } else if slot == 2 {
+                    hinh02 = capturedImg
+                }
+                showingCameraForSlot = nil
+            }
+            .ignoresSafeArea()
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { showingFullscreenImage != nil },
+            set: { if !$0 { showingFullscreenImage = nil } }
+        )) {
+            if let img = showingFullscreenImage {
+                ZStack(alignment: .topTrailing) {
+                    Color.black.ignoresSafeArea()
+                    Image(uiImage: img)
+                        .resizable()
+                        .scaledToFit()
+                    Button {
+                        showingFullscreenImage = nil
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 32))
+                            .foregroundColor(.white)
+                            .padding()
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: Binding(
+            get: { showingActionSheetForSlot != nil },
+            set: { if !$0 { showingActionSheetForSlot = nil } }
+        )) {
+            let slot = showingActionSheetForSlot
+            VTSPhotoSourceSheet(
+                onCamera: {
+                    showingActionSheetForSlot = nil
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showingCameraForSlot = slot
+                    }
+                },
+                onLibrary: {
+                    showingActionSheetForSlot = nil
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showingImagePickerForSlot = slot
+                    }
+                },
+                onCancel: {
+                    showingActionSheetForSlot = nil
+                }
+            )
         }
     }
     
     @ViewBuilder
     private func formFieldsCard(details: TPhieuvc_Xuat_DanhSach?) -> some View {
         VTSLiquidFormCard {
-            if !isEditMode, let d = details {
-                infoRow(label: "Số phiếu", value: d.soPhieu, icon: "number")
-                infoRow(label: "Ngày lập phiếu", value: d.ngay.toUIDateString, icon: "calendar")
-                infoRow(label: "Xe ngoài", value: d.xeNgoai ? "Có" : "Không", icon: "car.2.fill")
-                infoRow(label: "Số xe", value: d.soXe ?? "", icon: "car.fill")
-                infoRow(label: "Tài xế", value: d.taiXe ?? "", icon: "person.fill")
-                infoRow(label: "Khách hàng", value: (((d.tenKhachHang?.isEmpty) != nil) ? d.khachHang : d.tenKhachHang) ?? "", icon: "building.2.fill")
-                infoRow(label: "Hàng hoá", value: d.tenHangHoa.isEmpty ? d.hangHoa : d.tenHangHoa, icon: "shippingbox.fill")
-                infoRow(label: "Trọng lượng xe", value: "\(Int(d.trongLuongXe)) kg", icon: "scalemass.fill")
-                infoRow(label: "Trọng lượng hàng", value: "\(Int(d.trongLuongHang)) kg", icon: "scalemass")
-                infoRow(label: "Trạng thái", value: d.tenTrangThai ?? "", icon: "info.circle.fill")
-                infoRow(label: "Ghi chú", value: d.ghiChu ?? "", icon: "note.text")
-            } else {
-                VTSLiquidDateTimeField(label: "Ngày lập phiếu", date: $ngay, displayStyle: .dateTime)
+            // Row 1: Số phiếu & Ngày
+            HStack(spacing: 12) {
+                VTSLiquidReadonlyField(viewModel.soPhieu ?? "", caption: "Số phiếu")
                 
-                Toggle(isOn: $xeNgoai) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "car.2.fill")
-                            .foregroundColor(.vtsPrimary)
-                        Text("Xe ngoài")
-                            .font(.system(size: 15, weight: .medium))
+                VTSLiquidDateTimeField(label: "Ngày", date: $ngay, displayStyle: .dateOnly)
+            }
+            
+            // Row 2: Số xe ngoài & Số xe nhà
+            HStack(spacing: 12) {
+                VTSLiquidTextField(
+                    label: "Số xe ngoài",
+                    text: $soXeNgoai,
+                    isReadOnly: !isEditMode
+                )
+                .onChange(of: soXeNgoai) { _, newValue in
+                    if !newValue.isEmpty {
+                        xeNgoai = true
+                        soXeNha = ""
+                        soXeError = nil
                     }
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
                 
-                if xeNgoai {
-                    VTSLiquidTextField(label: "Số xe", text: $soXe, placeholder: "Nhập số xe...", errorMessage: soXeError)
-                    VTSLiquidTextField(label: "Tài xế", text: $taiXe, placeholder: "Nhập tên tài xế...", errorMessage: taiXeError)
-                } else {
-                    VTSLiquidPickerField(
-                        label: "Số xe",
-                        selection: $soXe,
-                        options: viewModel.xeOptions.map { $0.ma },
-                        displayName: { code in
-                            viewModel.xeOptions.first(where: { $0.ma == code })?.ten ?? code
-                        },
-                        displaySubtitle: { code in
-                            if let xe = viewModel.xeOptions.first(where: { $0.ma == code }) {
-                                return "Tài xế: \(xe.tenTaiXe)"
-                            }
-                            return ""
-                        },
-                        errorMessage: soXeError
-                    )
-                    .onChange(of: soXe) { _, newSoXe in
+                VTSLiquidPickerField(
+                    label: "Số xe nhà",
+                    selection: $soXeNha,
+                    options: viewModel.xeOptions.map { $0.ma },
+                    displayName: { code in
+                        viewModel.xeOptions.first(where: { $0.ma == code })?.ten ?? code
+                    },
+                    displaySubtitle: { code in
+                        if let xe = viewModel.xeOptions.first(where: { $0.ma == code }) {
+                            return "Tài xế: \(xe.tenTaiXe)"
+                        }
+                        return ""
+                    },
+                    errorMessage: soXeError
+                )
+                .onChange(of: soXeNha) { _, newSoXe in
+                    if !newSoXe.isEmpty {
+                        xeNgoai = false
+                        soXeNgoai = ""
+                        soXeError = nil
                         if let foundXe = viewModel.xeOptions.first(where: { $0.ma == newSoXe }) {
                             taiXe = foundXe.tenTaiXe
                         }
                     }
-                    
-                    VTSLiquidPickerField(
-                        label: "Tài xế",
-                        selection: $taiXe,
-                        options: viewModel.taiXeOptions.map { $0.ten },
-                        displayName: { $0 },
-                        errorMessage: taiXeError
-                    )
                 }
-                
-                VTSLiquidPickerField(
-                    label: "Khách hàng",
-                    selection: $khachHang,
-                    options: viewModel.khachHangOptions.map { $0.ma },
-                    displayName: { code in
-                        viewModel.khachHangOptions.first(where: { $0.ma == code })?.ten ?? code
-                    },
-                    errorMessage: khachHangError
-                )
-                
-                VTSLiquidPickerField(
-                    label: "Hàng hoá",
-                    selection: $hangHoa,
-                    options: viewModel.hangHoaOptions.map { $0.ma },
-                    displayName: { code in
-                        viewModel.hangHoaOptions.first(where: { $0.ma == code })?.ten ?? code
-                    },
-                    errorMessage: hangHoaError
-                )
-                
-                HStack(spacing: 12) {
-                    VTSLiquidTextField(label: "Trọng lượng xe (kg)", text: $trongLuongXe, keyboardType: .numberPad, errorMessage: trongLuongXeError)
-                    VTSLiquidTextField(label: "Trọng lượng hàng (kg)", text: $trongLuongHang, keyboardType: .numberPad, errorMessage: trongLuongHangError)
-                }
-                
-                VTSLiquidPickerField(
-                    label: "Trạng thái",
-                    selection: $trangThai,
-                    options: viewModel.statusOptions.map { $0.ma },
-                    displayName: { code in
-                        viewModel.statusOptions.first(where: { $0.ma == code })?.ten ?? code
-                    }
-                )
-                
-                VTSLiquidTextField(label: "Ghi chú", text: $ghiChu, placeholder: "Nhập ghi chú...")
+                .disabled(!isEditMode)
             }
+            
+            // Row 3: Tài xế
+            VTSLiquidTextField(
+                label: "Tài xế",
+                text: $taiXe,
+                isReadOnly: !isEditMode,
+                errorMessage: taiXeError
+            )
+            
+            // Row 4: Khách hàng
+            VTSLiquidPickerField(
+                label: "Khách hàng",
+                selection: $khachHang,
+                options: viewModel.khachHangOptions.map { $0.ma },
+                displayName: { code in
+                    viewModel.khachHangOptions.first(where: { $0.ma == code })?.ten ?? code
+                },
+                errorMessage: khachHangError
+            )
+            .disabled(!isEditMode)
+            
+            // Row 5: Hàng giao
+            VTSLiquidPickerField(
+                label: "Hàng giao",
+                selection: $hangHoa,
+                options: viewModel.hangHoaOptions.map { $0.ma },
+                displayName: { code in
+                    viewModel.hangHoaOptions.first(where: { $0.ma == code })?.ten ?? code
+                },
+                errorMessage: hangHoaError
+            )
+            .disabled(!isEditMode)
+            
+            // Row 6: Số/Trọng lượng
+            VTSLiquidTextField(
+                label: "Số/Trọng lượng",
+                text: $trongLuongHang,
+                keyboardType: .numberPad,
+                isReadOnly: !isEditMode,
+                errorMessage: trongLuongHangError
+            )
+            
+            // Row 7: Thời gian cân hàng
+            VTSLiquidDateTimeField(
+                label: "Thời gian cân hàng",
+                date: $thoiGianCanHang,
+                displayStyle: .dateTime
+            )
+            .disabled(!isEditMode)
+            
+            // Row 8: 2 ô ảnh
+            HStack(spacing: 12) {
+                photoBox(
+                    slotIndex: 1,
+                    iconName: "camera.badge.plus",
+                    image: $hinh01
+                )
+                
+                photoBox(
+                    slotIndex: 2,
+                    iconName: "photo.badge.arrow.up",
+                    image: $hinh02
+                )
+            }
+            
+            // Row 9: Ghi chú
+            VTSLiquidTextField(
+                label: "Ghi chú",
+                text: $ghiChu,
+                placeholder: "Nhập ghi chú...",
+                isReadOnly: !isEditMode
+            )
         }
     }
     
     @ViewBuilder
-    private func infoRow(label: String, value: String, icon: String) -> some View {
-        Button {
-            if !value.isEmpty {
-                UIPasteboard.general.string = value
-                ErrorManager.shared.showSuccess("Đã sao chép \(label.lowercased())")
-            }
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: icon)
-                    .foregroundColor(Color.vtsPrimary)
-                    .frame(width: 28, height: 28)
-                    .background(Color.vtsPrimary.opacity(0.1))
-                    .clipShape(Circle())
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(label)
-                        .font(.vtsCaption)
-                        .foregroundColor(.vtsTxtSecondary)
-                    Text(value.isEmpty ? "—" : value)
-                        .font(.vtsBody.bold())
-                        .foregroundColor(value.isEmpty ? .vtsTxtTertiary : .vtsTxtPrimary)
-                        .multilineTextAlignment(.leading)
+    private func photoBox(slotIndex: Int, iconName: String, image: Binding<UIImage?>) -> some View {
+        ZStack {
+            if let img = image.wrappedValue {
+                ZStack(alignment: .bottomTrailing) {
+                    Image(uiImage: img)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 130)
+                        .frame(maxWidth: .infinity)
+                        .clipped()
+                        .cornerRadius(12)
+                    
+                    if isEditMode {
+                        HStack(spacing: 6) {
+                            Button {
+                                showingFullscreenImage = img
+                            } label: {
+                                Image(systemName: "eye.fill")
+                                    .font(.system(size: 13, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .padding(8)
+                                    .background(Color.black.opacity(0.6))
+                                    .clipShape(Circle())
+                            }
+                            
+                            Button {
+                                image.wrappedValue = nil
+                            } label: {
+                                Image(systemName: "trash.fill")
+                                    .font(.system(size: 13, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .padding(8)
+                                    .background(Color.red.opacity(0.8))
+                                    .clipShape(Circle())
+                            }
+                        }
+                        .padding(6)
+                    }
                 }
-                Spacer()
-                if !value.isEmpty {
-                    Image(systemName: "doc.on.doc")
-                        .font(.system(size: 11))
-                        .foregroundColor(.vtsTxtTertiary)
+            } else {
+                Button {
+                    if isEditMode {
+                        showingActionSheetForSlot = slotIndex
+                    }
+                } label: {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(uiColor: .systemGray4))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.primary.opacity(0.15), lineWidth: 1)
+                            )
+                        
+                        Image(systemName: iconName)
+                            .font(.system(size: 52, weight: .medium))
+                            .foregroundColor(.black)
+                    }
+                    .frame(height: 130)
+                    .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(.plain)
+                .disabled(!isEditMode)
             }
-            .padding(.vertical, 6)
         }
-        .buttonStyle(.plain)
     }
     
     private func populateFields(with details: TPhieuvc_Xuat_DanhSach) {
         ngay = Date.fromAPIString(details.ngay) ?? Date()
         xeNgoai = details.xeNgoai
-        soXe = details.soXe ?? ""
+        if details.xeNgoai {
+            soXeNgoai = details.soXe ?? ""
+            soXeNha = ""
+        } else {
+            soXeNha = details.soXe ?? ""
+            soXeNgoai = ""
+        }
         taiXe = details.taiXe ?? ""
         khachHang = details.khachHang ?? ""
         hangHoa = details.hangHoa
-        trongLuongXe = String(Int(details.trongLuongXe))
-        trongLuongHang = String(Int(details.trongLuongHang))
+        if details.trongLuongHang > 0 {
+            trongLuongHang = String(Int(details.trongLuongHang))
+        } else {
+            trongLuongHang = ""
+        }
         ghiChu = details.ghiChu ?? ""
-        trangThai = details.trangThai ?? ""
+        trangThai = details.trangThai ?? "HT"
     }
     
     private func validateForm() -> Bool {
         var isValid = true
         
-        if soXe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            soXeError = "Vui lòng nhập hoặc chọn số xe"
+        let currentSoXe = xeNgoai ? soXeNgoai : soXeNha
+        if currentSoXe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            soXeError = "Không được để trống."
             isValid = false
         } else {
             soXeError = nil
         }
         
-        if taiXe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            taiXeError = "Vui lòng nhập hoặc chọn tài xế"
-            isValid = false
-        } else {
-            taiXeError = nil
-        }
-        
-        if khachHang.isEmpty {
-            khachHangError = "Vui lòng chọn khách hàng"
+        if khachHang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            khachHangError = "Không được để trống."
             isValid = false
         } else {
             khachHangError = nil
         }
         
-        if hangHoa.isEmpty {
-            hangHoaError = "Vui lòng chọn hàng hoá"
+        if hangHoa.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            hangHoaError = "Không được để trống."
             isValid = false
         } else {
             hangHoaError = nil
         }
         
-        if trongLuongXe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            trongLuongXeError = "Nhập trọng lượng xe"
-            isValid = false
-        } else if Double(trongLuongXe) == nil {
-            trongLuongXeError = "Số không hợp lệ"
-            isValid = false
-        } else {
-            trongLuongXeError = nil
-        }
-        
         if trongLuongHang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            trongLuongHangError = "Nhập trọng lượng hàng"
+            trongLuongHangError = "Không được để trống."
             isValid = false
         } else if Double(trongLuongHang) == nil {
             trongLuongHangError = "Số không hợp lệ"
@@ -455,21 +549,29 @@ struct PhieuXuatDetailView: View {
         isSaving = true
         defer { isSaving = false }
         
+        let hinh01Base64 = hinh01?.jpegData(compressionQuality: 0.7)?.base64EncodedString()
+        let hinh02Base64 = hinh02?.jpegData(compressionQuality: 0.7)?.base64EncodedString()
+        let currentSoXe = xeNgoai ? soXeNgoai : soXeNha
+        
         do {
             if viewModel.isNew {
                 let data = Params_ThemPhieu_Xuat(
                     ngay: ngay,
                     soThamChieu: nil,
                     xeNgoai: xeNgoai,
-                    soXe: soXe,
+                    soXe: currentSoXe,
                     nhanVien: nil,
                     taiXe: taiXe,
                     khachHang: khachHang,
                     hangHoa: hangHoa,
-                    trongLuongXe: Double(trongLuongXe) ?? 0,
+                    trongLuongXe: 0,
                     trongLuongHang: Double(trongLuongHang) ?? 0,
-                    thoiGian01: nil, hinh01NoiDungText: nil, hinh01NoiDung: nil,
-                    thoiGian02: nil, hinh02NoiDungText: nil, hinh02NoiDung: nil,
+                    thoiGian01: thoiGianCanHang,
+                    hinh01NoiDungText: nil,
+                    hinh01NoiDung: hinh01Base64,
+                    thoiGian02: thoiGianCanHang,
+                    hinh02NoiDungText: nil,
+                    hinh02NoiDung: hinh02Base64,
                     ghiChu: ghiChu.isEmpty ? nil : ghiChu,
                     trangThai: trangThai
                 )
@@ -484,19 +586,24 @@ struct PhieuXuatDetailView: View {
                     ngay: ngay,
                     soThamChieu: nil,
                     xeNgoai: xeNgoai,
-                    soXe: soXe,
+                    soXe: currentSoXe,
                     nhanVien: nil,
                     taiXe: taiXe,
                     khachHang: khachHang,
                     hangHoa: hangHoa,
-                    trongLuongXe: Double(trongLuongXe) ?? 0,
+                    trongLuongXe: 0,
                     trongLuongHang: Double(trongLuongHang) ?? 0,
-                    thoiGian01: nil, hinh01NoiDungText: nil, hinh01NoiDung: nil,
-                    thoiGian02: nil, hinh02NoiDungText: nil, hinh02NoiDung: nil,
+                    thoiGian01: thoiGianCanHang,
+                    hinh01NoiDungText: nil,
+                    hinh01NoiDung: hinh01Base64,
+                    thoiGian02: thoiGianCanHang,
+                    hinh02NoiDungText: nil,
+                    hinh02NoiDung: hinh02Base64,
                     ghiChu: ghiChu.isEmpty ? nil : ghiChu,
                     trangThai: trangThai,
                     soPhieu: viewModel.soPhieu,
-                    xoaHinh01: false, xoaHinh02: false
+                    xoaHinh01: false,
+                    xoaHinh02: false
                 )
                 let _ = try await PhieuXuatService.shared.sua(data)
                 router.showAlert(.alert, title: "Thành công", subtitle: "Cập nhật phiếu xuất thành công.") {

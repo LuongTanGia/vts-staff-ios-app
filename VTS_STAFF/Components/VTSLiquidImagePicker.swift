@@ -84,10 +84,24 @@ struct VTSLiquidImageSlot: View {
             .aspectRatio(1.5, contentMode: .fit)
         }
         .buttonStyle(VTSPressButtonStyle())
-        .confirmationDialog("Chọn nguồn ảnh", isPresented: $showActionSheet, titleVisibility: .visible) {
-            Button("Chụp ảnh") { showCamera = true }
-            Button("Chọn từ thư viện") { showPicker = true }
-            Button("Huỷ", role: .cancel) {}
+        .sheet(isPresented: $showActionSheet) {
+            VTSPhotoSourceSheet(
+                onCamera: {
+                    showActionSheet = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showCamera = true
+                    }
+                },
+                onLibrary: {
+                    showActionSheet = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showPicker = true
+                    }
+                },
+                onCancel: {
+                    showActionSheet = false
+                }
+            )
         }
         .photosPicker(isPresented: $showPicker, selection: $selectedItem, matching: .images)
         .onChange(of: selectedItem) { item in

@@ -183,6 +183,8 @@ struct TruyVanNhapView: View {
                         disableVerticalScrolling: false
                     )
                 }
+                
+                VTSCompanyFooter()
             }
         }
         .background(Color.vtsBg)

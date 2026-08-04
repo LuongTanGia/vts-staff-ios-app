@@ -69,6 +69,8 @@ struct XeDetailView: View {
                         .padding(.horizontal, VTSSpacing.sm)
                         .padding(.vertical, 16)
                     }
+                    
+                    VTSCompanyFooter()
                 }
                 .onAppear {
                     if let details = details {

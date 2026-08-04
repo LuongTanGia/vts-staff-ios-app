@@ -109,6 +109,8 @@ struct PhieuGiaCongListView: View {
                         .background(Color.vtsPrimary)
                     }
                 }
+                
+                VTSCompanyFooter()
             }
         }
         .task {
@@ -138,9 +140,9 @@ struct PhieuGiaCongListView: View {
                     
                     if AuthManager.shared.getPermission(for: "VTSSTAFF_DULIEU_PHIEUGIACONG")?.add == true {
                         Button {
-//                            router.showScreen(.push) { _ in
-//                                PhieuGiaCongDetailView(soPhieu: nil, isEditMode: true)
-//                            }
+                            router.showScreen(.push) { _ in
+                                PhieuGiaCongDetailView(soPhieu: nil, isEditMode: true)
+                            }
                         } label: {
                             Image(systemName: "plus")
                                 .font(.title3)

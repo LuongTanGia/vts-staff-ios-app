@@ -149,6 +149,8 @@ struct TruyVanChuyenXeView: View {
                     }
                 }
                 .background(Color.vtsBg)
+                
+                VTSCompanyFooter()
             }
         }
         .task {

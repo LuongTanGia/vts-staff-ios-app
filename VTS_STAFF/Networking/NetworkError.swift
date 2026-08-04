@@ -57,3 +57,22 @@ enum NetworkError: LocalizedError {
         }
     }
 }
+
+extension Error {
+    var isNoDataError: Bool {
+        if let netErr = self as? NetworkError {
+            if case .serverError(let code, _) = netErr, code == -104 {
+                return true
+            }
+            if case .noData = netErr {
+                return true
+            }
+        }
+        let nsErr = self as NSError
+        if nsErr.code == -104 {
+            return true
+        }
+        return localizedDescription.contains("-104")
+    }
+}
+

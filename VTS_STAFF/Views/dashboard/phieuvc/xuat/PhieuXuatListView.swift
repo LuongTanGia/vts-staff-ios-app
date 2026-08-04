@@ -111,10 +111,10 @@ struct PhieuXuatListView: View {
                         }
                         .frame(height: 48)
                         .background(Color.vtsPrimary)
-                        
-                       
                     }
                 }
+                
+                VTSCompanyFooter()
             }
         }
         .task {
@@ -145,9 +145,9 @@ struct PhieuXuatListView: View {
                     
                     if AuthManager.shared.getPermission(for: "VTSSTAFF_DULIEU_PHIEUXUAT")?.add == true {
                         Button {
-//                            router.showScreen(.push) { _ in
-//                                PhieuXuatDetailView(soPhieu: nil, isEditMode: true)
-//                            }
+                            router.showScreen(.push) { _ in
+                                PhieuXuatDetailView(soPhieu: nil, isEditMode: true)
+                            }
                         } label: {
                             Image(systemName: "plus")
                                 .font(.title3)

@@ -30,7 +30,7 @@ final class PhieuGiaCongService {
         return try await net.post(path: "\(base)/DanhSach", body: body)
     }
     
-    func thongTin(soPhieu: String) async throws -> APIListResponse<String> {
+    func thongTin(soPhieu: String) async throws -> APIObjectResponse<TPhieuvc_Giacong_DanhSach> {
         return try await net.post(path: "\(base)/ThongTin", body: Params_SoPhieu(soPhieu: soPhieu))
     }
     
@@ -71,7 +71,7 @@ final class PhieuNhapService {
                                   body: Params_DateFromTo_Base(dateFrom: dateFrom, dateTo: dateTo))
     }
     
-    func thongTin(soPhieu: String) async throws -> APIListResponse<String> {
+    func thongTin(soPhieu: String) async throws -> APIObjectResponse<TPhieuvc_Giacong_DanhSach> {
         return try await net.post(path: "\(base)/ThongTin", body: Params_SoPhieu(soPhieu: soPhieu))
     }
     
@@ -112,7 +112,7 @@ final class PhieuXuatService {
                                   body: Params_DateFromTo_Base(dateFrom: dateFrom, dateTo: dateTo))
     }
     
-    func thongTin(soPhieu: String) async throws -> APIListResponse<String> {
+    func thongTin(soPhieu: String) async throws -> APIObjectResponse<TPhieuvc_Giacong_DanhSach> {
         return try await net.post(path: "\(base)/ThongTin", body: Params_SoPhieu(soPhieu: soPhieu))
     }
     

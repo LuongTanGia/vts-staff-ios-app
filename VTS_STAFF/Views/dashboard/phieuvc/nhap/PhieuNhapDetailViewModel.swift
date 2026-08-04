@@ -37,34 +37,29 @@ final class PhieuNhapDetailViewModel: ObservableObject {
         state = .loading
         
         do {
-            // Load dropdown options in parallel
-            async let xeRes = ListHelpersService.shared.danhSachXe()
-            async let taiXeRes = ListHelpersService.shared.danhSachTaiXe()
-            async let khachHangRes = ListHelpersService.shared.danhSachKhachHang_KH()
-            async let hangHoaDuaRes = ListHelpersService.shared.danhSachHangHoa_DUA()
-            async let hangHoaThanRes = ListHelpersService.shared.danhSachHangHoa_THAN()
+            // Load dropdown options in parallel safely
+            async let xeRes = try? ListHelpersService.shared.danhSachXe()
+            async let taiXeRes = try? ListHelpersService.shared.danhSachTaiXe()
+            async let khachHangRes = try? ListHelpersService.shared.danhSachKhachHang_KH()
+            async let hangHoaDuaRes = try? ListHelpersService.shared.danhSachHangHoa_DUA()
+            async let hangHoaThanRes = try? ListHelpersService.shared.danhSachHangHoa_THAN()
             
-            let (xe, taiXe, khachHang, hhDua, hhThan) = try await (xeRes, taiXeRes, khachHangRes, hangHoaDuaRes, hangHoaThanRes)
+            let (xe, taiXe, khachHang, hhDua, hhThan) = await (xeRes, taiXeRes, khachHangRes, hangHoaDuaRes, hangHoaThanRes)
             
-            self.xeOptions = xe.DataResults ?? []
-            self.taiXeOptions = taiXe.DataResults ?? []
-            self.khachHangOptions = khachHang.DataResults ?? []
+            self.xeOptions = xe?.DataResults ?? []
+            self.taiXeOptions = taiXe?.DataResults ?? []
+            self.khachHangOptions = khachHang?.DataResults ?? []
             
             var combinedHH: [TDanhSachMaTenNhom] = []
-            combinedHH.append(contentsOf: hhDua.DataResults ?? [])
-            combinedHH.append(contentsOf: hhThan.DataResults ?? [])
+            combinedHH.append(contentsOf: hhDua?.DataResults ?? [])
+            combinedHH.append(contentsOf: hhThan?.DataResults ?? [])
             self.hangHoaOptions = combinedHH
             
             if let existing = existing {
-                // If we passed an existing item, use it directly
                 state = .success(existing)
             } else if let soPhieu = soPhieu, !soPhieu.isEmpty {
-                // Otherwise fetch from API (using search in local date list since thongTin returns string)
-                let dateFrom = Date().addingTimeInterval(-30 * 24 * 3600).toAPIString
-                let dateTo = Date().toAPIString
-                let listResponse = try await PhieuNhapService.shared.danhSach(dateFrom: dateFrom, dateTo: dateTo)
-                
-                if let found = listResponse.DataResults?.first(where: { $0.soPhieu == soPhieu }) {
+                let infoRes = try await PhieuNhapService.shared.thongTin(soPhieu: soPhieu)
+                if let found = infoRes.DataResult {
                     state = .success(found)
                 } else {
                     state = .empty
@@ -73,7 +68,11 @@ final class PhieuNhapDetailViewModel: ObservableObject {
                 state = .success(nil)
             }
         } catch {
-            state = .failure(error.localizedDescription)
+            if error.isNoDataError {
+                state = .empty
+            } else {
+                state = .failure(error.localizedDescription)
+            }
         }
     }
 }

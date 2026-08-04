@@ -123,6 +123,8 @@ struct KhachHangListView: View {
                         }
                     }
                 }
+                
+                VTSCompanyFooter()
             }
         }
         .task {

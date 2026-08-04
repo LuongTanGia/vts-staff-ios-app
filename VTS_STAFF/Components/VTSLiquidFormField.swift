@@ -104,7 +104,11 @@ struct VTSLiquidTextField: View {
                     .focused($focused)
                     .disabled(isReadOnly)
                     
-                    if isReadOnly && !text.isEmpty {
+                    if let errorMessage {
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .font(.system(size: 18))
+                            .foregroundStyle(.red)
+                    } else if isReadOnly && !text.isEmpty {
                         Button {
                             UIPasteboard.general.string = text
                             withAnimation {
@@ -129,7 +133,7 @@ struct VTSLiquidTextField: View {
             
             if let errorMessage {
                 Text(errorMessage)
-                    .font(.system(size: 11))
+                    .font(.system(size: 12))
                     .foregroundStyle(.red)
                     .padding(.horizontal, 4)
             }
@@ -266,9 +270,15 @@ struct VTSLiquidPickerField<T: Hashable>: View {
                             
                             Spacer()
                             
-                            Image(systemName: "chevron.down")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(errorMessage != nil ? Color.red : .secondary)
+                            if errorMessage != nil {
+                                Image(systemName: "exclamationmark.circle.fill")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(.red)
+                            } else {
+                                Image(systemName: "chevron.down")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(.secondary)
+                            }
                         }
                     }
                     .padding(.horizontal, 14)
@@ -279,7 +289,7 @@ struct VTSLiquidPickerField<T: Hashable>: View {
             
             if let errorMessage {
                 Text(errorMessage)
-                    .font(.system(size: 11))
+                    .font(.system(size: 12))
                     .foregroundStyle(.red)
                     .padding(.horizontal, 4)
             }

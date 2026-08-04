@@ -183,9 +183,12 @@ struct TruyVanXuatView: View {
                         disableVerticalScrolling: false
                     )
                 }
+                
+                VTSCompanyFooter()
             }
         }
         .background(Color.vtsBg)
+        
     }
 }
 
