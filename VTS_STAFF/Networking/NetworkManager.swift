@@ -247,6 +247,9 @@ extension Array: DecodableArray where Element: Decodable {
     static func decodeList(from data: Data, decoder: JSONDecoder) throws -> Self {
         let wrapper = try decoder.decode(APIListResponse<Element>.self, from: data)
         if wrapper.DataError != 0 {
+            if wrapper.DataError == -104 {
+                return [] as! Self
+            }
             throw NetworkError.serverError(statusCode: wrapper.DataError, message: wrapper.DataErrorDescription ?? "Unknown error")
         }
         return (wrapper.DataResults ?? []) as! Self

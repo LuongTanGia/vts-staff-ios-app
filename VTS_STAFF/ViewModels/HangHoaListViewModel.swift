@@ -49,7 +49,12 @@ final class HangHoaListViewModel: ObservableObject {
                 state = .success(list)
             }
         } catch {
-            state = .failure(error.localizedDescription)
+            if error.isNoDataError {
+                allHangHoa = []
+                state = .empty
+            } else {
+                state = .failure(error.localizedDescription)
+            }
         }
     }
     

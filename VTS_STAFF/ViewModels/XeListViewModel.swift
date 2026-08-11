@@ -49,7 +49,12 @@ final class XeListViewModel: ObservableObject {
                 state = .success(list)
             }
         } catch {
-            state = .failure(error.localizedDescription)
+            if error.isNoDataError {
+                allXe = []
+                state = .empty
+            } else {
+                state = .failure(error.localizedDescription)
+            }
         }
     }
     

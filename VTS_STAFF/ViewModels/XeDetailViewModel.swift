@@ -51,7 +51,11 @@ final class XeDetailViewModel: ObservableObject {
                 state = .success(nil)
             }
         } catch {
-            state = .failure(error.localizedDescription)
+            if error.isNoDataError {
+                state = .empty
+            } else {
+                state = .failure(error.localizedDescription)
+            }
         }
     }
 }

@@ -7,6 +7,7 @@
 //  Nếu server trả thẳng array/object thì dùng trực tiếp.
 //
 import Foundation
+import UIKit
 
 
 
@@ -401,9 +402,12 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
     let soPhieu: String
     let soPhieuInt: Int
     let ngay: String
+    let soThamChieu: String?
     let xeNgoai: Bool
     let soXe: String?
     let taiXe: String?
+    let nhanVien: String?
+    let tenNhanVien: String?
     let khachHang: String?
     let tenKhachHang: String?
     let hangHoa: String
@@ -422,6 +426,72 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
     let ghiChu: String?
     let trangThai: String?
     let tenTrangThai: String?
+    let hinh01NoiDungText: String?
+    let hinh02NoiDungText: String?
+    let hinh03NoiDungText: String?
+    let hinh04NoiDungText: String?
+    let hinh05NoiDungText: String?
+    let hinh06NoiDungText: String?
+    let thumbHinh01: String?
+    let thumbHinh02: String?
+    let thumbHinh03: String?
+    let thumbHinh04: String?
+    let thumbHinh05: String?
+    let thumbHinh06: String?
+    var hinh01NoiDung: String?
+    var hinh02NoiDung: String?
+    var hinh03NoiDung: String?
+    var hinh04NoiDung: String?
+    var hinh05NoiDung: String?
+    var hinh06NoiDung: String?
+    let hinh01: String?
+    let hinh02: String?
+    let hinh03: String?
+    let hinh04: String?
+    let hinh05: String?
+    let hinh06: String?
+    
+    var image1Base64: String? {
+        if let h = hinh01NoiDung, !h.isEmpty { return h }
+        if let h = thumbHinh01, !h.isEmpty { return h }
+        if let h = hinh01, !h.isEmpty { return h }
+        return nil
+    }
+    
+    var image2Base64: String? {
+        if let h = hinh02NoiDung, !h.isEmpty { return h }
+        if let h = thumbHinh02, !h.isEmpty { return h }
+        if let h = hinh02, !h.isEmpty { return h }
+        return nil
+    }
+    
+    var image3Base64: String? {
+        if let h = hinh03NoiDung, !h.isEmpty { return h }
+        if let h = thumbHinh03, !h.isEmpty { return h }
+        if let h = hinh03, !h.isEmpty { return h }
+        return nil
+    }
+    
+    var image4Base64: String? {
+        if let h = hinh04NoiDung, !h.isEmpty { return h }
+        if let h = thumbHinh04, !h.isEmpty { return h }
+        if let h = hinh04, !h.isEmpty { return h }
+        return nil
+    }
+    
+    var image5Base64: String? {
+        if let h = hinh05NoiDung, !h.isEmpty { return h }
+        if let h = thumbHinh05, !h.isEmpty { return h }
+        if let h = hinh05, !h.isEmpty { return h }
+        return nil
+    }
+    
+    var image6Base64: String? {
+        if let h = hinh06NoiDung, !h.isEmpty { return h }
+        if let h = thumbHinh06, !h.isEmpty { return h }
+        if let h = hinh06, !h.isEmpty { return h }
+        return nil
+    }
     
     var id: String { "\(taiXe ?? "")-\(soPhieu)-\(tenTrangThai ?? "")" }
     
@@ -429,9 +499,12 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
         case soPhieu = "SoPhieu"
         case soPhieuInt = "SoPhieuInt"
         case ngay = "Ngay"
+        case soThamChieu = "SoThamChieu"
         case xeNgoai = "XeNgoai"
         case soXe = "SoXe"
         case taiXe = "TaiXe"
+        case nhanVien = "NhanVien"
+        case tenNhanVien = "TenNhanVien"
         case khachHang = "KhachHang"
         case tenKhachHang = "TenKhachHang"
         case hangHoa = "HangHoa"
@@ -450,15 +523,42 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
         case ghiChu = "GhiChu"
         case trangThai = "TrangThai"
         case tenTrangThai = "TenTrangThai"
+        case hinh01NoiDungText = "Hinh01NoiDungText"
+        case hinh02NoiDungText = "Hinh02NoiDungText"
+        case hinh03NoiDungText = "Hinh03NoiDungText"
+        case hinh04NoiDungText = "Hinh04NoiDungText"
+        case hinh05NoiDungText = "Hinh05NoiDungText"
+        case hinh06NoiDungText = "Hinh06NoiDungText"
+        case thumbHinh01 = "ThumbHinh01"
+        case thumbHinh02 = "ThumbHinh02"
+        case thumbHinh03 = "ThumbHinh03"
+        case thumbHinh04 = "ThumbHinh04"
+        case thumbHinh05 = "ThumbHinh05"
+        case thumbHinh06 = "ThumbHinh06"
+        case hinh01NoiDung = "Hinh01NoiDung"
+        case hinh02NoiDung = "Hinh02NoiDung"
+        case hinh03NoiDung = "Hinh03NoiDung"
+        case hinh04NoiDung = "Hinh04NoiDung"
+        case hinh05NoiDung = "Hinh05NoiDung"
+        case hinh06NoiDung = "Hinh06NoiDung"
+        case hinh01 = "Hinh01"
+        case hinh02 = "Hinh02"
+        case hinh03 = "Hinh03"
+        case hinh04 = "Hinh04"
+        case hinh05 = "Hinh05"
+        case hinh06 = "Hinh06"
     }
     
     init(
         soPhieu: String = "",
         soPhieuInt: Int = 0,
         ngay: String = "",
+        soThamChieu: String? = nil,
         xeNgoai: Bool = false,
         soXe: String? = nil,
         taiXe: String? = nil,
+        nhanVien: String? = nil,
+        tenNhanVien: String? = nil,
         khachHang: String? = nil,
         tenKhachHang: String? = nil,
         hangHoa: String = "",
@@ -476,14 +576,41 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
         trongLuongHangTV: Double = 0,
         ghiChu: String? = nil,
         trangThai: String? = nil,
-        tenTrangThai: String? = nil
+        tenTrangThai: String? = nil,
+        hinh01NoiDungText: String? = nil,
+        hinh02NoiDungText: String? = nil,
+        hinh03NoiDungText: String? = nil,
+        hinh04NoiDungText: String? = nil,
+        hinh05NoiDungText: String? = nil,
+        hinh06NoiDungText: String? = nil,
+        thumbHinh01: String? = nil,
+        thumbHinh02: String? = nil,
+        thumbHinh03: String? = nil,
+        thumbHinh04: String? = nil,
+        thumbHinh05: String? = nil,
+        thumbHinh06: String? = nil,
+        hinh01NoiDung: String? = nil,
+        hinh02NoiDung: String? = nil,
+        hinh03NoiDung: String? = nil,
+        hinh04NoiDung: String? = nil,
+        hinh05NoiDung: String? = nil,
+        hinh06NoiDung: String? = nil,
+        hinh01: String? = nil,
+        hinh02: String? = nil,
+        hinh03: String? = nil,
+        hinh04: String? = nil,
+        hinh05: String? = nil,
+        hinh06: String? = nil
     ) {
         self.soPhieu = soPhieu
         self.soPhieuInt = soPhieuInt
         self.ngay = ngay
+        self.soThamChieu = soThamChieu
         self.xeNgoai = xeNgoai
         self.soXe = soXe
         self.taiXe = taiXe
+        self.nhanVien = nhanVien
+        self.tenNhanVien = tenNhanVien
         self.khachHang = khachHang
         self.tenKhachHang = tenKhachHang
         self.hangHoa = hangHoa
@@ -502,6 +629,30 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
         self.ghiChu = ghiChu
         self.trangThai = trangThai
         self.tenTrangThai = tenTrangThai
+        self.hinh01NoiDungText = hinh01NoiDungText
+        self.hinh02NoiDungText = hinh02NoiDungText
+        self.hinh03NoiDungText = hinh03NoiDungText
+        self.hinh04NoiDungText = hinh04NoiDungText
+        self.hinh05NoiDungText = hinh05NoiDungText
+        self.hinh06NoiDungText = hinh06NoiDungText
+        self.thumbHinh01 = thumbHinh01
+        self.thumbHinh02 = thumbHinh02
+        self.thumbHinh03 = thumbHinh03
+        self.thumbHinh04 = thumbHinh04
+        self.thumbHinh05 = thumbHinh05
+        self.thumbHinh06 = thumbHinh06
+        self.hinh01NoiDung = hinh01NoiDung
+        self.hinh02NoiDung = hinh02NoiDung
+        self.hinh03NoiDung = hinh03NoiDung
+        self.hinh04NoiDung = hinh04NoiDung
+        self.hinh05NoiDung = hinh05NoiDung
+        self.hinh06NoiDung = hinh06NoiDung
+        self.hinh01 = hinh01
+        self.hinh02 = hinh02
+        self.hinh03 = hinh03
+        self.hinh04 = hinh04
+        self.hinh05 = hinh05
+        self.hinh06 = hinh06
     }
     
     init(from decoder: Decoder) throws {
@@ -509,9 +660,12 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
         self.soPhieu = (try? container.decodeIfPresent(String.self, forKey: .soPhieu)) ?? ""
         self.soPhieuInt = (try? container.decodeIfPresent(Int.self, forKey: .soPhieuInt)) ?? 0
         self.ngay = (try? container.decodeIfPresent(String.self, forKey: .ngay)) ?? ""
+        self.soThamChieu = try? container.decodeIfPresent(String.self, forKey: .soThamChieu)
         self.xeNgoai = (try? container.decodeIfPresent(Bool.self, forKey: .xeNgoai)) ?? false
         self.soXe = try? container.decodeIfPresent(String.self, forKey: .soXe)
         self.taiXe = try? container.decodeIfPresent(String.self, forKey: .taiXe)
+        self.nhanVien = try? container.decodeIfPresent(String.self, forKey: .nhanVien)
+        self.tenNhanVien = try? container.decodeIfPresent(String.self, forKey: .tenNhanVien)
         self.khachHang = try? container.decodeIfPresent(String.self, forKey: .khachHang)
         self.tenKhachHang = try? container.decodeIfPresent(String.self, forKey: .tenKhachHang)
         self.hangHoa = (try? container.decodeIfPresent(String.self, forKey: .hangHoa)) ?? ""
@@ -561,6 +715,54 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
         self.ghiChu = try? container.decodeIfPresent(String.self, forKey: .ghiChu)
         self.trangThai = try? container.decodeIfPresent(String.self, forKey: .trangThai)
         self.tenTrangThai = try? container.decodeIfPresent(String.self, forKey: .tenTrangThai)
+        self.hinh01NoiDungText = try? container.decodeIfPresent(String.self, forKey: .hinh01NoiDungText)
+        self.hinh02NoiDungText = try? container.decodeIfPresent(String.self, forKey: .hinh02NoiDungText)
+        self.hinh03NoiDungText = try? container.decodeIfPresent(String.self, forKey: .hinh03NoiDungText)
+        self.hinh04NoiDungText = try? container.decodeIfPresent(String.self, forKey: .hinh04NoiDungText)
+        self.hinh05NoiDungText = try? container.decodeIfPresent(String.self, forKey: .hinh05NoiDungText)
+        self.hinh06NoiDungText = try? container.decodeIfPresent(String.self, forKey: .hinh06NoiDungText)
+        self.thumbHinh01 = try? container.decodeIfPresent(String.self, forKey: .thumbHinh01)
+        self.thumbHinh02 = try? container.decodeIfPresent(String.self, forKey: .thumbHinh02)
+        self.thumbHinh03 = try? container.decodeIfPresent(String.self, forKey: .thumbHinh03)
+        self.thumbHinh04 = try? container.decodeIfPresent(String.self, forKey: .thumbHinh04)
+        self.thumbHinh05 = try? container.decodeIfPresent(String.self, forKey: .thumbHinh05)
+        self.thumbHinh06 = try? container.decodeIfPresent(String.self, forKey: .thumbHinh06)
+        self.hinh01NoiDung = try? container.decodeIfPresent(String.self, forKey: .hinh01NoiDung)
+        self.hinh02NoiDung = try? container.decodeIfPresent(String.self, forKey: .hinh02NoiDung)
+        self.hinh03NoiDung = try? container.decodeIfPresent(String.self, forKey: .hinh03NoiDung)
+        self.hinh04NoiDung = try? container.decodeIfPresent(String.self, forKey: .hinh04NoiDung)
+        self.hinh05NoiDung = try? container.decodeIfPresent(String.self, forKey: .hinh05NoiDung)
+        self.hinh06NoiDung = try? container.decodeIfPresent(String.self, forKey: .hinh06NoiDung)
+        self.hinh01 = try? container.decodeIfPresent(String.self, forKey: .hinh01)
+        self.hinh02 = try? container.decodeIfPresent(String.self, forKey: .hinh02)
+        self.hinh03 = try? container.decodeIfPresent(String.self, forKey: .hinh03)
+        self.hinh04 = try? container.decodeIfPresent(String.self, forKey: .hinh04)
+        self.hinh05 = try? container.decodeIfPresent(String.self, forKey: .hinh05)
+        self.hinh06 = try? container.decodeIfPresent(String.self, forKey: .hinh06)
+    }
+}
+
+extension UIImage {
+    static func fromBase64(_ base64String: String?) -> UIImage? {
+        guard let base64String = base64String, !base64String.isEmpty else { return nil }
+        
+        var cleanedString = base64String
+        if let range = cleanedString.range(of: "base64,") {
+            cleanedString = String(cleanedString[range.upperBound...])
+        }
+        cleanedString = cleanedString.components(separatedBy: .whitespacesAndNewlines).joined()
+        cleanedString = cleanedString.replacingOccurrences(of: "\"", with: "")
+        
+        let remainder = cleanedString.count % 4
+        if remainder > 0 {
+            cleanedString += String(repeating: "=", count: 4 - remainder)
+        }
+        
+        guard let data = Data(base64Encoded: cleanedString, options: [.ignoreUnknownCharacters]),
+              let image = UIImage(data: data) else {
+            return nil
+        }
+        return image
     }
 }
 

@@ -72,9 +72,19 @@ final class TruyVanNhapViewModel: ObservableObject {
             }
         } catch {
             if isItem {
-                stateByItem = .failure(error.localizedDescription)
+                if error.isNoDataError {
+                    allDataByItem = []
+                    stateByItem = .empty
+                } else {
+                    stateByItem = .failure(error.localizedDescription)
+                }
             } else {
-                stateByCus = .failure(error.localizedDescription)
+                if error.isNoDataError {
+                    allDataByCus = []
+                    stateByCus = .empty
+                } else {
+                    stateByCus = .failure(error.localizedDescription)
+                }
             }
         }
     }

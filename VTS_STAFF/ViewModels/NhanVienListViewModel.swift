@@ -50,7 +50,12 @@ final class NhanVienListViewModel: ObservableObject {
                 state = .success(list)
             }
         } catch {
-            state = .failure(error.localizedDescription)
+            if error.isNoDataError {
+                allNhanVien = []
+                state = .empty
+            } else {
+                state = .failure(error.localizedDescription)
+            }
         }
     }
     

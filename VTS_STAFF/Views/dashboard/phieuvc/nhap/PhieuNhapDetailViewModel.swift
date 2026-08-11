@@ -55,15 +55,30 @@ final class PhieuNhapDetailViewModel: ObservableObject {
             combinedHH.append(contentsOf: hhThan?.DataResults ?? [])
             self.hangHoaOptions = combinedHH
             
-            if let existing = existing {
-                state = .success(existing)
-            } else if let soPhieu = soPhieu, !soPhieu.isEmpty {
-                let infoRes = try await PhieuNhapService.shared.thongTin(soPhieu: soPhieu)
-                if let found = infoRes.DataResult {
+            if let targetSoPhieu = soPhieu ?? existing?.soPhieu, !targetSoPhieu.isEmpty {
+                async let infoTask = PhieuNhapService.shared.thongTin(soPhieu: targetSoPhieu)
+                async let hinhTask = PhieuNhapService.shared.thongTinHinhAnh(
+                    soPhieu: targetSoPhieu,
+                    danhSachHinh: [
+                        Params_MaHinh(maHinh: "Hinh01"),
+                        Params_MaHinh(maHinh: "Hinh02")
+                    ]
+                )
+                
+                let (infoRes, hinhRes) = await (try? infoTask, try? hinhTask)
+                if var found = infoRes?.DataResult {
+                    if let list = hinhRes?.DataResults, !list.isEmpty {
+                        if list.indices.contains(0), !list[0].isEmpty { found.hinh01NoiDung = list[0] }
+                        if list.indices.contains(1), !list[1].isEmpty { found.hinh02NoiDung = list[1] }
+                    }
                     state = .success(found)
+                } else if let existing = existing {
+                    state = .success(existing)
                 } else {
                     state = .empty
                 }
+            } else if let existing = existing {
+                state = .success(existing)
             } else {
                 state = .success(nil)
             }

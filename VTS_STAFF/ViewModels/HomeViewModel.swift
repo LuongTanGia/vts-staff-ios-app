@@ -57,7 +57,11 @@ final class HomeViewModel: ObservableObject {
                 dashboardState = .success(data)
             }
         } catch {
-            dashboardState = .failure(error.localizedDescription)
+            if error.isNoDataError {
+                dashboardState = .empty
+            } else {
+                dashboardState = .failure(error.localizedDescription)
+            }
         }
     }
     

@@ -52,7 +52,12 @@ final class KhachHangListViewModel: ObservableObject {
                 state = .success(list)
             }
         } catch {
-            state = .failure(error.localizedDescription)
+            if error.isNoDataError {
+                allKhachHang = []
+                state = .empty
+            } else {
+                state = .failure(error.localizedDescription)
+            }
         }
     }
     

@@ -45,6 +45,7 @@ struct VTSLiquidImageSlot: View {
     @State private var showCamera      = false
     @State private var selectedItem: PhotosPickerItem?
     @State private var showActionSheet = false
+    @State private var editingImage: IdentifiableImage? = nil
     
     var body: some View {
         switch state {
@@ -104,19 +105,36 @@ struct VTSLiquidImageSlot: View {
             )
         }
         .photosPicker(isPresented: $showPicker, selection: $selectedItem, matching: .images)
-        .onChange(of: selectedItem) { item in
+        .onChange(of: selectedItem) { newItem in
             Task {
-                if let data = try? await item?.loadTransferable(type: Data.self),
+                if let newItem = newItem,
+                   let data = try? await newItem.loadTransferable(type: Data.self),
                    let img  = UIImage(data: data) {
-                    await MainActor.run { state = .hasImage(img) }
+                    await MainActor.run {
+                        selectedItem = nil
+                        editingImage = IdentifiableImage(image: img)
+                    }
                 }
             }
         }
         .fullScreenCover(isPresented: $showCamera) {
             CameraView { img in
-                state = .hasImage(img)
                 showCamera = false
+                editingImage = IdentifiableImage(image: img)
             }
+            .ignoresSafeArea()
+        }
+        .fullScreenCover(item: $editingImage) { item in
+            VTSImageEditorView(
+                inputImage: item.image,
+                onSave: { croppedImg in
+                    state = .hasImage(croppedImg)
+                    editingImage = nil
+                },
+                onCancel: {
+                    editingImage = nil
+                }
+            )
             .ignoresSafeArea()
         }
     }
@@ -142,11 +160,15 @@ struct VTSLiquidImageSlot: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             
-            // Action buttons: Xem + Xoá
-            HStack(spacing: 10) {
+            // Action buttons: Xem + Cắt/Xoay + Xoá
+            HStack(spacing: 8) {
                 // Xem
                 imageActionButton(icon: "eye.fill", color: .vtsPrimary) {
                     onView?()
+                }
+                // Cắt - Xoay
+                imageActionButton(icon: "crop", color: .vtsPrimary) {
+                    editingImage = IdentifiableImage(image: img)
                 }
                 // Xoá
                 imageActionButton(icon: "trash.fill", color: .vtsDanger) {
@@ -277,11 +299,7 @@ struct VTSLiquidImageGrid: View {
     }
 }
 
-// MARK: - Identifiable wrapper
-private struct IdentifiableImage: Identifiable {
-    let id = UUID()
-    let image: UIImage
-}
+
 
 // MARK: - Fullscreen image viewer
 private struct ImageFullscreenView: View {

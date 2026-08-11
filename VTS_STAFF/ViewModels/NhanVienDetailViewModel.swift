@@ -39,7 +39,11 @@ final class NhanVienDetailViewModel: ObservableObject {
                 state = .failure(detailsRes.DataErrorDescription ?? "Không tìm thấy thông tin nhân viên")
             }
         } catch {
-            state = .failure(error.localizedDescription)
+            if error.isNoDataError {
+                state = .empty
+            } else {
+                state = .failure(error.localizedDescription)
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ final class PhieuGiaCongDetailViewModel: ObservableObject {
     @Published var taiXeOptions: [TDanhSachMaTen] = []
     @Published var khachHangOptions: [TDanhSachMaTenNhom] = []
     @Published var hangHoaOptions: [TDanhSachMaTenNhom] = []
+    @Published var nhanVienOptions: [TNhanVien_DanhSach] = []
     
     let statusOptions = [
         TDanhSachMaTen(ma: "HT", ten: "Hoàn thành"),
@@ -43,27 +44,52 @@ final class PhieuGiaCongDetailViewModel: ObservableObject {
             async let khachHangRes = try? ListHelpersService.shared.danhSachKhachHang_KH()
             async let hangHoaDuaRes = try? ListHelpersService.shared.danhSachHangHoa_DUA()
             async let hangHoaThanRes = try? ListHelpersService.shared.danhSachHangHoa_THAN()
+            async let nhanVienRes = try? NhanVienService.shared.danhSach()
             
-            let (xe, taiXe, khachHang, hhDua, hhThan) = await (xeRes, taiXeRes, khachHangRes, hangHoaDuaRes, hangHoaThanRes)
+            let (xe, taiXe, khachHang, hhDua, hhThan, nhanVien) = await (xeRes, taiXeRes, khachHangRes, hangHoaDuaRes, hangHoaThanRes, nhanVienRes)
             
             self.xeOptions = xe?.DataResults ?? []
             self.taiXeOptions = taiXe?.DataResults ?? []
             self.khachHangOptions = khachHang?.DataResults ?? []
+            self.nhanVienOptions = nhanVien?.DataResults ?? []
             
             var combinedHH: [TDanhSachMaTenNhom] = []
             combinedHH.append(contentsOf: hhDua?.DataResults ?? [])
             combinedHH.append(contentsOf: hhThan?.DataResults ?? [])
             self.hangHoaOptions = combinedHH
             
-            if let existing = existing {
-                state = .success(existing)
-            } else if let soPhieu = soPhieu, !soPhieu.isEmpty {
-                let infoRes = try await PhieuGiaCongService.shared.thongTin(soPhieu: soPhieu)
-                if let found = infoRes.DataResult {
+            if let targetSoPhieu = soPhieu ?? existing?.soPhieu, !targetSoPhieu.isEmpty {
+                async let infoTask = PhieuGiaCongService.shared.thongTin(soPhieu: targetSoPhieu)
+                async let hinhTask = PhieuGiaCongService.shared.thongTinHinhAnh(
+                    soPhieu: targetSoPhieu,
+                    danhSachHinh: [
+                        Params_MaHinh(maHinh: "Hinh01"),
+                        Params_MaHinh(maHinh: "Hinh02"),
+                        Params_MaHinh(maHinh: "Hinh03"),
+                        Params_MaHinh(maHinh: "Hinh04"),
+                        Params_MaHinh(maHinh: "Hinh05"),
+                        Params_MaHinh(maHinh: "Hinh06")
+                    ]
+                )
+                
+                let (infoRes, hinhRes) = await (try? infoTask, try? hinhTask)
+                if var found = infoRes?.DataResult {
+                    if let list = hinhRes?.DataResults, !list.isEmpty {
+                        if list.indices.contains(0), !list[0].isEmpty { found.hinh01NoiDung = list[0] }
+                        if list.indices.contains(1), !list[1].isEmpty { found.hinh02NoiDung = list[1] }
+                        if list.indices.contains(2), !list[2].isEmpty { found.hinh03NoiDung = list[2] }
+                        if list.indices.contains(3), !list[3].isEmpty { found.hinh04NoiDung = list[3] }
+                        if list.indices.contains(4), !list[4].isEmpty { found.hinh05NoiDung = list[4] }
+                        if list.indices.contains(5), !list[5].isEmpty { found.hinh06NoiDung = list[5] }
+                    }
                     state = .success(found)
+                } else if let existing = existing {
+                    state = .success(existing)
                 } else {
                     state = .empty
                 }
+            } else if let existing = existing {
+                state = .success(existing)
             } else {
                 state = .success(nil)
             }

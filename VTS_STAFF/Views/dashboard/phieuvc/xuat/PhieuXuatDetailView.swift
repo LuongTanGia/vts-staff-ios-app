@@ -32,13 +32,25 @@ struct PhieuXuatDetailView: View {
     // Image states
     @State private var hinh01: UIImage? = nil
     @State private var hinh02: UIImage? = nil
+    @State private var hinh01Text: String? = nil
+    @State private var hinh02Text: String? = nil
     @State private var showingImagePickerForSlot: Int? = nil // 1 or 2
     @State private var photoPickerItem: PhotosPickerItem? = nil
     @State private var showingCameraForSlot: Int? = nil // 1 or 2
-    @State private var showingFullscreenImage: UIImage? = nil
+    @State private var showingFullscreenIndex: Int? = nil // 1 or 2
     @State private var showingActionSheetForSlot: Int? = nil // 1 or 2
+    @State private var editingImage: IdentifiableImage? = nil
+    @State private var editingSlot: Int? = nil
+    @State private var activeSlot: Int? = nil
     
     @State private var isSaving: Bool = false
+    
+    private var galleryItems: [VTSPhotoGalleryItem] {
+        [
+            VTSPhotoGalleryItem(id: 1, title: "Ảnh 1 - Phiếu xuất 1", image: hinh01, ocrText: hinh01Text),
+            VTSPhotoGalleryItem(id: 2, title: "Ảnh 2 - Phiếu xuất 2", image: hinh02, ocrText: hinh02Text)
+        ]
+    }
     
     // Errors state
     @State private var soXeError: String? = nil
@@ -207,18 +219,17 @@ struct PhieuXuatDetailView: View {
             get: { showingImagePickerForSlot != nil },
             set: { if !$0 { showingImagePickerForSlot = nil } }
         ), selection: $photoPickerItem, matching: .images)
-        .onChange(of: photoPickerItem) { item in
+        .onChange(of: photoPickerItem) { newItem in
             Task {
-                if let data = try? await item?.loadTransferable(type: Data.self),
+                if let newItem = newItem,
+                   let data = try? await newItem.loadTransferable(type: Data.self),
                    let img = UIImage(data: data) {
                     await MainActor.run {
-                        if showingImagePickerForSlot == 1 {
-                            hinh01 = img
-                        } else if showingImagePickerForSlot == 2 {
-                            hinh02 = img
-                        }
+                        let slot = showingImagePickerForSlot ?? activeSlot
                         showingImagePickerForSlot = nil
                         photoPickerItem = nil
+                        editingSlot = slot
+                        editingImage = IdentifiableImage(image: img)
                     }
                 }
             }
@@ -227,37 +238,57 @@ struct PhieuXuatDetailView: View {
             get: { showingCameraForSlot != nil },
             set: { if !$0 { showingCameraForSlot = nil } }
         )) {
-            let slot = showingCameraForSlot
+            let slot = showingCameraForSlot ?? activeSlot
             CameraView { capturedImg in
-                if slot == 1 {
-                    hinh01 = capturedImg
-                } else if slot == 2 {
-                    hinh02 = capturedImg
-                }
                 showingCameraForSlot = nil
+                editingSlot = slot
+                editingImage = IdentifiableImage(image: capturedImg)
             }
             .ignoresSafeArea()
         }
-        .fullScreenCover(isPresented: Binding(
-            get: { showingFullscreenImage != nil },
-            set: { if !$0 { showingFullscreenImage = nil } }
-        )) {
-            if let img = showingFullscreenImage {
-                ZStack(alignment: .topTrailing) {
-                    Color.black.ignoresSafeArea()
-                    Image(uiImage: img)
-                        .resizable()
-                        .scaledToFit()
-                    Button {
-                        showingFullscreenImage = nil
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 32))
-                            .foregroundColor(.white)
-                            .padding()
+        .fullScreenCover(item: $editingImage) { item in
+            VTSImageEditorView(
+                inputImage: item.image,
+                onSave: { croppedImg in
+                    let target = editingSlot ?? activeSlot ?? 1
+                    if target == 1 {
+                        hinh01 = croppedImg
+                        Task {
+                            hinh01Text = await VTSImageOCRHelper.performOCR(on: croppedImg)
+                        }
+                    } else if target == 2 {
+                        hinh02 = croppedImg
+                        Task {
+                            hinh02Text = await VTSImageOCRHelper.performOCR(on: croppedImg)
+                        }
                     }
+                    editingImage = nil
+                    editingSlot = nil
+                    activeSlot = nil
+                },
+                onCancel: {
+                    editingImage = nil
+                    editingSlot = nil
+                    activeSlot = nil
                 }
-            }
+            )
+            .ignoresSafeArea()
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { showingFullscreenIndex != nil },
+            set: { if !$0 { showingFullscreenIndex = nil } }
+        )) {
+            VTSPhotoGalleryView(
+                items: galleryItems,
+                selectedIndex: Binding(
+                    get: { showingFullscreenIndex ?? 1 },
+                    set: { showingFullscreenIndex = $0 }
+                ),
+                onClose: {
+                    showingFullscreenIndex = nil
+                }
+            )
+            .ignoresSafeArea()
         }
         .sheet(isPresented: Binding(
             get: { showingActionSheetForSlot != nil },
@@ -267,12 +298,14 @@ struct PhieuXuatDetailView: View {
             VTSPhotoSourceSheet(
                 onCamera: {
                     showingActionSheetForSlot = nil
+                    activeSlot = slot
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         showingCameraForSlot = slot
                     }
                 },
                 onLibrary: {
                     showingActionSheetForSlot = nil
+                    activeSlot = slot
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         showingImagePickerForSlot = slot
                     }
@@ -330,20 +363,24 @@ struct PhieuXuatDetailView: View {
                         soXeNgoai = ""
                         soXeError = nil
                         if let foundXe = viewModel.xeOptions.first(where: { $0.ma == newSoXe }) {
-                            taiXe = foundXe.tenTaiXe
+                            taiXe = foundXe.maTaiXe
                         }
                     }
                 }
                 .disabled(!isEditMode)
             }
             
-            // Row 3: Tài xế
-            VTSLiquidTextField(
+            // Row 3: Tài xế (truyền mã tài xế)
+            VTSLiquidPickerField(
                 label: "Tài xế",
-                text: $taiXe,
-                isReadOnly: !isEditMode,
+                selection: $taiXe,
+                options: viewModel.taiXeOptions.map { $0.ma },
+                displayName: { code in
+                    viewModel.taiXeOptions.first(where: { $0.ma == code })?.ten ?? code
+                },
                 errorMessage: taiXeError
             )
+            .disabled(!isEditMode)
             
             // Row 4: Khách hàng
             VTSLiquidPickerField(
@@ -423,17 +460,33 @@ struct PhieuXuatDetailView: View {
                         .frame(maxWidth: .infinity)
                         .clipped()
                         .cornerRadius(12)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            showingFullscreenIndex = slotIndex
+                        }
                     
-                    if isEditMode {
-                        HStack(spacing: 6) {
+                    HStack(spacing: 6) {
+                        Button {
+                            showingFullscreenIndex = slotIndex
+                        } label: {
+                            Image(systemName: "eye.fill")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(8)
+                                .background(Color.black.opacity(0.6))
+                                .clipShape(Circle())
+                        }
+                        
+                        if isEditMode {
                             Button {
-                                showingFullscreenImage = img
+                                editingSlot = slotIndex
+                                editingImage = IdentifiableImage(image: img)
                             } label: {
-                                Image(systemName: "eye.fill")
+                                Image(systemName: "crop")
                                     .font(.system(size: 13, weight: .bold))
                                     .foregroundColor(.white)
                                     .padding(8)
-                                    .background(Color.black.opacity(0.6))
+                                    .background(Color.blue.opacity(0.8))
                                     .clipShape(Circle())
                             }
                             
@@ -448,32 +501,41 @@ struct PhieuXuatDetailView: View {
                                     .clipShape(Circle())
                             }
                         }
-                        .padding(6)
                     }
+                    .padding(6)
                 }
             } else {
-                Button {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(uiColor: .systemGray6))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.primary.opacity(0.12), lineWidth: 1)
+                        )
+                    
+                    VStack(spacing: 8) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.vtsPrimary.opacity(0.12))
+                                .frame(width: 48, height: 48)
+                            Image(systemName: "photo.fill")
+                                .font(.system(size: 24, weight: .medium))
+                                .foregroundColor(.vtsPrimary)
+                        }
+                        
+                        Text(isEditMode ? "Thêm ảnh" : "Chưa có ảnh")
+                            .font(.vtsCaption)
+                            .foregroundColor(isEditMode ? .vtsTxtSecondary : .vtsTxtTertiary)
+                    }
+                }
+                .frame(height: 130)
+                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
+                .onTapGesture {
                     if isEditMode {
                         showingActionSheetForSlot = slotIndex
                     }
-                } label: {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(uiColor: .systemGray4))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.primary.opacity(0.15), lineWidth: 1)
-                            )
-                        
-                        Image(systemName: iconName)
-                            .font(.system(size: 52, weight: .medium))
-                            .foregroundColor(.black)
-                    }
-                    .frame(height: 130)
-                    .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.plain)
-                .disabled(!isEditMode)
             }
         }
     }
@@ -498,6 +560,16 @@ struct PhieuXuatDetailView: View {
         }
         ghiChu = details.ghiChu ?? ""
         trangThai = details.trangThai ?? "HT"
+        
+        if let img1 = UIImage.fromBase64(details.image1Base64) {
+            hinh01 = img1
+        }
+        hinh01Text = details.hinh01NoiDungText
+        
+        if let img2 = UIImage.fromBase64(details.image2Base64) {
+            hinh02 = img2
+        }
+        hinh02Text = details.hinh02NoiDungText
     }
     
     private func validateForm() -> Bool {
@@ -567,10 +639,10 @@ struct PhieuXuatDetailView: View {
                     trongLuongXe: 0,
                     trongLuongHang: Double(trongLuongHang) ?? 0,
                     thoiGian01: thoiGianCanHang,
-                    hinh01NoiDungText: nil,
+                    hinh01NoiDungText: hinh01Text,
                     hinh01NoiDung: hinh01Base64,
                     thoiGian02: thoiGianCanHang,
-                    hinh02NoiDungText: nil,
+                    hinh02NoiDungText: hinh02Text,
                     hinh02NoiDung: hinh02Base64,
                     ghiChu: ghiChu.isEmpty ? nil : ghiChu,
                     trangThai: trangThai
@@ -594,10 +666,10 @@ struct PhieuXuatDetailView: View {
                     trongLuongXe: 0,
                     trongLuongHang: Double(trongLuongHang) ?? 0,
                     thoiGian01: thoiGianCanHang,
-                    hinh01NoiDungText: nil,
+                    hinh01NoiDungText: hinh01Text,
                     hinh01NoiDung: hinh01Base64,
                     thoiGian02: thoiGianCanHang,
-                    hinh02NoiDungText: nil,
+                    hinh02NoiDungText: hinh02Text,
                     hinh02NoiDung: hinh02Base64,
                     ghiChu: ghiChu.isEmpty ? nil : ghiChu,
                     trangThai: trangThai,
