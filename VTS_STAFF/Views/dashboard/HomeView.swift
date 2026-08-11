@@ -48,7 +48,7 @@ struct HomeView: View {
         VTSPageContainer {
             VStack(spacing: 0) {
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: VTSSpacing.sm) {
+                    VStack(alignment: .leading, spacing: 14) {
                         VTSAsyncContent(
                             state: viewModel.dashboardState,
                             emptyTitle: "Không có dữ liệu thống kê",
@@ -69,22 +69,15 @@ struct HomeView: View {
                             let xuatTuanNay = data.hangXuat.filter { $0.colGroup.localizedCaseInsensitiveContains("TUANNAY") }
                             let xuatTuanTruoc = data.hangXuat.filter { $0.colGroup.localizedCaseInsensitiveContains("TUANTRUOC") }
                             
-                            return VStack(alignment: .leading) {
+                            return VStack(alignment: .leading, spacing: 14) {
                                 
+                                // Bảng Phân bố nhân sự
                                 if hasNHANVIENPermission {
                                     if !data.nhanVienPhongBan.isEmpty || !data.nhanVienInOut.isEmpty {
-                                        VTSGlassCard {
-                                            // 6. Bảng Nhân Sự
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Phân bố nhân sự")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                // 2. Grid of Stat Cards
+                                        homeCardContainer(title: "Phân bố nhân sự") {
+                                            VStack(spacing: 12) {
                                                 kpiGrid(data: data)
-                                                
-                                                hrTable(data: data)
-                                                    .id("hr_distribution_table")
+                                                hrCustomTable(data: data)
                                             }
                                         }
                                         .contentShape(Rectangle())
@@ -96,18 +89,12 @@ struct HomeView: View {
                                     }
                                 }
                                 
+                                // Các chuyến hàng hôm nay
                                 if hasXEPermission {
-                                    if !data.hangHoaChuyenXe.filter({ $0.colType.localizedCaseInsensitiveContains("HOMNAY") }).isEmpty {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Các chuyến hàng hôm nay")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                
-                                                transportTable(data: data)
-                                                    .id("transport_comparison_table")
-                                            }
+                                    let filteredChuyenXe = data.hangHoaChuyenXe.filter({ $0.colType.localizedCaseInsensitiveContains("HOMNAY") })
+                                    if !filteredChuyenXe.isEmpty {
+                                        homeCardContainer(title: "Các chuyến hàng hôm nay") {
+                                            transportCustomTable(filteredList: filteredChuyenXe)
                                         }
                                         .contentShape(Rectangle())
                                         .onTapGesture {
@@ -117,300 +104,153 @@ struct HomeView: View {
                                             }
                                         }
                                     } else {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Các chuyến hàng hôm nay")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                
-                                                HStack {
-                                                    Text("Không có chuyến hàng hôm nay")
-                                                        .font(.vtsCallout)
-                                                        .foregroundColor(.vtsTxtSecondary)
-                                                    Spacer()
-                                                    VTSButton("Truy vấn", icon: "magnifyingglass", style: .outline, size: .small) {
-                                                        let range = Date.todayRange
-                                                        router.showScreen(.push) { _ in
-                                                            TruyVanChuyenXeView(fromDate: range.from, toDate: range.to)
-                                                        }
-                                                    }
-                                                }
+                                        emptySectionPill(title: "Các chuyến hàng hôm nay") {
+                                            let range = Date.todayRange
+                                            router.showScreen(.push) { _ in
+                                                TruyVanChuyenXeView(fromDate: range.from, toDate: range.to)
                                             }
                                         }
                                     }
                                 }
                                 
+                                // Hàng nhận hôm nay / tuần này / tuần trước
                                 if hasNHAPPermission {
                                     if showNhapHomNay {
                                         if !nhapHomNay.isEmpty {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Hàng nhận hôm nay")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                importTable(list: nhapHomNay)
-                                                    .id("import_cargo_table_homnay")
+                                            homeCardContainer(title: "Hàng nhận hôm nay") {
+                                                importCustomTable(list: nhapHomNay)
+                                            }
+                                            .contentShape(Rectangle())
+                                            .onTapGesture {
+                                                let range = Date.todayRange
+                                                router.showScreen(.push) { _ in
+                                                    TruyVanNhapView(fromDate: range.from, toDate: range.to)
+                                                }
+                                            }
+                                        } else {
+                                            emptySectionPill(title: "Hàng nhận hôm nay") {
+                                                let range = Date.todayRange
+                                                router.showScreen(.push) { _ in
+                                                    TruyVanNhapView(fromDate: range.from, toDate: range.to)
+                                                }
                                             }
                                         }
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            let range = Date.todayRange
-                                            router.showScreen(.push) { _ in
-                                                TruyVanNhapView(fromDate: range.from, toDate: range.to)
+                                    }
+                                    
+                                    if showNhapTuanNay {
+                                        if !nhapTuanNay.isEmpty {
+                                            homeCardContainer(title: "Hàng nhận tuần này") {
+                                                importCustomTable(list: nhapTuanNay)
+                                            }
+                                            .contentShape(Rectangle())
+                                            .onTapGesture {
+                                                let range = Date.getWeekRange(offsetWeeks: 0)
+                                                router.showScreen(.push) { _ in
+                                                    TruyVanNhapView(fromDate: range.from, toDate: range.to)
+                                                }
+                                            }
+                                        } else {
+                                            emptySectionPill(title: "Hàng nhận tuần này") {
+                                                let range = Date.getWeekRange(offsetWeeks: 0)
+                                                router.showScreen(.push) { _ in
+                                                    TruyVanNhapView(fromDate: range.from, toDate: range.to)
+                                                }
                                             }
                                         }
-                                    } else {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Hàng nhận hôm nay")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                
-                                                HStack {
-                                                    Text("Không có hàng nhận hôm nay")
-                                                        .font(.vtsCallout)
-                                                        .foregroundColor(.vtsTxtSecondary)
-                                                    Spacer()
-                                                    VTSButton("Truy vấn", icon: "magnifyingglass", style: .outline, size: .small) {
-                                                        let range = Date.todayRange
-                                                        router.showScreen(.push) { _ in
-                                                            TruyVanNhapView(fromDate: range.from, toDate: range.to)
-                                                        }
-                                                    }
+                                    }
+                                    
+                                    if showNhapTuanTruoc {
+                                        if !nhapTuanTruoc.isEmpty {
+                                            homeCardContainer(title: "Hàng nhận tuần trước") {
+                                                importCustomTable(list: nhapTuanTruoc)
+                                            }
+                                            .contentShape(Rectangle())
+                                            .onTapGesture {
+                                                let range = Date.getWeekRange(offsetWeeks: -1)
+                                                router.showScreen(.push) { _ in
+                                                    TruyVanNhapView(fromDate: range.from, toDate: range.to)
+                                                }
+                                            }
+                                        } else {
+                                            emptySectionPill(title: "Hàng nhận tuần trước") {
+                                                let range = Date.getWeekRange(offsetWeeks: -1)
+                                                router.showScreen(.push) { _ in
+                                                    TruyVanNhapView(fromDate: range.from, toDate: range.to)
                                                 }
                                             }
                                         }
                                     }
                                 }
                                 
-                                if showNhapTuanNay {
-                                    if !nhapTuanNay.isEmpty {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Hàng nhận tuần này")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                importTable(list: nhapTuanNay)
-                                                    .id("import_cargo_table_tuannay")
-                                            }
-                                        }
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            let range = Date.getWeekRange(offsetWeeks: 0)
-                                            router.showScreen(.push) { _ in
-                                                TruyVanNhapView(fromDate: range.from, toDate: range.to)
-                                            }
-                                        }
-                                    } else {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Hàng nhận tuần này")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                
-                                                HStack {
-                                                    Text("Không có hàng nhận tuần này")
-                                                        .font(.vtsCallout)
-                                                        .foregroundColor(.vtsTxtSecondary)
-                                                    Spacer()
-                                                    VTSButton("Truy vấn", icon: "magnifyingglass", style: .outline, size: .small) {
-                                                        let range = Date.getWeekRange(offsetWeeks: 0)
-                                                        router.showScreen(.push) { _ in
-                                                            TruyVanNhapView(fromDate: range.from, toDate: range.to)
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                if showNhapTuanTruoc {
-                                    if !nhapTuanTruoc.isEmpty {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Hàng nhận tuần trước")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                importTable(list: nhapTuanTruoc)
-                                                    .id("import_cargo_table_tuantruoc")
-                                            }
-                                        }
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            let range = Date.getWeekRange(offsetWeeks: -1)
-                                            router.showScreen(.push) { _ in
-                                                TruyVanNhapView(fromDate: range.from, toDate: range.to)
-                                            }
-                                        }
-                                    } else {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Hàng nhận tuần trước")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                
-                                                HStack {
-                                                    Text("Không có hàng nhận tuần trước")
-                                                        .font(.vtsCallout)
-                                                        .foregroundColor(.vtsTxtSecondary)
-                                                    Spacer()
-                                                    VTSButton("Truy vấn", icon: "magnifyingglass", style: .outline, size: .small) {
-                                                        let range = Date.getWeekRange(offsetWeeks: -1)
-                                                        router.showScreen(.push) { _ in
-                                                            TruyVanNhapView(fromDate: range.from, toDate: range.to)
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                }
-                                
+                                // Hàng giao hôm nay / tuần này / tuần trước
                                 if hasXUATPermission {
                                     if showXuatHomNay {
                                         if !xuatHomNay.isEmpty {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Hàng giao hôm nay")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                exportTable(list: xuatHomNay)
-                                                    .id("export_cargo_table_homnay")
+                                            homeCardContainer(title: "Hàng giao hôm nay") {
+                                                exportCustomTable(list: xuatHomNay)
+                                            }
+                                            .contentShape(Rectangle())
+                                            .onTapGesture {
+                                                let range = Date.todayRange
+                                                router.showScreen(.push) { _ in
+                                                    TruyVanXuatView(fromDate: range.from, toDate: range.to)
+                                                }
+                                            }
+                                        } else {
+                                            emptySectionPill(title: "Hàng giao hôm nay") {
+                                                let range = Date.todayRange
+                                                router.showScreen(.push) { _ in
+                                                    TruyVanXuatView(fromDate: range.from, toDate: range.to)
+                                                }
                                             }
                                         }
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            let range = Date.todayRange
-                                            router.showScreen(.push) { _ in
-                                                TruyVanXuatView(fromDate: range.from, toDate: range.to)
+                                    }
+                                    
+                                    if showXuatTuanNay {
+                                        if !xuatTuanNay.isEmpty {
+                                            homeCardContainer(title: "Hàng giao tuần này") {
+                                                exportCustomTable(list: xuatTuanNay)
+                                            }
+                                            .contentShape(Rectangle())
+                                            .onTapGesture {
+                                                let range = Date.getWeekRange(offsetWeeks: 0)
+                                                router.showScreen(.push) { _ in
+                                                    TruyVanXuatView(fromDate: range.from, toDate: range.to)
+                                                }
+                                            }
+                                        } else {
+                                            emptySectionPill(title: "Hàng giao tuần này") {
+                                                let range = Date.getWeekRange(offsetWeeks: 0)
+                                                router.showScreen(.push) { _ in
+                                                    TruyVanXuatView(fromDate: range.from, toDate: range.to)
+                                                }
                                             }
                                         }
-                                    } else {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Hàng giao hôm nay")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                
-                                                HStack {
-                                                    Text("Không có hàng giao hôm nay")
-                                                        .font(.vtsCallout)
-                                                        .foregroundColor(.vtsTxtSecondary)
-                                                    Spacer()
-                                                    VTSButton("Truy vấn", icon: "magnifyingglass", style: .outline, size: .small) {
-                                                        let range = Date.todayRange
-                                                        router.showScreen(.push) { _ in
-                                                            TruyVanXuatView(fromDate: range.from, toDate: range.to)
-                                                        }
-                                                    }
+                                    }
+                                    
+                                    if showXuatTuanTruoc {
+                                        if !xuatTuanTruoc.isEmpty {
+                                            homeCardContainer(title: "Hàng giao tuần trước") {
+                                                exportCustomTable(list: xuatTuanTruoc)
+                                            }
+                                            .contentShape(Rectangle())
+                                            .onTapGesture {
+                                                let range = Date.getWeekRange(offsetWeeks: -1)
+                                                router.showScreen(.push) { _ in
+                                                    TruyVanXuatView(fromDate: range.from, toDate: range.to)
+                                                }
+                                            }
+                                        } else {
+                                            emptySectionPill(title: "Hàng giao tuần trước") {
+                                                let range = Date.getWeekRange(offsetWeeks: -1)
+                                                router.showScreen(.push) { _ in
+                                                    TruyVanXuatView(fromDate: range.from, toDate: range.to)
                                                 }
                                             }
                                         }
                                     }
                                 }
-                                
-                                if showXuatTuanNay {
-                                    if !xuatTuanNay.isEmpty {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Hàng giao tuần này")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                exportTable(list: xuatTuanNay)
-                                                    .id("export_cargo_table_tuannay")
-                                            }
-                                        }
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            let range = Date.getWeekRange(offsetWeeks: 0)
-                                            router.showScreen(.push) { _ in
-                                                TruyVanXuatView(fromDate: range.from, toDate: range.to)
-                                            }
-                                        }
-                                    } else {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Hàng giao tuần này")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                
-                                                HStack {
-                                                    Text("Không có hàng giao tuần này")
-                                                        .font(.vtsCallout)
-                                                        .foregroundColor(.vtsTxtSecondary)
-                                                    Spacer()
-                                                    VTSButton("Truy vấn", icon: "magnifyingglass", style: .outline, size: .small) {
-                                                        let range = Date.getWeekRange(offsetWeeks: 0)
-                                                        router.showScreen(.push) { _ in
-                                                            TruyVanXuatView(fromDate: range.from, toDate: range.to)
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                if showXuatTuanTruoc {
-                                    if !xuatTuanTruoc.isEmpty {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Hàng giao tuần trước")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                exportTable(list: xuatTuanTruoc)
-                                                    .id("export_cargo_table_tuantruoc")
-                                            }
-                                        }
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            let range = Date.getWeekRange(offsetWeeks: -1)
-                                            router.showScreen(.push) { _ in
-                                                TruyVanXuatView(fromDate: range.from, toDate: range.to)
-                                            }
-                                        }
-                                    } else {
-                                        VTSGlassCard {
-                                            VStack(alignment: .leading, spacing: VTSSpacing.sm) {
-                                                Text("Hàng giao tuần trước")
-                                                    .font(.vtsCaption.bold())
-                                                    .foregroundColor(.vtsTxtSecondary)
-                                                    .tracking(1)
-                                                
-                                                HStack {
-                                                    Text("Không có hàng giao tuần trước")
-                                                        .font(.vtsCallout)
-                                                        .foregroundColor(.vtsTxtSecondary)
-                                                    Spacer()
-                                                    VTSButton("Truy vấn", icon: "magnifyingglass", style: .outline, size: .small) {
-                                                        let range = Date.getWeekRange(offsetWeeks: -1)
-                                                        router.showScreen(.push) { _ in
-                                                            TruyVanXuatView(fromDate: range.from, toDate: range.to)
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                }
-                                
                             }
-                            
                         }
                     }
                     .padding(VTSSpacing.sm)
@@ -439,11 +279,46 @@ struct HomeView: View {
         }
     }
     
-    // MARK: - Subviews & Builders
+    // MARK: - Subviews & Custom Card/Table Builders
+    
+    @ViewBuilder
+    private func homeCardContainer<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(spacing: 12) {
+            Text(title)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(Color(hex: "0F2D59"))
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 2)
+            
+            content()
+        }
+        .padding(12)
+        .background(Color.white)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 3)
+    }
+    
+    @ViewBuilder
+    private func emptySectionPill(title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack {
+                Spacer()
+                Text(title)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundColor(Color(hex: "0F2D59"))
+                Spacer()
+            }
+            .padding(.vertical, 14)
+            .background(Color.white)
+            .cornerRadius(14)
+            .shadow(color: Color.black.opacity(0.05), radius: 6, x: 0, y: 2)
+        }
+        .buttonStyle(.plain)
+    }
     
     @ViewBuilder
     private func kpiGrid(data: HomeDashboardData) -> some View {
-        VStack(spacing: VTSSpacing.sm) {
+        VStack(spacing: VTSSpacing.xs) {
             ForEach(data.nhanVienInOut) { item in
                 HStack {
                     Text(item.colName)
@@ -454,382 +329,656 @@ struct HomeView: View {
                         .font(.vtsBody.bold())
                         .foregroundColor(.vtsPrimary)
                 }
-               
             }
         }
     }
+    
     @ViewBuilder
-    private func transportTable(data: HomeDashboardData) -> some View {
-        let filteredList = data.hangHoaChuyenXe.filter({ $0.colType.localizedCaseInsensitiveContains("HOMNAY") })
-        let totalcolValue2 = filteredList.sum(by: \.colValue2)
-        let totalcolValue4 = filteredList.sum(by: \.colValue4)
+    private func transportCustomTable(filteredList: [THangHoa_ChuyenXeDataResult]) -> some View {
+        let totalCol1 = filteredList.sum(by: \.colValue1)
+        let totalCol2 = filteredList.sum(by: \.colValue2)
+        let totalCol3 = filteredList.sum(by: \.colValue3)
+        let totalCol4 = filteredList.sum(by: \.colValue4)
         
-        ERPTable(
-            dataSource: filteredList,
-            columns: [
-                ERPColumn(
-                    title: AnyView(Text("#")),
-                    key: "000",
-                    width: 0.1,
-                    alignment: .center,
-                    render: { item, index in
-                        AnyView(
-                            Text(String(index + 1))
-                                .foregroundColor(.vtsTxtPrimary)
-                        )
-                    },
-                    
-                ),
-                ERPColumn(
-                    title: AnyView(Text("Hàng hoá")),
-                    key: "colName",
-                    width: 0.4,
-                    alignment: .leading,
-                    render: { item, _ in
-                        AnyView(
-                            Text(item.colName ?? "")
-                                .foregroundColor(.vtsTxtPrimary)
-                        )
-                    },
-                    footer: AnyView(
-                        Text("Tổng")
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    )
-                ),
+        let tableBorderColor = Color(hex: "C5D2E0")
+        let headerBgColor = Color(hex: "E8EEF9")
+        let headerTextColor = Color(hex: "0F2D59")
+        
+        let col1Width: CGFloat = 28
+        let colXeWidth: CGFloat = 44
+        let colQtyWidth: CGFloat = 65
+        
+        VStack(spacing: 0) {
+            // Multi-level Header
+            HStack(spacing: 0) {
+                Text("#")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .frame(width: col1Width, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
                 
-                ERPColumn(
-                    title: AnyView(
-                        VStack(alignment: .center) {
-                            Text("Nhận")
-                            Divider()
-                                .padding(0.5)
-                                .background(Color.vtsBg)
-                            Text("Số/ Trọng lượng")
-                                .multilineTextAlignment(.center)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        
-                    ),
-                    key: "colValue2",
-                    width: 0.25,
-                    alignment: .trailing,
-                    render: { item, _ in
-                        AnyView(
-                            Text("\(item.colValue2)")
-                                .foregroundColor(.vtsTxtPrimary)
-                        )
-                    },
-                    footer: AnyView(
-                        Text("\(totalcolValue2)")
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                    )
-                ),
-                ERPColumn(
-                    title: AnyView(
-                        VStack {
-                            Text("Giao")
-                            Divider()
-                                .padding(0.5)
-                                .background(Color.vtsBg)
-                            Text("Số/ Trọng lượng")
-                                .multilineTextAlignment(.center)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        
-                    ),
-                    key: "colValue4",
-                    width: 0.25,
-                    alignment: .trailing,
-                    render: { item, _ in
-                        AnyView(
-                            Text("\(item.colValue4)")
-                                .foregroundColor(.vtsTxtPrimary)
-                        )
-                    },
-                    footer: AnyView(
-                        Text("\(totalcolValue4)")
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                    )
-                )
-            ],
-            rowHeight: 30,
-            disableVerticalScrolling: true
-        )
-    }
-    
-    @ViewBuilder
-    private func importTable(list: [THangNhapDataResult]) -> some View {
-        let totalcolValue = list.filter {
-            $0.colDataType == 0
-        }.sum(by: \.colValue)
-        ERPTable(
-            dataSource: list,
-            
-            columns: [
-                ERPColumn(
-                    title: AnyView(Text("#")),
-                    key: "colCode",
-                    width: 0.1,
-                    alignment: .center,
-                    render: { item, index in
-                        AnyView(Text(""))
-                    }
-                ),
-                ERPColumn(
-                    title: AnyView(Text("Khách hàng / Hàng hoá")),
-                    key: "colName",
-                    width: 0.6,
-                    alignment: .leading,
-                    render: { item, index in
-                        AnyView(Text(""))
-                    },
-                    footer: AnyView(
-                        Text("Tổng")
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    )
-                ),
-                ERPColumn(
-                    title: AnyView(Text("Số/ Trọng lượng")),
-                    key: "colValue",
-                    width: 0.3,
-                    alignment: .trailing,
-                    render: { item, index in
-                        AnyView(Text(""))
-                    },
-                    footer: AnyView(
-                        Text("\(totalcolValue)")
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                    )
-                )
-            ],
-            customRowBuilder: { item, width in
+                Text("Hàng hóa")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 4)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
                 
-                if item.colDataType == 0 {
-                    return AnyView(
-                        
-                        HStack(spacing: 0) {
-                            
-                            Text(String(item.colOrder))
-                                .padding(5)
-                                .frame(width: width * 0.1, alignment: .center)
-                                .frame(maxHeight: .infinity)
-                                .border(Color.vtsBorder, width: 0.5)
-                            Text(item.colName ?? "")
-                                .padding(5)
-                                .frame(width: width * 0.6, alignment: .leading)
-                                .frame(maxHeight: .infinity)
-                                .border(Color.vtsBorder, width: 0.5)
-                            Text(item.colValue.toFormattedString(maxDecimals: 0))
-                                .padding(5)
-                                .frame(width: width * 0.3, alignment: .trailing)
-                                .frame(maxHeight: .infinity)
-                                .border(Color.vtsBorder, width: 0.5)
-                            
-                            
-                        }
-                        .background(.white)
+                // Group "Nhận"
+                VStack(spacing: 0) {
+                    Text("Nhận")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.vertical, 4)
                         .frame(maxWidth: .infinity)
-                        .fixedSize(horizontal: false, vertical: true)
-                        
-                    )
-                }
-                if item.colDataType == 1 {
-                    return AnyView(
-                        Text(item.colName ?? "")
-                            .padding(5)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .background(.green.opacity(0.5))
-                            .border(Color.vtsBorder, width: 0.5)
-                    )
+                        .border(tableBorderColor, width: 0.5)
                     
-                }
-                return nil
-            },
-            //            rowHeight: 30,
-            disableVerticalScrolling: true
-        )
-    }
-    
-    @ViewBuilder
-    private func exportTable(list: [THangXuatDataResult]) -> some View {
-        let totalcolValue = list.filter {
-            $0.colDataType == 0
-        }.sum(by: \.colValue)
-        ERPTable(
-            dataSource: list,
-            columns: [
-                ERPColumn(
-                    title: AnyView(Text("#")),
-                    key: "colCode",
-                    width: 0.1,
-                    alignment: .center,
-                    render: { item, _ in
-                        AnyView(
-                            Text(item.colCode ?? "")
-                                .foregroundColor(.vtsTxtSecondary)
-                        )
+                    HStack(spacing: 0) {
+                        Text("Xe")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(headerTextColor)
+                            .padding(.vertical, 4)
+                            .frame(width: colXeWidth, alignment: .center)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                        
+                        Text("Số lượng")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(headerTextColor)
+                            .padding(.vertical, 4)
+                            .frame(width: colQtyWidth, alignment: .center)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
                     }
-                ),
-                ERPColumn(
-                    title: AnyView(Text("Khách hàng / Hàng hoá")),
-                    key: "colName",
-                    width: 0.6,
-                    alignment: .leading,
-                    render: { item, _ in
-                        AnyView(
-                            Text(item.colName ?? "")
-                                .foregroundColor(.vtsTxtPrimary)
-                        )
-                    },
-                    footer: AnyView(
-                        Text("Tổng")
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    )
-                ),
-                ERPColumn(
-                    title: AnyView(Text("Số/ Trọng lượng")),
-                    key: "colValue",
-                    width: 0.3,
-                    alignment: .trailing,
-                    render: { item, _ in
-                        return AnyView(
-                            Text("\(item.colValue) tấn")
-                                .foregroundColor(.vtsTxtPrimary)
-                        )
-                    },
-                    footer: AnyView(
-                        Text("\(totalcolValue)")
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                    )
-                )
-            ],
-            customRowBuilder: { item, width in
+                }
                 
-                if item.colDataType == 0 {
-                    return AnyView(
-                        
-                        HStack(spacing: 0) {
-                            
-                            Text(String(item.colOrder))
-                                .padding(5)
-                                .frame(width: width * 0.1, alignment: .center)
-                                .frame(maxHeight: .infinity)
-                                .border(Color.vtsBorder, width: 0.5)
-                            Text(item.colName ?? "")
-                                .padding(5)
-                                .frame(width: width * 0.6, alignment: .leading)
-                                .frame(maxHeight: .infinity)
-                                .border(Color.vtsBorder, width: 0.5)
-                            Text(item.colValue.toFormattedString(maxDecimals: 0))
-                                .padding(5)
-                                .frame(width: width * 0.3, alignment: .trailing)
-                                .frame(maxHeight: .infinity)
-                                .border(Color.vtsBorder, width: 0.5)
-                            
-                            
-                        }
-                        .background(.white)
+                // Group "Giao"
+                VStack(spacing: 0) {
+                    Text("Giao")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.vertical, 4)
                         .frame(maxWidth: .infinity)
-                        .fixedSize(horizontal: false, vertical: true)
-                        
-                    )
-                }
-                if item.colDataType == 1 {
-                    return AnyView(
-                        Text(item.colName ?? "")
-                            .padding(5)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .background(.green.opacity(0.5))
-                            .border(Color.vtsBorder, width: 0.5)
-                    )
+                        .border(tableBorderColor, width: 0.5)
                     
+                    HStack(spacing: 0) {
+                        Text("Xe")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(headerTextColor)
+                            .padding(.vertical, 4)
+                            .frame(width: colXeWidth, alignment: .center)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                        
+                        Text("Số lượng")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(headerTextColor)
+                            .padding(.vertical, 4)
+                            .frame(width: colQtyWidth, alignment: .center)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                    }
                 }
-                return nil
-            },
-            //            rowHeight: 30,
-            disableVerticalScrolling: true
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .background(headerBgColor)
+            
+            // Data Rows
+            ForEach(Array(filteredList.enumerated()), id: \.offset) { index, item in
+                HStack(spacing: 0) {
+                    Text("\(index + 1)")
+                        .font(.system(size: 13))
+                        .foregroundColor(headerTextColor)
+                        .frame(width: col1Width, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .border(tableBorderColor, width: 0.5)
+                    
+                    Text(item.colName ?? "")
+                        .font(.system(size: 13))
+                        .foregroundColor(Color(hex: "0F2D59"))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 7)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxHeight: .infinity)
+                        .border(tableBorderColor, width: 0.5)
+                    
+                    Text("\(item.colValue1)")
+                        .font(.system(size: 13))
+                        .foregroundColor(Color(hex: "0F2D59"))
+                        .padding(.horizontal, 4)
+                        .frame(width: colXeWidth, alignment: .trailing)
+                        .frame(maxHeight: .infinity)
+                        .border(tableBorderColor, width: 0.5)
+                    
+                    Text("\(item.colValue2)")
+                        .font(.system(size: 13))
+                        .foregroundColor(Color(hex: "0F2D59"))
+                        .padding(.horizontal, 4)
+                        .frame(width: colQtyWidth, alignment: .trailing)
+                        .frame(maxHeight: .infinity)
+                        .border(tableBorderColor, width: 0.5)
+                    
+                    Text("\(item.colValue3)")
+                        .font(.system(size: 13))
+                        .foregroundColor(Color(hex: "0F2D59"))
+                        .padding(.horizontal, 4)
+                        .frame(width: colXeWidth, alignment: .trailing)
+                        .frame(maxHeight: .infinity)
+                        .border(tableBorderColor, width: 0.5)
+                    
+                    Text("\(item.colValue4)")
+                        .font(.system(size: 13))
+                        .foregroundColor(Color(hex: "0F2D59"))
+                        .padding(.horizontal, 4)
+                        .frame(width: colQtyWidth, alignment: .trailing)
+                        .frame(maxHeight: .infinity)
+                        .border(tableBorderColor, width: 0.5)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                .background(Color.white)
+            }
+            
+            // Summary Row ("Cộng")
+            HStack(spacing: 0) {
+                Text(" ")
+                    .font(.system(size: 13, weight: .bold))
+                    .padding(.vertical, 7)
+                    .frame(width: col1Width, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("Cộng")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 7)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("\(totalCol1)")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 4)
+                    .frame(width: colXeWidth, alignment: .trailing)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("\(totalCol2)")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 4)
+                    .frame(width: colQtyWidth, alignment: .trailing)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("\(totalCol3)")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 4)
+                    .frame(width: colXeWidth, alignment: .trailing)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("\(totalCol4)")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 4)
+                    .frame(width: colQtyWidth, alignment: .trailing)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .background(headerBgColor)
+        }
+        .cornerRadius(2)
+        .overlay(
+            RoundedRectangle(cornerRadius: 2)
+                .stroke(tableBorderColor, lineWidth: 0.5)
         )
     }
     
     @ViewBuilder
-    private func hrTable(data: HomeDashboardData) -> some View {
-        let totalcolValue = data.nhanVienPhongBan.sum(by: \.colValue)
-        let totalcolValue0 = data.nhanVienPhongBan.sum(by: \.colValue0)
-        let totalcolValue1 = data.nhanVienPhongBan.sum(by: \.colValue1)
-        ERPTable(
-            dataSource: data.nhanVienPhongBan,
-            columns: [
-                ERPColumn(
-                    title: AnyView(Text("Phòng ban")),
-                    key: "colName",
-                    width: 0.4,
-                    alignment: .leading,
-                    render: { item, _ in
-                        AnyView(
-                            Text(item.colName ?? "")
-                                .foregroundColor(.vtsTxtPrimary)
-                            
-                        )
-                    },
-                    footer: AnyView(
-                        Text("Tổng")
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    )
-                ),
-                ERPColumn(
-                    title: AnyView(Text("Tổng")),
-                    key: "colValue",
-                    width: 0.2,
-                    alignment: .trailing,
-                    render: { item, _ in
-                        AnyView(
-                            Text("\(item.colValue)")
-                                .foregroundColor(.vtsTxtPrimary)
-                        )
-                    },
-                    footer: AnyView(
-                        Text("\(totalcolValue)")
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                    )
-                ),
-                ERPColumn(
-                    title: AnyView(Text("Vắng")),
-                    key: "colValue0",
-                    width: 0.2,
-                    alignment: .trailing,
-                    render: { item, _ in
-                        AnyView(
-                            Text("\(item.colValue0)")
-                                .foregroundColor(.red)
-                        )
-                    },
-                    footer: AnyView(
-                        Text("\(totalcolValue0)")
-                            .foregroundColor(.red)
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                    )
-                ),
-                ERPColumn(
-                    title: AnyView(Text("Đi làm")),
-                    key: "colValue1",
-                    width: 0.2,
-                    alignment: .trailing,
-                    render: { item, _ in
-                        AnyView(
-                            Text("\(item.colValue1)")
-                                .foregroundColor(.vtsTxtPrimary)
-                        )
-                    },
-                    footer: AnyView(
-                        Text("\(totalcolValue1)")
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                    )
-                ),
+    private func importCustomTable(list: [THangNhapDataResult]) -> some View {
+        let totalQty = list.filter { $0.colDataType == 0 }.sum(by: \.colValue)
+        let tableBorderColor = Color(hex: "C5D2E0")
+        let headerBgColor = Color(hex: "E8EEF9")
+        let headerTextColor = Color(hex: "0F2D59")
+        let subtotalBgColor = Color(hex: "C8E6C9") // Green tint
+        
+        let col1Width: CGFloat = 32
+        let col3Width: CGFloat = 90
+        
+        VStack(spacing: 0) {
+            // Header Row
+            HStack(spacing: 0) {
+                Text("#")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .frame(width: col1Width, alignment: .center)
+                    .padding(.vertical, 7)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
                 
-            ],
+                Text("Khách hàng / Hàng hóa")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 7)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("Số lượng")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 7)
+                    .frame(width: col3Width, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .background(headerBgColor)
             
-            rowHeight: 30,
-            disableVerticalScrolling: true
+            // Data Rows
+            ForEach(list) { item in
+                if item.colDataType == 0 {
+                    HStack(spacing: 0) {
+                        Text("\(item.colOrder)")
+                            .font(.system(size: 13))
+                            .foregroundColor(headerTextColor)
+                            .frame(width: col1Width, alignment: .center)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                        
+                        Text(item.colName ?? "")
+                            .font(.system(size: 13))
+                            .foregroundColor(Color(hex: "0F2D59"))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 7)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                        
+                        Text(item.colValue.toFormattedString(maxDecimals: 0))
+                            .font(.system(size: 13))
+                            .foregroundColor(Color(hex: "0F2D59"))
+                            .padding(.horizontal, 6)
+                            .frame(width: col3Width, alignment: .trailing)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .background(Color.white)
+                } else if item.colDataType == 1 {
+                    HStack(spacing: 0) {
+                        Text(" ")
+                            .font(.system(size: 13, weight: .bold))
+                            .padding(.vertical, 7)
+                            .frame(width: col1Width, alignment: .center)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                        
+                        Text(item.colName ?? "")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(headerTextColor)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 7)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                        
+                        Text(item.colValue.toFormattedString(maxDecimals: 0))
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(headerTextColor)
+                            .padding(.horizontal, 6)
+                            .frame(width: col3Width, alignment: .trailing)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .background(subtotalBgColor)
+                }
+            }
+            
+            // Summary Row ("Cộng")
+            HStack(spacing: 0) {
+                Text(" ")
+                    .font(.system(size: 13, weight: .bold))
+                    .padding(.vertical, 7)
+                    .frame(width: col1Width, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("Cộng")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 7)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text(totalQty.toFormattedString(maxDecimals: 0))
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 6)
+                    .frame(width: col3Width, alignment: .trailing)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .background(headerBgColor)
+        }
+        .cornerRadius(2)
+        .overlay(
+            RoundedRectangle(cornerRadius: 2)
+                .stroke(tableBorderColor, lineWidth: 0.5)
+        )
+    }
+    
+    @ViewBuilder
+    private func exportCustomTable(list: [THangXuatDataResult]) -> some View {
+        let totalQty = list.filter { $0.colDataType == 0 }.sum(by: \.colValue)
+        let tableBorderColor = Color(hex: "C5D2E0")
+        let headerBgColor = Color(hex: "E8EEF9")
+        let headerTextColor = Color(hex: "0F2D59")
+        let subtotalBgColor = Color(hex: "C8E6C9") // Green tint
+        
+        let col1Width: CGFloat = 32
+        let col3Width: CGFloat = 90
+        
+        VStack(spacing: 0) {
+            // Header Row
+            HStack(spacing: 0) {
+                Text("#")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .frame(width: col1Width, alignment: .center)
+                    .padding(.vertical, 7)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("Khách hàng / Hàng hóa")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 7)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("Số lượng")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 7)
+                    .frame(width: col3Width, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .background(headerBgColor)
+            
+            // Data Rows
+            ForEach(list) { item in
+                if item.colDataType == 0 {
+                    HStack(spacing: 0) {
+                        Text("\(item.colOrder)")
+                            .font(.system(size: 13))
+                            .foregroundColor(headerTextColor)
+                            .frame(width: col1Width, alignment: .center)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                        
+                        Text(item.colName ?? "")
+                            .font(.system(size: 13))
+                            .foregroundColor(Color(hex: "0F2D59"))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 7)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                        
+                        Text(item.colValue.toFormattedString(maxDecimals: 0))
+                            .font(.system(size: 13))
+                            .foregroundColor(Color(hex: "0F2D59"))
+                            .padding(.horizontal, 6)
+                            .frame(width: col3Width, alignment: .trailing)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .background(Color.white)
+                } else if item.colDataType == 1 {
+                    HStack(spacing: 0) {
+                        Text(" ")
+                            .font(.system(size: 13, weight: .bold))
+                            .padding(.vertical, 7)
+                            .frame(width: col1Width, alignment: .center)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                        
+                        Text(item.colName ?? "")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(headerTextColor)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 7)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                        
+                        Text(item.colValue.toFormattedString(maxDecimals: 0))
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(headerTextColor)
+                            .padding(.horizontal, 6)
+                            .frame(width: col3Width, alignment: .trailing)
+                            .frame(maxHeight: .infinity)
+                            .border(tableBorderColor, width: 0.5)
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .background(subtotalBgColor)
+                }
+            }
+            
+            // Summary Row ("Cộng")
+            HStack(spacing: 0) {
+                Text(" ")
+                    .font(.system(size: 13, weight: .bold))
+                    .padding(.vertical, 7)
+                    .frame(width: col1Width, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("Cộng")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 7)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text(totalQty.toFormattedString(maxDecimals: 0))
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 6)
+                    .frame(width: col3Width, alignment: .trailing)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .background(headerBgColor)
+        }
+        .cornerRadius(2)
+        .overlay(
+            RoundedRectangle(cornerRadius: 2)
+                .stroke(tableBorderColor, lineWidth: 0.5)
+        )
+    }
+    
+    @ViewBuilder
+    private func hrCustomTable(data: HomeDashboardData) -> some View {
+        let totalVal = data.nhanVienPhongBan.sum(by: \.colValue)
+        let totalVal0 = data.nhanVienPhongBan.sum(by: \.colValue0)
+        let totalVal1 = data.nhanVienPhongBan.sum(by: \.colValue1)
+        
+        let tableBorderColor = Color(hex: "C5D2E0")
+        let headerBgColor = Color(hex: "E8EEF9")
+        let headerTextColor = Color(hex: "0F2D59")
+        
+        let col1Width: CGFloat = 28
+        let colValWidth: CGFloat = 50
+        
+        VStack(spacing: 0) {
+            // Header Row
+            HStack(spacing: 0) {
+                Text("#")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .frame(width: col1Width, alignment: .center)
+                    .padding(.vertical, 7)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("Phòng ban")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.leading, 6)
+                    .padding(.vertical, 7)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("Tổng")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 2)
+                    .padding(.vertical, 7)
+                    .frame(width: colValWidth, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("Vắng")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(Color(hex: "D32F2F"))
+                    .padding(.horizontal, 2)
+                    .padding(.vertical, 7)
+                    .frame(width: colValWidth, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("Mặt")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 2)
+                    .padding(.vertical, 7)
+                    .frame(width: colValWidth, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .background(headerBgColor)
+            
+            // Data Rows
+            ForEach(Array(data.nhanVienPhongBan.enumerated()), id: \.offset) { index, item in
+                HStack(spacing: 0) {
+                    Text("\(index + 1)")
+                        .font(.system(size: 13))
+                        .foregroundColor(headerTextColor)
+                        .frame(width: col1Width, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .border(tableBorderColor, width: 0.5)
+                    
+                    Text(item.colName ?? "")
+                        .font(.system(size: 13))
+                        .foregroundColor(Color(hex: "0F2D59"))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 7)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxHeight: .infinity)
+                        .border(tableBorderColor, width: 0.5)
+                    
+                    Text("\(item.colValue)")
+                        .font(.system(size: 13))
+                        .foregroundColor(Color(hex: "0F2D59"))
+                        .padding(.horizontal, 2)
+                        .frame(width: colValWidth, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .border(tableBorderColor, width: 0.5)
+                    
+                    Text("\(item.colValue0)")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(Color(hex: "D32F2F"))
+                        .padding(.horizontal, 2)
+                        .frame(width: colValWidth, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .border(tableBorderColor, width: 0.5)
+                    
+                    Text("\(item.colValue1)")
+                        .font(.system(size: 13))
+                        .foregroundColor(Color(hex: "0F2D59"))
+                        .padding(.horizontal, 2)
+                        .frame(width: colValWidth, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .border(tableBorderColor, width: 0.5)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                .background(Color.white)
+            }
+            
+            // Summary Row ("Cộng")
+            HStack(spacing: 0) {
+                Text(" ")
+                    .font(.system(size: 13, weight: .bold))
+                    .padding(.vertical, 7)
+                    .frame(width: col1Width, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("Cộng")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 7)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("\(totalVal)")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 2)
+                    .frame(width: colValWidth, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("\(totalVal0)")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(Color(hex: "D32F2F"))
+                    .padding(.horizontal, 2)
+                    .frame(width: colValWidth, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+                
+                Text("\(totalVal1)")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(headerTextColor)
+                    .padding(.horizontal, 2)
+                    .frame(width: colValWidth, alignment: .center)
+                    .frame(maxHeight: .infinity)
+                    .border(tableBorderColor, width: 0.5)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .background(headerBgColor)
+        }
+        .cornerRadius(2)
+        .overlay(
+            RoundedRectangle(cornerRadius: 2)
+                .stroke(tableBorderColor, lineWidth: 0.5)
         )
     }
 }

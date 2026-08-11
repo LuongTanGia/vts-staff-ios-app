@@ -99,6 +99,46 @@ struct PhieuGiaCongDetailView: View {
         AuthManager.shared.getPermission(for: "VTSSTAFF_DULIEU_PHIEUGIACONG")?.del == true
     }
     
+    private var currentNhanVienDisplay: String {
+        if let found = viewModel.nhanVienOptions.first(where: { $0.emid == nhanVien }) {
+            return found.emHoTen
+        }
+        if case .success(let details) = viewModel.state, let details = details, let name = details.tenNhanVien, !name.isEmpty {
+            return name
+        }
+        return nhanVien.isEmpty ? "---" : nhanVien
+    }
+    
+    private var currentHangHoaDisplay: String {
+        if let found = viewModel.hangHoaOptions.first(where: { $0.ma == hangHoa }) {
+            return found.ten
+        }
+        if case .success(let details) = viewModel.state, let details = details, !details.tenHangHoa.isEmpty {
+            return details.tenHangHoa
+        }
+        return hangHoa.isEmpty ? "---" : hangHoa
+    }
+    
+    private var currentKhachHangDisplay: String {
+        if let found = viewModel.khachHangOptions.first(where: { $0.ma == khachHang }) {
+            return found.ten
+        }
+        if case .success(let details) = viewModel.state, let details = details, let name = details.tenKhachHang, !name.isEmpty {
+            return name
+        }
+        return khachHang.isEmpty ? "---" : khachHang
+    }
+    
+    private var headerTitleDisplay: String {
+        if viewModel.isNew {
+            return "Chuyến hàng gia công mới"
+        } else if isEditMode {
+            return "Cập nhật chuyến hàng gia công"
+        } else {
+            return "Thông tin chuyến hàng gia công"
+        }
+    }
+    
     init(soPhieu: String?, existing: TPhieuvc_Giacong_DanhSach? = nil, isEditMode: Bool = false) {
         self.initialEditMode = isEditMode
         self._isEditMode = State(initialValue: isEditMode || soPhieu == nil || soPhieu?.isEmpty == true)
@@ -119,9 +159,14 @@ struct PhieuGiaCongDetailView: View {
                 }
             ) { details in
                 VStack(spacing: 0) {
-                    // Pinned Header Card
-                    profileHeaderCard(details: details)
-                        .background(Color.vtsPrimary)
+                    VTSVoucherHeaderProfileCard(
+                        iconName: "building.2.fill",
+                        soXe: soXe,
+                        tenNhanVien: currentNhanVienDisplay,
+                        tenHangHoa: currentHangHoaDisplay,
+                        trongLuongHang: trongLuongHang,
+                        tenKhachHang: currentKhachHangDisplay
+                    )
                     
                     // Scrollable Form details
                     ScrollView(showsIndicators: false) {
@@ -179,8 +224,8 @@ struct PhieuGiaCongDetailView: View {
         }
         .customToolbar(
             isPrimaryActionVisible: false,
-            title: "",
-            subtitle: viewModel.isNew ? "Thêm phiếu gia công" : (isEditMode ? "Chỉnh sửa phiếu gia công" : "Thông tin phiếu gia công"),
+            title: "VTS-Staff",
+            subtitle: headerTitleDisplay,
             isWhiteText: true,
             leading: { EmptyView() },
             trailing: {
@@ -487,11 +532,52 @@ struct PhieuGiaCongDetailView: View {
                     .padding(.vertical, 8)
                     
                     if xeNgoai {
-                        VTSLiquidTextField(label: "Số xe", text: $soXe, placeholder: "Nhập số xe...", errorMessage: soXeError)
-                        VTSLiquidTextField(label: "Tài xế", text: $taiXe, placeholder: "Nhập tên tài xế...", errorMessage: taiXeError)
+                        VTSLiquidTextField(
+                            label: "Số xe ngoài",
+                            text: $soXe,
+                            placeholder: "Nhập số xe...",
+                            isReadOnly: !isEditMode,
+                            errorMessage: soXeError
+                        )
+                        .onChange(of: soXe) { _, newValue in
+                            let upper = newValue.uppercased()
+                            if soXe != upper {
+                                soXe = upper
+                            }
+                            let normalizedInput = normalizePlate(upper)
+                            if !normalizedInput.isEmpty,
+                               let matchedXe = viewModel.xeOptions.first(where: {
+                                   normalizePlate($0.ma) == normalizedInput || normalizePlate($0.ten) == normalizedInput
+                               }) {
+                                xeNgoai = false
+                                soXe = matchedXe.ma
+                                soXeError = nil
+                                if !matchedXe.maTaiXe.isEmpty {
+                                    nhanVien = matchedXe.maTaiXe
+                                }
+                            }
+                        }
+                        
+                        VTSLiquidTextField(
+                            label: "Tài xế ngoài",
+                            text: $taiXe,
+                            placeholder: "Nhập tên tài xế...",
+                            isReadOnly: !isEditMode,
+                            errorMessage: taiXeError
+                        )
                     } else {
                         VTSLiquidPickerField(
-                            label: "Số xe",
+                            label: "Nhân viên theo dõi",
+                            selection: $nhanVien,
+                            options: viewModel.nhanVienOptions.map { $0.emid },
+                            displayName: { code in
+                                viewModel.nhanVienOptions.first(where: { $0.emid == code })?.emHoTen ?? code
+                            }
+                        )
+                        .disabled(!isEditMode)
+                        
+                        VTSLiquidPickerField(
+                            label: "Số xe nhà",
                             selection: $soXe,
                             options: viewModel.xeOptions.map { $0.ma },
                             displayName: { code in
@@ -507,19 +593,12 @@ struct PhieuGiaCongDetailView: View {
                         )
                         .onChange(of: soXe) { _, newSoXe in
                             if let foundXe = viewModel.xeOptions.first(where: { $0.ma == newSoXe }) {
-                                taiXe = foundXe.maTaiXe
+                                if !foundXe.maTaiXe.isEmpty {
+                                    nhanVien = foundXe.maTaiXe
+                                }
                             }
                         }
-                        
-                        VTSLiquidPickerField(
-                            label: "Tài xế",
-                            selection: $taiXe,
-                            options: viewModel.taiXeOptions.map { $0.ma },
-                            displayName: { code in
-                                viewModel.taiXeOptions.first(where: { $0.ma == code })?.ten ?? code
-                            },
-                            errorMessage: taiXeError
-                        )
+                        .disabled(!isEditMode)
                     }
                     
                     VTSLiquidPickerField(
@@ -747,13 +826,25 @@ struct PhieuGiaCongDetailView: View {
         .buttonStyle(.plain)
     }
     
+    private func normalizePlate(_ input: String) -> String {
+        input.uppercased()
+            .replacingOccurrences(of: "-", with: "")
+            .replacingOccurrences(of: ".", with: "")
+            .replacingOccurrences(of: " ", with: "")
+    }
+    
     private func populateFields(with details: TPhieuvc_Giacong_DanhSach) {
         ngay = Date.fromAPIString(details.ngay) ?? Date()
         soThamChieu = details.soThamChieu ?? ""
-        nhanVien = details.nhanVien ?? ""
         xeNgoai = details.xeNgoai
         soXe = details.soXe ?? ""
-        taiXe = details.taiXe ?? ""
+        if details.xeNgoai {
+            taiXe = details.taiXe ?? ""
+            nhanVien = ""
+        } else {
+            nhanVien = details.nhanVien ?? details.taiXe ?? ""
+            taiXe = ""
+        }
         khachHang = details.khachHang ?? ""
         hangHoa = details.hangHoa
         trongLuongXe = String(details.trongLuongXe)
@@ -847,6 +938,9 @@ struct PhieuGiaCongDetailView: View {
         let tg5 = thoiGian05 ?? (hinh05 != nil ? now : nil)
         let tg6 = thoiGian06 ?? (hinh06 != nil ? now : nil)
         
+        let finalNhanVien: String? = xeNgoai ? nil : (nhanVien.isEmpty ? nil : nhanVien)
+        let finalTaiXe: String? = xeNgoai ? (taiXe.isEmpty ? nil : taiXe) : nil
+        
         do {
             if viewModel.isNew {
                 let data = Params_ThemPhieu_GiaCong(
@@ -854,8 +948,8 @@ struct PhieuGiaCongDetailView: View {
                     soThamChieu: soThamChieu.isEmpty ? nil : soThamChieu,
                     xeNgoai: xeNgoai,
                     soXe: soXe,
-                    nhanVien: nhanVien.isEmpty ? nil : nhanVien,
-                    taiXe: taiXe,
+                    nhanVien: finalNhanVien,
+                    taiXe: finalTaiXe,
                     khachHang: khachHang,
                     hangHoa: hangHoa,
                     trongLuongXe: Double(trongLuongXe) ?? 0,
@@ -885,8 +979,8 @@ struct PhieuGiaCongDetailView: View {
                     soThamChieu: soThamChieu.isEmpty ? nil : soThamChieu,
                     xeNgoai: xeNgoai,
                     soXe: soXe,
-                    nhanVien: nhanVien.isEmpty ? nil : nhanVien,
-                    taiXe: taiXe,
+                    nhanVien: finalNhanVien,
+                    taiXe: finalTaiXe,
                     khachHang: khachHang,
                     hangHoa: hangHoa,
                     trongLuongXe: Double(trongLuongXe) ?? 0,

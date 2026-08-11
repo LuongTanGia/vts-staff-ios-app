@@ -71,6 +71,46 @@ struct PhieuNhapDetailView: View {
         AuthManager.shared.getPermission(for: "VTSSTAFF_DULIEU_PHIEUNHAP")?.del == true
     }
     
+    private var currentNhanVienDisplay: String {
+        if let found = viewModel.taiXeOptions.first(where: { $0.ma == taiXe }) {
+            return found.ten
+        }
+        if case .success(let details) = viewModel.state, let details = details, let name = details.tenNhanVien, !name.isEmpty {
+            return name
+        }
+        return taiXe.isEmpty ? "---" : taiXe
+    }
+    
+    private var currentHangHoaDisplay: String {
+        if let found = viewModel.hangHoaOptions.first(where: { $0.ma == hangHoa }) {
+            return found.ten
+        }
+        if case .success(let details) = viewModel.state, let details = details, !details.tenHangHoa.isEmpty {
+            return details.tenHangHoa
+        }
+        return hangHoa.isEmpty ? "---" : hangHoa
+    }
+    
+    private var currentKhachHangDisplay: String {
+        if let found = viewModel.khachHangOptions.first(where: { $0.ma == khachHang }) {
+            return found.ten
+        }
+        if case .success(let details) = viewModel.state, let details = details, let name = details.tenKhachHang, !name.isEmpty {
+            return name
+        }
+        return khachHang.isEmpty ? "---" : khachHang
+    }
+    
+    private var headerTitleDisplay: String {
+        if viewModel.isNew {
+            return "Chuyến hàng nhận mới"
+        } else if isEditMode {
+            return "Cập nhật chuyến hàng nhận"
+        } else {
+            return "Thông tin chuyến hàng nhận"
+        }
+    }
+    
     init(soPhieu: String?, existing: TPhieuvc_Nhap_DanhSach? = nil, isEditMode: Bool = false) {
         self.initialEditMode = isEditMode
         self._isEditMode = State(initialValue: isEditMode || soPhieu == nil || soPhieu?.isEmpty == true)
@@ -91,6 +131,15 @@ struct PhieuNhapDetailView: View {
                 }
             ) { details in
                 VStack(spacing: 0) {
+                    VTSVoucherHeaderProfileCard(
+                        iconName: "building.2.fill",
+                        soXe: xeNgoai ? soXeNgoai : soXeNha,
+                        tenNhanVien: currentNhanVienDisplay,
+                        tenHangHoa: currentHangHoaDisplay,
+                        trongLuongHang: trongLuongHang,
+                        tenKhachHang: currentKhachHangDisplay
+                    )
+                    
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 16) {
                             formFieldsCard(details: details)
@@ -147,7 +196,7 @@ struct PhieuNhapDetailView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "VTS-Staff",
-            subtitle: "Thông tin chuyến hàng nhận",
+            subtitle: headerTitleDisplay,
             isWhiteText: true,
             leading: {},
             trailing: {
@@ -335,7 +384,23 @@ struct PhieuNhapDetailView: View {
                     isReadOnly: !isEditMode
                 )
                 .onChange(of: soXeNgoai) { _, newValue in
-                    if !newValue.isEmpty {
+                    let upper = newValue.uppercased()
+                    if soXeNgoai != upper {
+                        soXeNgoai = upper
+                    }
+                    let normalizedInput = normalizePlate(upper)
+                    if !normalizedInput.isEmpty,
+                       let matchedXe = viewModel.xeOptions.first(where: {
+                           normalizePlate($0.ma) == normalizedInput || normalizePlate($0.ten) == normalizedInput
+                       }) {
+                        xeNgoai = false
+                        soXeNha = matchedXe.ma
+                        soXeNgoai = ""
+                        soXeError = nil
+                        if !matchedXe.maTaiXe.isEmpty {
+                            taiXe = matchedXe.maTaiXe
+                        }
+                    } else if !upper.isEmpty {
                         xeNgoai = true
                         soXeNha = ""
                         soXeError = nil
@@ -370,17 +435,27 @@ struct PhieuNhapDetailView: View {
                 .disabled(!isEditMode)
             }
             
-            // Row 3: Tài xế (truyền mã tài xế)
-            VTSLiquidPickerField(
-                label: "Tài xế",
-                selection: $taiXe,
-                options: viewModel.taiXeOptions.map { $0.ma },
-                displayName: { code in
-                    viewModel.taiXeOptions.first(where: { $0.ma == code })?.ten ?? code
-                },
-                errorMessage: taiXeError
-            )
-            .disabled(!isEditMode)
+            // Row 3: Tài xế (Picker nếu xe nhà, Text Input nếu xe ngoài)
+            if xeNgoai {
+                VTSLiquidTextField(
+                    label: "Tài xế ngoài",
+                    text: $taiXe,
+                    placeholder: "Nhập tên tài xế...",
+                    isReadOnly: !isEditMode,
+                    errorMessage: taiXeError
+                )
+            } else {
+                VTSLiquidPickerField(
+                    label: "Tài xế",
+                    selection: $taiXe,
+                    options: viewModel.taiXeOptions.map { $0.ma },
+                    displayName: { code in
+                        viewModel.taiXeOptions.first(where: { $0.ma == code })?.ten ?? code
+                    },
+                    errorMessage: taiXeError
+                )
+                .disabled(!isEditMode)
+            }
             
             // Row 4: Khách hàng
             VTSLiquidPickerField(
@@ -540,17 +615,25 @@ struct PhieuNhapDetailView: View {
         }
     }
     
+    private func normalizePlate(_ input: String) -> String {
+        input.uppercased()
+            .replacingOccurrences(of: "-", with: "")
+            .replacingOccurrences(of: ".", with: "")
+            .replacingOccurrences(of: " ", with: "")
+    }
+    
     private func populateFields(with details: TPhieuvc_Nhap_DanhSach) {
         ngay = Date.fromAPIString(details.ngay) ?? Date()
         xeNgoai = details.xeNgoai
         if details.xeNgoai {
             soXeNgoai = details.soXe ?? ""
             soXeNha = ""
+            taiXe = details.taiXe ?? ""
         } else {
             soXeNha = details.soXe ?? ""
             soXeNgoai = ""
+            taiXe = details.nhanVien ?? details.taiXe ?? ""
         }
-        taiXe = details.taiXe ?? ""
         khachHang = details.khachHang ?? ""
         hangHoa = details.hangHoa
         if details.trongLuongHang > 0 {
@@ -624,6 +707,8 @@ struct PhieuNhapDetailView: View {
         let hinh01Base64 = hinh01?.jpegData(compressionQuality: 0.7)?.base64EncodedString()
         let hinh02Base64 = hinh02?.jpegData(compressionQuality: 0.7)?.base64EncodedString()
         let currentSoXe = xeNgoai ? soXeNgoai : soXeNha
+        let finalNhanVien: String? = xeNgoai ? nil : (taiXe.isEmpty ? nil : taiXe)
+        let finalTaiXe: String? = xeNgoai ? (taiXe.isEmpty ? nil : taiXe) : nil
         
         do {
             if viewModel.isNew {
@@ -632,8 +717,8 @@ struct PhieuNhapDetailView: View {
                     soThamChieu: nil,
                     xeNgoai: xeNgoai,
                     soXe: currentSoXe,
-                    nhanVien: nil,
-                    taiXe: taiXe,
+                    nhanVien: finalNhanVien,
+                    taiXe: finalTaiXe,
                     khachHang: khachHang,
                     hangHoa: hangHoa,
                     trongLuongXe: 0,
@@ -659,8 +744,8 @@ struct PhieuNhapDetailView: View {
                     soThamChieu: nil,
                     xeNgoai: xeNgoai,
                     soXe: currentSoXe,
-                    nhanVien: nil,
-                    taiXe: taiXe,
+                    nhanVien: finalNhanVien,
+                    taiXe: finalTaiXe,
                     khachHang: khachHang,
                     hangHoa: hangHoa,
                     trongLuongXe: 0,
