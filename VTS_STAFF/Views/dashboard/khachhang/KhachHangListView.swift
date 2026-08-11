@@ -118,14 +118,14 @@ struct KhachHangListView: View {
                                     
                                 },
                                 rowHeight: nil,
-                                disableVerticalScrolling: false
+                                disableVerticalScrolling: false,
+                                showCompanyFooter: true
                             )
                         }
                     }
                 }
-                
-                VTSCompanyFooter()
             }
+            .ignoresSafeArea(edges: .bottom)
         }
         .task {
             if !hasLoadedData {

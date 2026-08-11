@@ -76,6 +76,7 @@ struct NhanVienDetailView: View {
                     
                     VTSCompanyFooter()
                 }
+                .ignoresSafeArea(edges: .bottom)
                 .onAppear {
                     populateFields(with: details)
                 }

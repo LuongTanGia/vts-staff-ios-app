@@ -143,15 +143,15 @@ struct TruyVanChuyenXeView: View {
                                 },
                                 
                                
-                                disableVerticalScrolling: false
+                                disableVerticalScrolling: false,
+                                showCompanyFooter: true
                             )
                         }
                     }
                 }
                 .background(Color.vtsBg)
-                
-                VTSCompanyFooter()
             }
+            .ignoresSafeArea(edges: .bottom)
         }
         .task {
             if !hasLoadedData {

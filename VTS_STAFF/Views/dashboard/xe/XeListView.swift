@@ -131,14 +131,14 @@ struct XeListView: View {
                                     
                                 },
                                 rowHeight: 40,
-                                disableVerticalScrolling: false
+                                disableVerticalScrolling: false,
+                                showCompanyFooter: true
                             )
                         }
                     }
                 }
-                
-                VTSCompanyFooter()
             }
+            .ignoresSafeArea(edges: .bottom)
         }
         .task {
             await viewModel.loadData()

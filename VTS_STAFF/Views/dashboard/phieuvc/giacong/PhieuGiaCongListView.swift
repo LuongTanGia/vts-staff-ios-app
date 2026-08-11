@@ -96,22 +96,23 @@ struct PhieuGiaCongListView: View {
                         let totalWeight = filtered.reduce(0) { $0 + $1.trongLuongHang }
                         HStack(spacing: 0) {
                             Text("Tổng cộng \(filtered.count) phiếu")
-                                .font(.system(size: 15, weight: .bold))
+                                .font(.system(size: 13, weight: .bold))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity, alignment: .center)
                             
                             Text(Double(totalWeight).toFormattedString(maxDecimals: 0))
-                                .font(.system(size: 15, weight: .bold))
+                                .font(.system(size: 13, weight: .bold))
                                 .foregroundColor(.white)
                                 .frame(width: 110, alignment: .center)
                         }
-                        .frame(height: 48)
+                        .padding(.vertical, 7)
                         .background(Color.vtsPrimary)
                     }
                 }
                 
                 VTSCompanyFooter()
             }
+            .ignoresSafeArea(edges: .bottom)
         }
         .task {
             if !hasLoadedData {

@@ -51,6 +51,7 @@ struct TruyVanXuatView: View {
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .background(Color.vtsPrimary)
             }
+            .ignoresSafeArea(edges: .bottom)
         }
         .task {
             if !hasLoadedData {
@@ -180,13 +181,13 @@ struct TruyVanXuatView: View {
                             return nil
                         },
                      
-                        disableVerticalScrolling: false
+                        disableVerticalScrolling: false,
+                        showCompanyFooter: true
                     )
                 }
-                
-                VTSCompanyFooter()
             }
         }
+        .ignoresSafeArea(edges: .bottom)
         .background(Color.vtsBg)
         
     }

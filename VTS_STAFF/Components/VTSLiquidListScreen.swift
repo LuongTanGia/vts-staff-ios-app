@@ -367,32 +367,44 @@ struct VTSCompanyFooter: View {
     }
     
     var body: some View {
-        HStack(alignment: .center, spacing: 10) {
-            // Logo placeholder (thay bằng Image("vts_logo") nếu có asset)
+        HStack(alignment: .center, spacing: 8) {
+            if UIImage(named: "logoFooter") != nil {
+                Image("logoFooter")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 22)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.white)
+                    .cornerRadius(3)
+            } else {
+                Text("VTS")
+                    .font(.system(size: 11, weight: .black))
+                    .foregroundColor(.vtsPrimary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(Color.white)
+                    .cornerRadius(3)
+            }
             
-            Image("logoFooter")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 100)
-                .padding(.horizontal, 15)
-                .padding(.vertical, 5)
-                .background(Color.vtsBg)
-            
-            
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 1) {
                 Text(companyName)
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.system(size: 11, weight: .bold))
                     .foregroundStyle(.white)
                 Text(address)
-                    .font(.system(size: 11))
-                    .foregroundStyle(.white.opacity(0.8))
-                    .lineLimit(2)
+                    .font(.system(size: 9))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .lineLimit(1)
             }
             
             Spacer()
         }
+        .padding(.horizontal, 10)
+        .padding(.top, 6)
+        .padding(.bottom, 2)
+        .frame(maxWidth: .infinity)
         .background(Color.vtsPrimary)
-        .frame(height: 0)
+        .ignoresSafeArea(edges: .bottom)
     }
 }
 

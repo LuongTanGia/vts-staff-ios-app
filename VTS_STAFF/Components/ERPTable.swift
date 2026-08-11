@@ -111,6 +111,7 @@ public struct ERPTable<Data: Identifiable>: View {
     // Premium settings
     public var rowHeight: CGFloat? = nil
     public var disableVerticalScrolling: Bool = false
+    public var showCompanyFooter: Bool = false
     
     @State private var animate = false
     @State private var isFirstAppear = true
@@ -136,7 +137,8 @@ public struct ERPTable<Data: Identifiable>: View {
         customHeaderBuilder: ((CGFloat) -> AnyView?)? = nil,
         customFooterBuilder: ((CGFloat) -> AnyView?)? = nil,
         rowHeight: CGFloat? = nil,
-        disableVerticalScrolling: Bool = false
+        disableVerticalScrolling: Bool = false,
+        showCompanyFooter: Bool = false
     ) {
         self.dataSource = dataSource
         self.columns = columns
@@ -155,6 +157,7 @@ public struct ERPTable<Data: Identifiable>: View {
         self.rowHeight = rowHeight
         self.disableVerticalScrolling = disableVerticalScrolling
         self.customFooterBuilder = customFooterBuilder
+        self.showCompanyFooter = showCompanyFooter
         
         if let defaultSortKey = defaultSortKey {
             let foundCol = columns.first(where: { $0.key == defaultSortKey })
@@ -299,6 +302,9 @@ public struct ERPTable<Data: Identifiable>: View {
                 footer(tableWidth)
             }
             
+            if showCompanyFooter {
+                VTSCompanyFooter()
+            }
         }
         .background(
             GeometryReader { geo in
@@ -465,7 +471,7 @@ private extension ERPTable {
                 }
             }
             .padding(.horizontal, 8)
-            .padding(.vertical, 8)
+            .padding(.vertical, 4)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: column.alignment.swiftUI)
             .font(.vtsTableFooter)
             .foregroundColor(Color.vtsBg)

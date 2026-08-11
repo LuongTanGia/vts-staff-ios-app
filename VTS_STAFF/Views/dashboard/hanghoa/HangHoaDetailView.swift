@@ -71,6 +71,7 @@ struct HangHoaDetailView: View {
                     
                     VTSCompanyFooter()
                 }
+                .ignoresSafeArea(edges: .bottom)
                 .onAppear {
                     if let details = details {
                         populateFields(with: details)
