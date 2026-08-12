@@ -34,7 +34,7 @@ final class PhieuGiaCongService {
         return try await net.post(path: "\(base)/ThongTin", body: Params_SoPhieu(soPhieu: soPhieu))
     }
     
-    func thongTinHinhAnh(soPhieu: String, danhSachHinh: [Params_MaHinh]) async throws -> APIListResponse<String> {
+    func thongTinHinhAnh(soPhieu: String, danhSachHinh: [Params_MaHinh]) async throws -> APIListResponse<THinhAnhResult> {
         let body = Params_ThongTin_HinhAnh(soPhieu: soPhieu, danhSachHinh: danhSachHinh)
         return try await net.post(path: "\(base)/ThongTin_HinhAnh", body: body)
     }
@@ -75,7 +75,7 @@ final class PhieuNhapService {
         return try await net.post(path: "\(base)/ThongTin", body: Params_SoPhieu(soPhieu: soPhieu))
     }
     
-    func thongTinHinhAnh(soPhieu: String, danhSachHinh: [Params_MaHinh]) async throws -> APIListResponse<String> {
+    func thongTinHinhAnh(soPhieu: String, danhSachHinh: [Params_MaHinh]) async throws -> APIListResponse<THinhAnhResult> {
         return try await net.post(path: "\(base)/ThongTin_HinhAnh",
                                   body: Params_ThongTin_HinhAnh(soPhieu: soPhieu, danhSachHinh: danhSachHinh))
     }
@@ -116,7 +116,7 @@ final class PhieuXuatService {
         return try await net.post(path: "\(base)/ThongTin", body: Params_SoPhieu(soPhieu: soPhieu))
     }
     
-    func thongTinHinhAnh(soPhieu: String, danhSachHinh: [Params_MaHinh]) async throws -> APIListResponse<String> {
+    func thongTinHinhAnh(soPhieu: String, danhSachHinh: [Params_MaHinh]) async throws -> APIListResponse<THinhAnhResult> {
         return try await net.post(path: "\(base)/ThongTin_HinhAnh",
                                   body: Params_ThongTin_HinhAnh(soPhieu: soPhieu, danhSachHinh: danhSachHinh))
     }

@@ -457,244 +457,209 @@ struct PhieuGiaCongDetailView: View {
     private func formFieldsCard(details: TPhieuvc_Giacong_DanhSach?) -> some View {
         VTSLiquidFormCard {
             VStack(alignment: .leading, spacing: 14) {
-                if !isEditMode, let d = details {
-                    infoRow(label: "Số phiếu", value: d.soPhieu, icon: "number")
-                    infoRow(label: "Ngày lập", value: Date.fromAPIString(d.ngay)?.formatted(date: .numeric, time: .shortened) ?? d.ngay, icon: "calendar")
-                    infoRow(label: "Số tham chiếu", value: d.soThamChieu ?? "", icon: "doc.text")
-                    infoRow(label: "Nhân viên theo dõi", value: d.tenNhanVien ?? d.nhanVien ?? "", icon: "person.badge.shield.checkmark.fill")
-                    infoRow(label: "Xe ngoài", value: d.xeNgoai ? "Có" : "Không", icon: "car.2.fill")
-                    infoRow(label: "Số xe", value: d.soXe ?? "", icon: "truck.box.fill")
-                    infoRow(label: "Tài xế", value: d.taiXe ?? "", icon: "person.crop.rectangle.fill")
-                    infoRow(label: "Khách hàng", value: d.tenKhachHang ?? d.khachHang ?? "", icon: "building.2.fill")
-                    infoRow(label: "Hàng hoá", value: d.tenHangHoa, icon: "shippingbox.fill")
-                    infoRow(label: "Trọng lượng xe", value: "\(d.trongLuongXe) kg", icon: "scalemass.fill")
-                    infoRow(label: "Trọng lượng hàng", value: "\(d.trongLuongHang) kg", icon: "scalemass")
-                    infoRow(label: "Hàng gia công", value: d.tenHangHoaGC ?? d.hangHoaGC ?? "", icon: "gearshape")
-                    infoRow(label: "Trọng lượng gia công", value: "\(d.trongLuongHangGC) kg", icon: "scalemass")
-                    infoRow(label: "Hàng thu hồi", value: d.tenHangHoaTV ?? d.hangHoaTV ?? "", icon: "arrow.uturn.backward")
-                    infoRow(label: "Trọng lượng thu hồi", value: "\(d.trongLuongHangTV) kg", icon: "scalemass")
-                    infoRow(label: "Trạng thái", value: d.tenTrangThai ?? "", icon: "info.circle.fill")
-                    infoRow(label: "Ghi chú", value: d.ghiChu ?? "", icon: "note.text")
-                    
-                    // Ảnh hiển thị chế độ xem
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Hình ảnh hàng hoá")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(.vtsPrimary)
-                        
-                        HStack(spacing: 12) {
-                            photoBox(slotIndex: 1, label: "Ảnh hàng hoá 1", image: $hinh01)
-                            photoBox(slotIndex: 2, label: "Ảnh hàng hoá 2", image: $hinh02)
-                        }
-                        
-                        Text("Hình ảnh gia công")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(.vtsPrimary)
-                            .padding(.top, 4)
-                        
-                        HStack(spacing: 12) {
-                            photoBox(slotIndex: 3, label: "Ảnh gia công 1", image: $hinh03)
-                            photoBox(slotIndex: 4, label: "Ảnh gia công 2", image: $hinh04)
-                        }
-                        
-                        Text("Hình ảnh thu hồi")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(.vtsPrimary)
-                            .padding(.top, 4)
-                        
-                        HStack(spacing: 12) {
-                            photoBox(slotIndex: 5, label: "Ảnh thu hồi 1", image: $hinh05)
-                            photoBox(slotIndex: 6, label: "Ảnh thu hồi 2", image: $hinh06)
+                // Row 1: Left Barcode / Photo box placeholder & Right Date field
+                HStack(spacing: 12) {
+                    // Left: Barcode / slot placeholder box
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(hex: "7C8071"))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.primary.opacity(0.12), lineWidth: 1)
+                            )
+                        if let img = hinh01 {
+                            Image(uiImage: img)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(height: 52)
+                                .clipped()
+                                .cornerRadius(12)
+                        } else {
+                            Image(systemName: "photo.badge.arrow.up")
+                                .font(.system(size: 24))
+                                .foregroundColor(Color.black.opacity(0.85))
                         }
                     }
-                    .padding(.top, 8)
-                } else {
-                    VTSLiquidDateTimeField(label: "Ngày lập phiếu", date: $ngay, displayStyle: .dateTime)
-                    VTSLiquidTextField(label: "Số tham chiếu", text: $soThamChieu, placeholder: "Nhập số tham chiếu...")
+                    .frame(height: 52)
+                    .frame(maxWidth: .infinity)
                     
-                    VTSLiquidPickerField(
-                        label: "Nhân viên theo dõi",
-                        selection: $nhanVien,
-                        options: viewModel.nhanVienOptions.map { $0.emid },
-                        displayName: { code in
-                            viewModel.nhanVienOptions.first(where: { $0.emid == code })?.emHoTen ?? code
-                        }
+                    // Right: Date field "Ngày"
+                    VTSLiquidDateTimeField(
+                        label: "Ngày",
+                        date: $ngay,
+                        displayStyle: .dateOnly
                     )
-                    
-                    Toggle(isOn: $xeNgoai) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "car.2.fill")
-                                .foregroundColor(.vtsPrimary)
-                            Text("Xe ngoài")
-                                .font(.system(size: 15, weight: .medium))
-                        }
-                    }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    
-                    if xeNgoai {
-                        VTSLiquidTextField(
-                            label: "Số xe ngoài",
-                            text: $soXe,
-                            placeholder: "Nhập số xe...",
-                            isReadOnly: !isEditMode,
-                            errorMessage: soXeError
-                        )
-                        .onChange(of: soXe) { _, newValue in
-                            let upper = newValue.uppercased()
-                            if soXe != upper {
-                                soXe = upper
-                            }
-                            let normalizedInput = normalizePlate(upper)
-                            if !normalizedInput.isEmpty,
-                               let matchedXe = viewModel.xeOptions.first(where: {
-                                   normalizePlate($0.ma) == normalizedInput || normalizePlate($0.ten) == normalizedInput
-                               }) {
-                                xeNgoai = false
-                                soXe = matchedXe.ma
-                                soXeError = nil
-                                if !matchedXe.maTaiXe.isEmpty {
-                                    nhanVien = matchedXe.maTaiXe
-                                }
-                            }
-                        }
-                        
-                        VTSLiquidTextField(
-                            label: "Tài xế ngoài",
-                            text: $taiXe,
-                            placeholder: "Nhập tên tài xế...",
-                            isReadOnly: !isEditMode,
-                            errorMessage: taiXeError
-                        )
-                    } else {
-                        VTSLiquidPickerField(
-                            label: "Nhân viên theo dõi",
-                            selection: $nhanVien,
-                            options: viewModel.nhanVienOptions.map { $0.emid },
-                            displayName: { code in
-                                viewModel.nhanVienOptions.first(where: { $0.emid == code })?.emHoTen ?? code
-                            }
-                        )
-                        .disabled(!isEditMode)
-                        
-                        VTSLiquidPickerField(
-                            label: "Số xe nhà",
-                            selection: $soXe,
-                            options: viewModel.xeOptions.map { $0.ma },
-                            displayName: { code in
-                                viewModel.xeOptions.first(where: { $0.ma == code })?.ten ?? code
-                            },
-                            displaySubtitle: { code in
-                                if let xe = viewModel.xeOptions.first(where: { $0.ma == code }) {
-                                    return "Tài xế: \(xe.tenTaiXe)"
-                                }
-                                return ""
-                            },
-                            errorMessage: soXeError
-                        )
-                        .onChange(of: soXe) { _, newSoXe in
-                            if let foundXe = viewModel.xeOptions.first(where: { $0.ma == newSoXe }) {
-                                if !foundXe.maTaiXe.isEmpty {
-                                    nhanVien = foundXe.maTaiXe
-                                }
-                            }
-                        }
-                        .disabled(!isEditMode)
-                    }
-                    
-                    VTSLiquidPickerField(
-                        label: "Khách hàng",
-                        selection: $khachHang,
-                        options: viewModel.khachHangOptions.map { $0.ma },
-                        displayName: { code in
-                            viewModel.khachHangOptions.first(where: { $0.ma == code })?.ten ?? code
-                        },
-                        errorMessage: khachHangError
-                    )
-                    
-                    VTSLiquidPickerField(
-                        label: "Hàng hoá chính",
-                        selection: $hangHoa,
-                        options: viewModel.hangHoaOptions.map { $0.ma },
-                        displayName: { code in
-                            viewModel.hangHoaOptions.first(where: { $0.ma == code })?.ten ?? code
-                        },
-                        errorMessage: hangHoaError
-                    )
-                    
-                    HStack(spacing: 12) {
-                        VTSLiquidTextField(label: "Trọng lượng xe (kg)", text: $trongLuongXe, keyboardType: .numberPad, errorMessage: trongLuongXeError)
-                        VTSLiquidTextField(label: "Trọng lượng hàng (kg)", text: $trongLuongHang, keyboardType: .numberPad, errorMessage: trongLuongHangError)
-                    }
-                    
-                    Text("Hình ảnh hàng hoá chính")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(.vtsPrimary)
-                        .padding(.top, 4)
-                    
-                    HStack(spacing: 12) {
-                        photoBox(slotIndex: 1, label: "Ảnh hàng hoá 1", image: $hinh01)
-                        photoBox(slotIndex: 2, label: "Ảnh hàng hoá 2", image: $hinh02)
-                    }
-                    
-                    // Gia Cong specific fields section
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Thông tin gia công")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.vtsPrimary)
-                            .padding(.top, 8)
-                        
-                        VTSLiquidPickerField(
-                            label: "Hàng gia công",
-                            selection: $hangHoaGC,
-                            options: [""] + viewModel.hangHoaOptions.map { $0.ma },
-                            displayName: { code in
-                                code.isEmpty ? "Không chọn" : (viewModel.hangHoaOptions.first(where: { $0.ma == code })?.ten ?? code)
-                            }
-                        )
-                        
-                        VTSLiquidTextField(label: "Trọng lượng gia công (kg)", text: $trongLuongHangGC, keyboardType: .numberPad)
-                        
-                        HStack(spacing: 12) {
-                            photoBox(slotIndex: 3, label: "Ảnh gia công 1", image: $hinh03)
-                            photoBox(slotIndex: 4, label: "Ảnh gia công 2", image: $hinh04)
-                        }
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Thông tin thu hồi / trả về")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.vtsPrimary)
-                            .padding(.top, 8)
-                        
-                        VTSLiquidPickerField(
-                            label: "Hàng thu hồi",
-                            selection: $hangHoaTV,
-                            options: [""] + viewModel.hangHoaOptions.map { $0.ma },
-                            displayName: { code in
-                                code.isEmpty ? "Không chọn" : (viewModel.hangHoaOptions.first(where: { $0.ma == code })?.ten ?? code)
-                            }
-                        )
-                        
-                        VTSLiquidTextField(label: "Trọng lượng thu hồi (kg)", text: $trongLuongHangTV, keyboardType: .numberPad)
-                        
-                        HStack(spacing: 12) {
-                            photoBox(slotIndex: 5, label: "Ảnh thu hồi 1", image: $hinh05)
-                            photoBox(slotIndex: 6, label: "Ảnh thu hồi 2", image: $hinh06)
-                        }
-                    }
-                    
-                    VTSLiquidPickerField(
-                        label: "Trạng thái",
-                        selection: $trangThai,
-                        options: viewModel.statusOptions.map { $0.ma },
-                        displayName: { code in
-                            viewModel.statusOptions.first(where: { $0.ma == code })?.ten ?? code
-                        }
-                    )
-                    
-                    VTSLiquidTextField(label: "Ghi chú", text: $ghiChu, placeholder: "Nhập ghi chú...")
+                    .disabled(!isEditMode)
+                    .frame(maxWidth: .infinity)
                 }
+                
+                // Row 2: Số phiếu
+                VTSLiquidTextField(
+                    label: "Số phiếu",
+                    text: .constant(details?.soPhieu ?? (viewModel.soPhieu ?? "")),
+                    isReadOnly: true
+                )
+                
+                // Row 3: Số xe ngoài (Left) & Số xe nhà (Right)
+                HStack(spacing: 12) {
+                    VTSLiquidTextField(
+                        label: "Số xe ngoài",
+                        text: $soXe,
+                        placeholder: "",
+                        isReadOnly: !isEditMode,
+                        errorMessage: soXeError
+                    )
+                    .onChange(of: soXe) { _, newValue in
+                        let upper = newValue.uppercased()
+                        if soXe != upper {
+                            soXe = upper
+                        }
+                    }
+                    
+                    VTSLiquidPickerField(
+                        label: "Số xe nhà",
+                        selection: $soXe,
+                        options: viewModel.xeOptions.map { $0.ma },
+                        displayName: { code in
+                            viewModel.xeOptions.first(where: { $0.ma == code })?.ten ?? (code.isEmpty ? "Số xe nhà" : code)
+                        },
+                        errorMessage: soXeError
+                    )
+                    .disabled(!isEditMode)
+                }
+                
+                // Row 4: Tài xế
+                VTSLiquidTextField(
+                    label: "Tài xế",
+                    text: $taiXe,
+                    placeholder: "",
+                    isReadOnly: !isEditMode,
+                    errorMessage: taiXeError
+                )
+                
+                // Row 5: Khách hàng
+                VTSLiquidPickerField(
+                    label: "Khách hàng",
+                    selection: $khachHang,
+                    options: viewModel.khachHangOptions.map { $0.ma },
+                    displayName: { code in
+                        viewModel.khachHangOptions.first(where: { $0.ma == code })?.ten ?? code
+                    },
+                    errorMessage: khachHangError
+                )
+                .disabled(!isEditMode)
+                
+                // Row 6: Hàng giao
+                VTSLiquidPickerField(
+                    label: "Hàng giao",
+                    selection: $hangHoa,
+                    options: viewModel.hangHoaOptions.map { $0.ma },
+                    displayName: { code in
+                        viewModel.hangHoaOptions.first(where: { $0.ma == code })?.ten ?? code
+                    },
+                    errorMessage: hangHoaError
+                )
+                .disabled(!isEditMode)
+                
+                // Row 7: Số lượng (Hàng giao)
+                VTSLiquidTextField(
+                    label: "Số lượng",
+                    text: $trongLuongHang,
+                    keyboardType: .numberPad,
+                    isReadOnly: !isEditMode,
+                    errorMessage: trongLuongHangError
+                )
+                
+                // Row 8: Thời điểm cân hàng giao
+                VTSLiquidPickerField(
+                    label: "Thời điểm cân hàng giao",
+                    selection: .constant(""),
+                    options: [],
+                    displayName: { _ in "Thời điểm cân hàng giao" }
+                )
+                .disabled(!isEditMode)
+                
+                // Row 9: Photo 1 & 2 for Hàng giao
+                HStack(spacing: 12) {
+                    photoBox(slotIndex: 1, label: "Ảnh hàng giao 1", image: $hinh01)
+                    photoBox(slotIndex: 2, label: "Ảnh hàng giao 2", image: $hinh02)
+                }
+                
+                // Row 10: Hàng bán
+                VTSLiquidPickerField(
+                    label: "Hàng bán",
+                    selection: $hangHoaGC,
+                    options: [""] + viewModel.hangHoaOptions.map { $0.ma },
+                    displayName: { code in
+                        code.isEmpty ? "Hàng bán" : (viewModel.hangHoaOptions.first(where: { $0.ma == code })?.ten ?? code)
+                    }
+                )
+                .disabled(!isEditMode)
+                
+                // Row 11: Số lượng (Hàng bán)
+                VTSLiquidTextField(
+                    label: "Số lượng",
+                    text: $trongLuongHangGC,
+                    keyboardType: .numberPad,
+                    isReadOnly: !isEditMode
+                )
+                
+                // Row 12: Thời điểm cân hàng bán
+                VTSLiquidPickerField(
+                    label: "Thời điểm cân hàng bán",
+                    selection: .constant(""),
+                    options: [],
+                    displayName: { _ in "Thời điểm cân hàng bán" }
+                )
+                .disabled(!isEditMode)
+                
+                // Row 13: Photo 3 & 4 for Hàng bán
+                HStack(spacing: 12) {
+                    photoBox(slotIndex: 3, label: "Ảnh hàng bán 1", image: $hinh03)
+                    photoBox(slotIndex: 4, label: "Ảnh hàng bán 2", image: $hinh04)
+                }
+                
+                // Row 14: Hàng thu về
+                VTSLiquidPickerField(
+                    label: "Hàng thu về",
+                    selection: $hangHoaTV,
+                    options: [""] + viewModel.hangHoaOptions.map { $0.ma },
+                    displayName: { code in
+                        code.isEmpty ? "Hàng thu về" : (viewModel.hangHoaOptions.first(where: { $0.ma == code })?.ten ?? code)
+                    }
+                )
+                .disabled(!isEditMode)
+                
+                // Row 15: Số lượng (Hàng thu về)
+                VTSLiquidTextField(
+                    label: "Số lượng",
+                    text: $trongLuongHangTV,
+                    keyboardType: .numberPad,
+                    isReadOnly: !isEditMode
+                )
+                
+                // Row 16: Thời điểm cân hàng thu về
+                VTSLiquidPickerField(
+                    label: "Thời điểm cân hàng thu về",
+                    selection: .constant(""),
+                    options: [],
+                    displayName: { _ in "Thời điểm cân hàng thu về" }
+                )
+                .disabled(!isEditMode)
+                
+                // Row 17: Photo 5 & 6 for Hàng thu về
+                HStack(spacing: 12) {
+                    photoBox(slotIndex: 5, label: "Ảnh hàng thu về 1", image: $hinh05)
+                    photoBox(slotIndex: 6, label: "Ảnh hàng thu về 2", image: $hinh06)
+                }
+                
+                // Row 18: Ghi chú
+                VTSLiquidTextField(
+                    label: "Ghi chú",
+                    text: $ghiChu,
+                    placeholder: "",
+                    isReadOnly: !isEditMode
+                )
             }
         }
     }
@@ -707,7 +672,7 @@ struct PhieuGiaCongDetailView: View {
                     Image(uiImage: img)
                         .resizable()
                         .scaledToFill()
-                        .frame(height: 120)
+                        .frame(height: 130)
                         .frame(maxWidth: .infinity)
                         .clipped()
                         .cornerRadius(12)
@@ -758,28 +723,17 @@ struct PhieuGiaCongDetailView: View {
             } else {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(uiColor: .systemGray6))
+                        .fill(Color(hex: "7C8071"))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color.primary.opacity(0.12), lineWidth: 1)
                         )
                     
-                    VStack(spacing: 6) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.vtsPrimary.opacity(0.12))
-                                .frame(width: 42, height: 42)
-                            Image(systemName: "photo.fill")
-                                .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(.vtsPrimary)
-                        }
-                        
-                        Text(isEditMode ? "Thêm \(label.lowercased())" : "Chưa có ảnh")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(isEditMode ? .vtsTxtSecondary : .vtsTxtTertiary)
-                    }
+                    Image(systemName: "photo.badge.arrow.up")
+                        .font(.system(size: 38, weight: .regular))
+                        .foregroundColor(Color.black.opacity(0.85))
                 }
-                .frame(height: 120)
+                .frame(height: 130)
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
                 .onTapGesture {
@@ -837,25 +791,41 @@ struct PhieuGiaCongDetailView: View {
     private func populateFields(with details: TPhieuvc_Giacong_DanhSach) {
         ngay = Date.fromAPIString(details.ngay) ?? Date()
         soThamChieu = details.soThamChieu ?? ""
-        xeNgoai = details.xeNgoai
-        soXe = details.soXe ?? ""
-        if details.xeNgoai {
-            taiXe = details.taiXe ?? ""
-            nhanVien = ""
-        } else {
-            nhanVien = details.nhanVien ?? details.taiXe ?? ""
-            taiXe = ""
-        }
+        nhanVien = details.nhanVien ?? ""
         khachHang = details.khachHang ?? ""
+        
+        let plate = details.soXe ?? ""
+        soXe = plate
+        let upperPlate = plate.uppercased()
+        let normalizedPlate = normalizePlate(upperPlate)
+        
+        if !normalizedPlate.isEmpty,
+           let found = viewModel.xeOptions.first(where: {
+               normalizePlate($0.ma) == normalizedPlate || normalizePlate($0.ten) == normalizedPlate
+           }) {
+            xeNgoai = false
+            soXe = found.ma
+            if !found.maTaiXe.isEmpty {
+                nhanVien = found.maTaiXe
+            }
+            taiXe = details.taiXe ?? found.tenTaiXe
+        } else {
+            xeNgoai = details.xeNgoai
+            taiXe = details.taiXe ?? ""
+        }
+        
         hangHoa = details.hangHoa
-        trongLuongXe = String(details.trongLuongXe)
-        trongLuongHang = String(details.trongLuongHang)
+        trongLuongXe = details.trongLuongXe == 0 ? "" : String(details.trongLuongXe)
+        trongLuongHang = details.trongLuongHang == 0 ? "" : String(details.trongLuongHang)
+        
         hangHoaGC = details.hangHoaGC ?? ""
-        trongLuongHangGC = String(details.trongLuongHangGC)
+        trongLuongHangGC = details.trongLuongHangGC == 0 ? "" : String(details.trongLuongHangGC)
+        
         hangHoaTV = details.hangHoaTV ?? ""
-        trongLuongHangTV = String(details.trongLuongHangTV)
+        trongLuongHangTV = details.trongLuongHangTV == 0 ? "" : String(details.trongLuongHangTV)
+        
+        trangThai = details.trangThai ?? "Moi"
         ghiChu = details.ghiChu ?? ""
-        trangThai = details.trangThai ?? ""
         
         if let img1 = UIImage.fromBase64(details.image1Base64) { hinh01 = img1 }
         hinh01Text = details.hinh01NoiDungText

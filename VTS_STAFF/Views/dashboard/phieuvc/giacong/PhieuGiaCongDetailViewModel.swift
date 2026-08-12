@@ -75,12 +75,12 @@ final class PhieuGiaCongDetailViewModel: ObservableObject {
                 let (infoRes, hinhRes) = await (try? infoTask, try? hinhTask)
                 if var found = infoRes?.DataResult {
                     if let list = hinhRes?.DataResults, !list.isEmpty {
-                        if list.indices.contains(0), !list[0].isEmpty { found.hinh01NoiDung = list[0] }
-                        if list.indices.contains(1), !list[1].isEmpty { found.hinh02NoiDung = list[1] }
-                        if list.indices.contains(2), !list[2].isEmpty { found.hinh03NoiDung = list[2] }
-                        if list.indices.contains(3), !list[3].isEmpty { found.hinh04NoiDung = list[3] }
-                        if list.indices.contains(4), !list[4].isEmpty { found.hinh05NoiDung = list[4] }
-                        if list.indices.contains(5), !list[5].isEmpty { found.hinh06NoiDung = list[5] }
+                        if let item = list.first(where: { $0.maHinh == "Hinh01" }) ?? (list.indices.contains(0) ? list[0] : nil), let str = item.noiDungHinh, !str.isEmpty { found.hinh01NoiDung = str }
+                        if let item = list.first(where: { $0.maHinh == "Hinh02" }) ?? (list.indices.contains(1) ? list[1] : nil), let str = item.noiDungHinh, !str.isEmpty { found.hinh02NoiDung = str }
+                        if let item = list.first(where: { $0.maHinh == "Hinh03" }) ?? (list.indices.contains(2) ? list[2] : nil), let str = item.noiDungHinh, !str.isEmpty { found.hinh03NoiDung = str }
+                        if let item = list.first(where: { $0.maHinh == "Hinh04" }) ?? (list.indices.contains(3) ? list[3] : nil), let str = item.noiDungHinh, !str.isEmpty { found.hinh04NoiDung = str }
+                        if let item = list.first(where: { $0.maHinh == "Hinh05" }) ?? (list.indices.contains(4) ? list[4] : nil), let str = item.noiDungHinh, !str.isEmpty { found.hinh05NoiDung = str }
+                        if let item = list.first(where: { $0.maHinh == "Hinh06" }) ?? (list.indices.contains(5) ? list[5] : nil), let str = item.noiDungHinh, !str.isEmpty { found.hinh06NoiDung = str }
                     }
                     state = .success(found)
                 } else if let existing = existing {

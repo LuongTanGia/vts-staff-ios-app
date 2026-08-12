@@ -335,404 +335,567 @@ struct HomeView: View {
     
     @ViewBuilder
     private func transportCustomTable(filteredList: [THangHoa_ChuyenXeDataResult]) -> some View {
-        let totalCol1 = filteredList.sum(by: \.colValue1)
-        let totalCol2 = filteredList.sum(by: \.colValue2)
-        let totalCol3 = filteredList.sum(by: \.colValue3)
-        let totalCol4 = filteredList.sum(by: \.colValue4)
-        
-        let tableBorderColor = Color(hex: "C5D2E0")
-        let headerBgColor = Color(hex: "E8EEF9")
-        let headerTextColor = Color(hex: "0F2D59")
-        
-        let col1Width: CGFloat = 28
-        let colXeWidth: CGFloat = 44
-        let colQtyWidth: CGFloat = 65
-        
-        VStack(spacing: 0) {
-            // Multi-level Header
-            HStack(spacing: 0) {
-                Text("#")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .frame(width: col1Width, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("Hàng hóa")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 4)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                // Group "Nhận"
-                VStack(spacing: 0) {
-                    Text("Nhận")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(headerTextColor)
-                        .padding(.vertical, 4)
-                        .frame(maxWidth: .infinity)
-                        .border(tableBorderColor, width: 0.5)
-                    
-                    HStack(spacing: 0) {
-                        Text("Xe")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(headerTextColor)
-                            .padding(.vertical, 4)
-                            .frame(width: colXeWidth, alignment: .center)
-                            .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
-                        
-                        Text("Số lượng")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(headerTextColor)
-                            .padding(.vertical, 4)
-                            .frame(width: colQtyWidth, alignment: .center)
-                            .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
-                    }
-                }
-                
-                // Group "Giao"
-                VStack(spacing: 0) {
-                    Text("Giao")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(headerTextColor)
-                        .padding(.vertical, 4)
-                        .frame(maxWidth: .infinity)
-                        .border(tableBorderColor, width: 0.5)
-                    
-                    HStack(spacing: 0) {
-                        Text("Xe")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(headerTextColor)
-                            .padding(.vertical, 4)
-                            .frame(width: colXeWidth, alignment: .center)
-                            .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
-                        
-                        Text("Số lượng")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(headerTextColor)
-                            .padding(.vertical, 4)
-                            .frame(width: colQtyWidth, alignment: .center)
-                            .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
-                    }
-                }
-            }
-            .fixedSize(horizontal: false, vertical: true)
-            .background(headerBgColor)
+        VTSFlexibleTableContainer { containerW in
+            let totalCol1 = filteredList.sum(by: \.colValue1)
+            let totalCol2 = filteredList.sum(by: \.colValue2)
+            let totalCol3 = filteredList.sum(by: \.colValue3)
+            let totalCol4 = filteredList.sum(by: \.colValue4)
             
-            // Data Rows
-            ForEach(Array(filteredList.enumerated()), id: \.offset) { index, item in
+            let tableBorderColor = Color(hex: "C5D2E0")
+            let headerBgColor = Color(hex: "E8EEF9")
+            let headerTextColor = Color(hex: "0F2D59")
+            
+            let col1Width: CGFloat = max(24, containerW * 0.08)
+            let colXeWidth: CGFloat = max(40, containerW * 0.15)
+            let colQtyWidth: CGFloat = max(52, containerW * 0.21)
+            
+            VStack(spacing: 0) {
+                // Multi-level Header
                 HStack(spacing: 0) {
-                    Text("\(index + 1)")
-                        .font(.system(size: 13))
+                    Text("#")
+                        .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .frame(width: col1Width, alignment: .center)
                         .frame(maxHeight: .infinity)
-                        .border(tableBorderColor, width: 0.5)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text(item.colName ?? "")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(hex: "0F2D59"))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 7)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .frame(maxHeight: .infinity)
-                        .border(tableBorderColor, width: 0.5)
-                    
-                    Text("\(item.colValue1)")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(hex: "0F2D59"))
+                    Text("Hàng hóa")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
-                        .frame(width: colXeWidth, alignment: .trailing)
+                        .frame(maxWidth: .infinity, alignment: .center)
                         .frame(maxHeight: .infinity)
-                        .border(tableBorderColor, width: 0.5)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("\(item.colValue2)")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(hex: "0F2D59"))
-                        .padding(.horizontal, 4)
-                        .frame(width: colQtyWidth, alignment: .trailing)
-                        .frame(maxHeight: .infinity)
-                        .border(tableBorderColor, width: 0.5)
+                    // Group "Nhận"
+                    VStack(spacing: 0) {
+                        Text("Nhận")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(headerTextColor)
+                            .padding(.vertical, 4)
+                            .frame(maxWidth: .infinity)
+                            .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
+                        
+                        HStack(spacing: 0) {
+                            Text("Xe")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(headerTextColor)
+                                .padding(.vertical, 4)
+                                .frame(width: colXeWidth, alignment: .center)
+                                .frame(maxHeight: .infinity)
+                                .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                            
+                            Text("Số lượng")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(headerTextColor)
+                                .padding(.vertical, 4)
+                                .frame(width: colQtyWidth, alignment: .center)
+                                .frame(maxHeight: .infinity)
+                        }
+                    }
+                    .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("\(item.colValue3)")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(hex: "0F2D59"))
-                        .padding(.horizontal, 4)
-                        .frame(width: colXeWidth, alignment: .trailing)
-                        .frame(maxHeight: .infinity)
-                        .border(tableBorderColor, width: 0.5)
-                    
-                    Text("\(item.colValue4)")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(hex: "0F2D59"))
-                        .padding(.horizontal, 4)
-                        .frame(width: colQtyWidth, alignment: .trailing)
-                        .frame(maxHeight: .infinity)
-                        .border(tableBorderColor, width: 0.5)
+                    // Group "Giao"
+                    VStack(spacing: 0) {
+                        Text("Giao")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(headerTextColor)
+                            .padding(.vertical, 4)
+                            .frame(maxWidth: .infinity)
+                            .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
+                        
+                        HStack(spacing: 0) {
+                            Text("Xe")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(headerTextColor)
+                                .padding(.vertical, 4)
+                                .frame(width: colXeWidth, alignment: .center)
+                                .frame(maxHeight: .infinity)
+                                .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                            
+                            Text("Số lượng")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(headerTextColor)
+                                .padding(.vertical, 4)
+                                .frame(width: colQtyWidth, alignment: .center)
+                                .frame(maxHeight: .infinity)
+                        }
+                    }
                 }
                 .fixedSize(horizontal: false, vertical: true)
-                .background(Color.white)
+                .background(headerBgColor)
+                .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
+                
+                // Data Rows
+                ForEach(Array(filteredList.enumerated()), id: \.offset) { index, item in
+                    HStack(spacing: 0) {
+                        Text("\(index + 1)")
+                            .font(.system(size: 13))
+                            .foregroundColor(headerTextColor)
+                            .frame(width: col1Width, alignment: .center)
+                            .frame(maxHeight: .infinity)
+                            .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                        
+                        Text(item.colName ?? "")
+                            .font(.system(size: 13))
+                            .foregroundColor(Color(hex: "0F2D59"))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 7)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(maxHeight: .infinity)
+                            .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                        
+                        Text("\(item.colValue1)")
+                            .font(.system(size: 13))
+                            .foregroundColor(Color(hex: "0F2D59"))
+                            .padding(.horizontal, 4)
+                            .frame(width: colXeWidth, alignment: .trailing)
+                            .frame(maxHeight: .infinity)
+                            .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                        
+                        Text("\(item.colValue2)")
+                            .font(.system(size: 13))
+                            .foregroundColor(Color(hex: "0F2D59"))
+                            .padding(.horizontal, 4)
+                            .frame(width: colQtyWidth, alignment: .trailing)
+                            .frame(maxHeight: .infinity)
+                            .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                        
+                        Text("\(item.colValue3)")
+                            .font(.system(size: 13))
+                            .foregroundColor(Color(hex: "0F2D59"))
+                            .padding(.horizontal, 4)
+                            .frame(width: colXeWidth, alignment: .trailing)
+                            .frame(maxHeight: .infinity)
+                            .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                        
+                        Text("\(item.colValue4)")
+                            .font(.system(size: 13))
+                            .foregroundColor(Color(hex: "0F2D59"))
+                            .padding(.horizontal, 4)
+                            .frame(width: colQtyWidth, alignment: .trailing)
+                            .frame(maxHeight: .infinity)
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .background(Color.white)
+                    .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
+                }
+                
+                // Summary Row ("Cộng")
+                HStack(spacing: 0) {
+                    Text(" ")
+                        .font(.system(size: 13, weight: .bold))
+                        .padding(.vertical, 7)
+                        .frame(width: col1Width, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("Cộng")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 7)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("\(totalCol1)")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 4)
+                        .frame(width: colXeWidth, alignment: .trailing)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("\(totalCol2)")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 4)
+                        .frame(width: colQtyWidth, alignment: .trailing)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("\(totalCol3)")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 4)
+                        .frame(width: colXeWidth, alignment: .trailing)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("\(totalCol4)")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 4)
+                        .frame(width: colQtyWidth, alignment: .trailing)
+                        .frame(maxHeight: .infinity)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                .background(headerBgColor)
             }
-            
-            // Summary Row ("Cộng")
-            HStack(spacing: 0) {
-                Text(" ")
-                    .font(.system(size: 13, weight: .bold))
-                    .padding(.vertical, 7)
-                    .frame(width: col1Width, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("Cộng")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 7)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("\(totalCol1)")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 4)
-                    .frame(width: colXeWidth, alignment: .trailing)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("\(totalCol2)")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 4)
-                    .frame(width: colQtyWidth, alignment: .trailing)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("\(totalCol3)")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 4)
-                    .frame(width: colXeWidth, alignment: .trailing)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("\(totalCol4)")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 4)
-                    .frame(width: colQtyWidth, alignment: .trailing)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-            }
-            .fixedSize(horizontal: false, vertical: true)
-            .background(headerBgColor)
+            .cornerRadius(2)
+            .overlay(
+                RoundedRectangle(cornerRadius: 2)
+                    .stroke(tableBorderColor, lineWidth: 0.5)
+            )
         }
-        .cornerRadius(2)
-        .overlay(
-            RoundedRectangle(cornerRadius: 2)
-                .stroke(tableBorderColor, lineWidth: 0.5)
-        )
     }
     
     @ViewBuilder
     private func importCustomTable(list: [THangNhapDataResult]) -> some View {
-        let totalQty = list.filter { $0.colDataType == 0 }.sum(by: \.colValue)
-        let tableBorderColor = Color(hex: "C5D2E0")
-        let headerBgColor = Color(hex: "E8EEF9")
-        let headerTextColor = Color(hex: "0F2D59")
-        let subtotalBgColor = Color(hex: "C8E6C9") // Green tint
-        
-        let col1Width: CGFloat = 32
-        let col3Width: CGFloat = 90
-        
-        VStack(spacing: 0) {
-            // Header Row
-            HStack(spacing: 0) {
-                Text("#")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .frame(width: col1Width, alignment: .center)
-                    .padding(.vertical, 7)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("Khách hàng / Hàng hóa")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 7)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("Số lượng")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 7)
-                    .frame(width: col3Width, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-            }
-            .fixedSize(horizontal: false, vertical: true)
-            .background(headerBgColor)
+        VTSFlexibleTableContainer { containerW in
+            let totalQty = list.filter { $0.colDataType == 0 }.sum(by: \.colValue)
+            let tableBorderColor = Color(hex: "C5D2E0")
+            let headerBgColor = Color(hex: "E8EEF9")
+            let headerTextColor = Color(hex: "0F2D59")
+            let subtotalBgColor = Color(hex: "C8E6C9") // Green tint
             
-            // Data Rows
-            ForEach(list) { item in
-                if item.colDataType == 0 {
-                    HStack(spacing: 0) {
-                        Text("\(item.colOrder)")
-                            .font(.system(size: 13))
-                            .foregroundColor(headerTextColor)
-                            .frame(width: col1Width, alignment: .center)
-                            .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
-                        
-                        Text(item.colName ?? "")
-                            .font(.system(size: 13))
-                            .foregroundColor(Color(hex: "0F2D59"))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 7)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
-                        
-                        Text(item.colValue.toFormattedString(maxDecimals: 0))
-                            .font(.system(size: 13))
-                            .foregroundColor(Color(hex: "0F2D59"))
-                            .padding(.horizontal, 6)
-                            .frame(width: col3Width, alignment: .trailing)
-                            .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
-                    }
-                    .fixedSize(horizontal: false, vertical: true)
-                    .background(Color.white)
-                } else if item.colDataType == 1 {
-                    HStack(spacing: 0) {
-                        Text(" ")
-                            .font(.system(size: 13, weight: .bold))
-                            .padding(.vertical, 7)
-                            .frame(width: col1Width, alignment: .center)
-                            .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
-                        
-                        Text(item.colName ?? "")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(headerTextColor)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 7)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
-                        
-                        Text(item.colValue.toFormattedString(maxDecimals: 0))
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(headerTextColor)
-                            .padding(.horizontal, 6)
-                            .frame(width: col3Width, alignment: .trailing)
-                            .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
-                    }
-                    .fixedSize(horizontal: false, vertical: true)
-                    .background(subtotalBgColor)
+            let col1Width: CGFloat = max(26, containerW * 0.09)
+            let col3Width: CGFloat = max(75, containerW * 0.26)
+            
+            VStack(spacing: 0) {
+                // Header Row
+                HStack(spacing: 0) {
+                    Text("#")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .frame(width: col1Width, alignment: .center)
+                        .padding(.vertical, 7)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("Khách hàng / Hàng hóa")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 7)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("Số lượng")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 7)
+                        .frame(width: col3Width, alignment: .center)
+                        .frame(maxHeight: .infinity)
                 }
-            }
-            
-            // Summary Row ("Cộng")
-            HStack(spacing: 0) {
-                Text(" ")
-                    .font(.system(size: 13, weight: .bold))
-                    .padding(.vertical, 7)
-                    .frame(width: col1Width, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
+                .fixedSize(horizontal: false, vertical: true)
+                .background(headerBgColor)
+                .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
                 
-                Text("Cộng")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 7)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
+                // Data Rows
+                ForEach(list) { item in
+                    if item.colDataType == 0 {
+                        HStack(spacing: 0) {
+                            Text("\(item.colOrder)")
+                                .font(.system(size: 13))
+                                .foregroundColor(headerTextColor)
+                                .frame(width: col1Width, alignment: .center)
+                                .frame(maxHeight: .infinity)
+                                .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                            
+                            Text(item.colName ?? "")
+                                .font(.system(size: 13))
+                                .foregroundColor(Color(hex: "0F2D59"))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 7)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .frame(maxHeight: .infinity)
+                                .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                            
+                            Text(item.colValue.toFormattedString(maxDecimals: 0))
+                                .font(.system(size: 13))
+                                .foregroundColor(Color(hex: "0F2D59"))
+                                .padding(.horizontal, 6)
+                                .frame(width: col3Width, alignment: .trailing)
+                                .frame(maxHeight: .infinity)
+                        }
+                        .fixedSize(horizontal: false, vertical: true)
+                        .background(Color.white)
+                        .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
+                    } else if item.colDataType == 1 {
+                        HStack(spacing: 0) {
+                            Text(" ")
+                                .font(.system(size: 13, weight: .bold))
+                                .padding(.vertical, 7)
+                                .frame(width: col1Width, alignment: .center)
+                                .frame(maxHeight: .infinity)
+                                .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                            
+                            Text(item.colName ?? "")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(headerTextColor)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 7)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .frame(maxHeight: .infinity)
+                                .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                            
+                            Text(item.colValue.toFormattedString(maxDecimals: 0))
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(headerTextColor)
+                                .padding(.horizontal, 6)
+                                .frame(width: col3Width, alignment: .trailing)
+                                .frame(maxHeight: .infinity)
+                        }
+                        .fixedSize(horizontal: false, vertical: true)
+                        .background(subtotalBgColor)
+                        .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
+                    }
+                }
                 
-                Text(totalQty.toFormattedString(maxDecimals: 0))
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 6)
-                    .frame(width: col3Width, alignment: .trailing)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
+                // Summary Row ("Cộng")
+                HStack(spacing: 0) {
+                    Text(" ")
+                        .font(.system(size: 13, weight: .bold))
+                        .padding(.vertical, 7)
+                        .frame(width: col1Width, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("Cộng")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 7)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text(totalQty.toFormattedString(maxDecimals: 0))
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 6)
+                        .frame(width: col3Width, alignment: .trailing)
+                        .frame(maxHeight: .infinity)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                .background(headerBgColor)
             }
-            .fixedSize(horizontal: false, vertical: true)
-            .background(headerBgColor)
+            .cornerRadius(2)
+            .overlay(
+                RoundedRectangle(cornerRadius: 2)
+                    .stroke(tableBorderColor, lineWidth: 0.5)
+            )
         }
-        .cornerRadius(2)
-        .overlay(
-            RoundedRectangle(cornerRadius: 2)
-                .stroke(tableBorderColor, lineWidth: 0.5)
-        )
     }
     
     @ViewBuilder
     private func exportCustomTable(list: [THangXuatDataResult]) -> some View {
-        let totalQty = list.filter { $0.colDataType == 0 }.sum(by: \.colValue)
-        let tableBorderColor = Color(hex: "C5D2E0")
-        let headerBgColor = Color(hex: "E8EEF9")
-        let headerTextColor = Color(hex: "0F2D59")
-        let subtotalBgColor = Color(hex: "C8E6C9") // Green tint
-        
-        let col1Width: CGFloat = 32
-        let col3Width: CGFloat = 90
-        
-        VStack(spacing: 0) {
-            // Header Row
-            HStack(spacing: 0) {
-                Text("#")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .frame(width: col1Width, alignment: .center)
-                    .padding(.vertical, 7)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("Khách hàng / Hàng hóa")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 7)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("Số lượng")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 7)
-                    .frame(width: col3Width, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-            }
-            .fixedSize(horizontal: false, vertical: true)
-            .background(headerBgColor)
+        VTSFlexibleTableContainer { containerW in
+            let totalQty = list.filter { $0.colDataType == 0 }.sum(by: \.colValue)
+            let tableBorderColor = Color(hex: "C5D2E0")
+            let headerBgColor = Color(hex: "E8EEF9")
+            let headerTextColor = Color(hex: "0F2D59")
+            let subtotalBgColor = Color(hex: "C8E6C9") // Green tint
             
-            // Data Rows
-            ForEach(list) { item in
-                if item.colDataType == 0 {
+            let col1Width: CGFloat = max(26, containerW * 0.09)
+            let col3Width: CGFloat = max(75, containerW * 0.26)
+            
+            VStack(spacing: 0) {
+                // Header Row
+                HStack(spacing: 0) {
+                    Text("#")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .frame(width: col1Width, alignment: .center)
+                        .padding(.vertical, 7)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("Khách hàng / Hàng hóa")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 7)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("Số lượng")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 7)
+                        .frame(width: col3Width, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                .background(headerBgColor)
+                .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
+                
+                // Data Rows
+                ForEach(list) { item in
+                    if item.colDataType == 0 {
+                        HStack(spacing: 0) {
+                            Text("\(item.colOrder)")
+                                .font(.system(size: 13))
+                                .foregroundColor(headerTextColor)
+                                .frame(width: col1Width, alignment: .center)
+                                .frame(maxHeight: .infinity)
+                                .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                            
+                            Text(item.colName ?? "")
+                                .font(.system(size: 13))
+                                .foregroundColor(Color(hex: "0F2D59"))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 7)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .frame(maxHeight: .infinity)
+                                .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                            
+                            Text(item.colValue.toFormattedString(maxDecimals: 0))
+                                .font(.system(size: 13))
+                                .foregroundColor(Color(hex: "0F2D59"))
+                                .padding(.horizontal, 6)
+                                .frame(width: col3Width, alignment: .trailing)
+                                .frame(maxHeight: .infinity)
+                        }
+                        .fixedSize(horizontal: false, vertical: true)
+                        .background(Color.white)
+                        .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
+                    } else if item.colDataType == 1 {
+                        HStack(spacing: 0) {
+                            Text(" ")
+                                .font(.system(size: 13, weight: .bold))
+                                .padding(.vertical, 7)
+                                .frame(width: col1Width, alignment: .center)
+                                .frame(maxHeight: .infinity)
+                                .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                            
+                            Text(item.colName ?? "")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(headerTextColor)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 7)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .frame(maxHeight: .infinity)
+                                .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                            
+                            Text(item.colValue.toFormattedString(maxDecimals: 0))
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(headerTextColor)
+                                .padding(.horizontal, 6)
+                                .frame(width: col3Width, alignment: .trailing)
+                                .frame(maxHeight: .infinity)
+                        }
+                        .fixedSize(horizontal: false, vertical: true)
+                        .background(subtotalBgColor)
+                        .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
+                    }
+                }
+                
+                // Summary Row ("Cộng")
+                HStack(spacing: 0) {
+                    Text(" ")
+                        .font(.system(size: 13, weight: .bold))
+                        .padding(.vertical, 7)
+                        .frame(width: col1Width, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("Cộng")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 7)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text(totalQty.toFormattedString(maxDecimals: 0))
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 6)
+                        .frame(width: col3Width, alignment: .trailing)
+                        .frame(maxHeight: .infinity)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                .background(headerBgColor)
+            }
+            .cornerRadius(2)
+            .overlay(
+                RoundedRectangle(cornerRadius: 2)
+                    .stroke(tableBorderColor, lineWidth: 0.5)
+            )
+        }
+    }
+    
+    @ViewBuilder
+    private func hrCustomTable(data: HomeDashboardData) -> some View {
+        VTSFlexibleTableContainer { containerW in
+            let totalVal = data.nhanVienPhongBan.sum(by: \.colValue)
+            let totalVal0 = data.nhanVienPhongBan.sum(by: \.colValue0)
+            let totalVal1 = data.nhanVienPhongBan.sum(by: \.colValue1)
+            
+            let tableBorderColor = Color(hex: "C5D2E0")
+            let headerBgColor = Color(hex: "E8EEF9")
+            let headerTextColor = Color(hex: "0F2D59")
+            
+            let col1Width: CGFloat = max(24, containerW * 0.08)
+            let colValWidth: CGFloat = max(45, containerW * 0.16)
+            
+            VStack(spacing: 0) {
+                // Header Row
+                HStack(spacing: 0) {
+                    Text("#")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .frame(width: col1Width, alignment: .center)
+                        .padding(.vertical, 7)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("Phòng ban")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.leading, 6)
+                        .padding(.vertical, 7)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("Tổng")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 2)
+                        .padding(.vertical, 7)
+                        .frame(width: colValWidth, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("Vắng")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(Color(hex: "D32F2F"))
+                        .padding(.horizontal, 2)
+                        .padding(.vertical, 7)
+                        .frame(width: colValWidth, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                    
+                    Text("Mặt")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
+                        .padding(.horizontal, 2)
+                        .padding(.vertical, 7)
+                        .frame(width: colValWidth, alignment: .center)
+                        .frame(maxHeight: .infinity)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                .background(headerBgColor)
+                .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
+                
+                // Data Rows
+                ForEach(Array(data.nhanVienPhongBan.enumerated()), id: \.offset) { index, item in
                     HStack(spacing: 0) {
-                        Text("\(item.colOrder)")
+                        Text("\(index + 1)")
                             .font(.system(size: 13))
                             .foregroundColor(headerTextColor)
                             .frame(width: col1Width, alignment: .center)
                             .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
+                            .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                         
                         Text(item.colName ?? "")
                             .font(.system(size: 13))
@@ -741,245 +904,115 @@ struct HomeView: View {
                             .padding(.vertical, 7)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
+                            .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                         
-                        Text(item.colValue.toFormattedString(maxDecimals: 0))
+                        Text("\(item.colValue)")
                             .font(.system(size: 13))
                             .foregroundColor(Color(hex: "0F2D59"))
-                            .padding(.horizontal, 6)
-                            .frame(width: col3Width, alignment: .trailing)
+                            .padding(.horizontal, 2)
+                            .frame(width: colValWidth, alignment: .center)
                             .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
+                            .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                        
+                        Text("\(item.colValue0)")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(Color(hex: "D32F2F"))
+                            .padding(.horizontal, 2)
+                            .frame(width: colValWidth, alignment: .center)
+                            .frame(maxHeight: .infinity)
+                            .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
+                        
+                        Text("\(item.colValue1)")
+                            .font(.system(size: 13))
+                            .foregroundColor(Color(hex: "0F2D59"))
+                            .padding(.horizontal, 2)
+                            .frame(width: colValWidth, alignment: .center)
+                            .frame(maxHeight: .infinity)
                     }
                     .fixedSize(horizontal: false, vertical: true)
                     .background(Color.white)
-                } else if item.colDataType == 1 {
-                    HStack(spacing: 0) {
-                        Text(" ")
-                            .font(.system(size: 13, weight: .bold))
-                            .padding(.vertical, 7)
-                            .frame(width: col1Width, alignment: .center)
-                            .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
-                        
-                        Text(item.colName ?? "")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(headerTextColor)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 7)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
-                        
-                        Text(item.colValue.toFormattedString(maxDecimals: 0))
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(headerTextColor)
-                            .padding(.horizontal, 6)
-                            .frame(width: col3Width, alignment: .trailing)
-                            .frame(maxHeight: .infinity)
-                            .border(tableBorderColor, width: 0.5)
-                    }
-                    .fixedSize(horizontal: false, vertical: true)
-                    .background(subtotalBgColor)
+                    .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
                 }
-            }
-            
-            // Summary Row ("Cộng")
-            HStack(spacing: 0) {
-                Text(" ")
-                    .font(.system(size: 13, weight: .bold))
-                    .padding(.vertical, 7)
-                    .frame(width: col1Width, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
                 
-                Text("Cộng")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 7)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text(totalQty.toFormattedString(maxDecimals: 0))
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 6)
-                    .frame(width: col3Width, alignment: .trailing)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-            }
-            .fixedSize(horizontal: false, vertical: true)
-            .background(headerBgColor)
-        }
-        .cornerRadius(2)
-        .overlay(
-            RoundedRectangle(cornerRadius: 2)
-                .stroke(tableBorderColor, lineWidth: 0.5)
-        )
-    }
-    
-    @ViewBuilder
-    private func hrCustomTable(data: HomeDashboardData) -> some View {
-        let totalVal = data.nhanVienPhongBan.sum(by: \.colValue)
-        let totalVal0 = data.nhanVienPhongBan.sum(by: \.colValue0)
-        let totalVal1 = data.nhanVienPhongBan.sum(by: \.colValue1)
-        
-        let tableBorderColor = Color(hex: "C5D2E0")
-        let headerBgColor = Color(hex: "E8EEF9")
-        let headerTextColor = Color(hex: "0F2D59")
-        
-        let col1Width: CGFloat = 28
-        let colValWidth: CGFloat = 50
-        
-        VStack(spacing: 0) {
-            // Header Row
-            HStack(spacing: 0) {
-                Text("#")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .frame(width: col1Width, alignment: .center)
-                    .padding(.vertical, 7)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("Phòng ban")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.leading, 6)
-                    .padding(.vertical, 7)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("Tổng")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 2)
-                    .padding(.vertical, 7)
-                    .frame(width: colValWidth, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("Vắng")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(Color(hex: "D32F2F"))
-                    .padding(.horizontal, 2)
-                    .padding(.vertical, 7)
-                    .frame(width: colValWidth, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("Mặt")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 2)
-                    .padding(.vertical, 7)
-                    .frame(width: colValWidth, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-            }
-            .fixedSize(horizontal: false, vertical: true)
-            .background(headerBgColor)
-            
-            // Data Rows
-            ForEach(Array(data.nhanVienPhongBan.enumerated()), id: \.offset) { index, item in
+                // Summary Row ("Cộng")
                 HStack(spacing: 0) {
-                    Text("\(index + 1)")
-                        .font(.system(size: 13))
-                        .foregroundColor(headerTextColor)
+                    Text(" ")
+                        .font(.system(size: 13, weight: .bold))
+                        .padding(.vertical, 7)
                         .frame(width: col1Width, alignment: .center)
                         .frame(maxHeight: .infinity)
-                        .border(tableBorderColor, width: 0.5)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text(item.colName ?? "")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(hex: "0F2D59"))
+                    Text("Cộng")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 7)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxWidth: .infinity, alignment: .center)
                         .frame(maxHeight: .infinity)
-                        .border(tableBorderColor, width: 0.5)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("\(item.colValue)")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(hex: "0F2D59"))
+                    Text("\(totalVal)")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
                         .padding(.horizontal, 2)
                         .frame(width: colValWidth, alignment: .center)
                         .frame(maxHeight: .infinity)
-                        .border(tableBorderColor, width: 0.5)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("\(item.colValue0)")
-                        .font(.system(size: 13, weight: .semibold))
+                    Text("\(totalVal0)")
+                        .font(.system(size: 13, weight: .bold))
                         .foregroundColor(Color(hex: "D32F2F"))
                         .padding(.horizontal, 2)
                         .frame(width: colValWidth, alignment: .center)
                         .frame(maxHeight: .infinity)
-                        .border(tableBorderColor, width: 0.5)
+                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("\(item.colValue1)")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(hex: "0F2D59"))
+                    Text("\(totalVal1)")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(headerTextColor)
                         .padding(.horizontal, 2)
                         .frame(width: colValWidth, alignment: .center)
                         .frame(maxHeight: .infinity)
-                        .border(tableBorderColor, width: 0.5)
                 }
                 .fixedSize(horizontal: false, vertical: true)
-                .background(Color.white)
+                .background(headerBgColor)
             }
-            
-            // Summary Row ("Cộng")
-            HStack(spacing: 0) {
-                Text(" ")
-                    .font(.system(size: 13, weight: .bold))
-                    .padding(.vertical, 7)
-                    .frame(width: col1Width, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("Cộng")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 7)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("\(totalVal)")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 2)
-                    .frame(width: colValWidth, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("\(totalVal0)")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(Color(hex: "D32F2F"))
-                    .padding(.horizontal, 2)
-                    .frame(width: colValWidth, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-                
-                Text("\(totalVal1)")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(headerTextColor)
-                    .padding(.horizontal, 2)
-                    .frame(width: colValWidth, alignment: .center)
-                    .frame(maxHeight: .infinity)
-                    .border(tableBorderColor, width: 0.5)
-            }
-            .fixedSize(horizontal: false, vertical: true)
-            .background(headerBgColor)
+            .cornerRadius(2)
+            .overlay(
+                RoundedRectangle(cornerRadius: 2)
+                    .stroke(tableBorderColor, lineWidth: 0.5)
+            )
         }
-        .cornerRadius(2)
-        .overlay(
-            RoundedRectangle(cornerRadius: 2)
-                .stroke(tableBorderColor, lineWidth: 0.5)
-        )
+    }
+}
+
+// MARK: - VTSFlexibleTableContainer
+struct VTSFlexibleTableContainer<Content: View>: View {
+    @State private var containerWidth: CGFloat = 0
+    @ViewBuilder let content: (CGFloat) -> Content
+
+    var body: some View {
+        let width = containerWidth > 0 ? containerWidth : (UIScreen.main.bounds.width - 56)
+        content(width)
+            .background(
+                GeometryReader { geo in
+                    Color.clear
+                        .preference(key: VTSContainerWidthKey.self, value: geo.size.width)
+                }
+            )
+            .onPreferenceChange(VTSContainerWidthKey.self) { newWidth in
+                if newWidth > 0 && containerWidth != newWidth {
+                    containerWidth = newWidth
+                }
+            }
+    }
+}
+
+private struct VTSContainerWidthKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
 

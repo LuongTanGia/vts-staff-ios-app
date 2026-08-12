@@ -367,42 +367,42 @@ struct VTSCompanyFooter: View {
     }
     
     var body: some View {
-        HStack(alignment: .center, spacing: 8) {
+        HStack(alignment: .center, spacing: 10) {
             if UIImage(named: "logoFooter") != nil {
                 Image("logoFooter")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(height: 22)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
+                    .frame(height: 26)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
                     .background(Color.white)
-                    .cornerRadius(3)
+                    .cornerRadius(4)
             } else {
                 Text("VTS")
-                    .font(.system(size: 11, weight: .black))
+                    .font(.system(size: 12, weight: .black))
                     .foregroundColor(.vtsPrimary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 3)
                     .background(Color.white)
-                    .cornerRadius(3)
+                    .cornerRadius(4)
             }
             
-            VStack(alignment: .leading, spacing: 1) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(companyName)
-                    .font(.system(size: 11, weight: .bold))
+                    .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(.white)
                 Text(address)
-                    .font(.system(size: 9))
+                    .font(.system(size: 10))
                     .foregroundStyle(.white.opacity(0.85))
                     .lineLimit(1)
             }
             
             Spacer()
         }
-        .padding(.horizontal, 10)
-        .padding(.top, 6)
-        .padding(.bottom, 2)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
         .frame(maxWidth: .infinity)
+        .frame(height: 50)
         .background(Color.vtsPrimary)
         .ignoresSafeArea(edges: .bottom)
     }

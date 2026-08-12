@@ -397,6 +397,19 @@ struct THangHoa_ThongTin: Codable {
 
 
 
+// MARK: - THinhAnhResult
+struct THinhAnhResult: Decodable, Sendable {
+    let soPhieu: String?
+    let maHinh: String?
+    let noiDungHinh: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case soPhieu = "SoPhieu"
+        case maHinh = "MaHinh"
+        case noiDungHinh = "NoiDungHinh"
+    }
+}
+
 // MARK: - Phieuvc_Nhap_DanhSach
 struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
     let soPhieu: String

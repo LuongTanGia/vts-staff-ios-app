@@ -87,7 +87,7 @@ struct MainTabView: View {
         }
         .tint(.vtsPrimary)
         .tabViewStyle(.sidebarAdaptable)
-        .preferredColorScheme(.light)
+        .preferredColorScheme(.dark)
         
         
         

@@ -68,8 +68,12 @@ final class PhieuNhapDetailViewModel: ObservableObject {
                 let (infoRes, hinhRes) = await (try? infoTask, try? hinhTask)
                 if var found = infoRes?.DataResult {
                     if let list = hinhRes?.DataResults, !list.isEmpty {
-                        if list.indices.contains(0), !list[0].isEmpty { found.hinh01NoiDung = list[0] }
-                        if list.indices.contains(1), !list[1].isEmpty { found.hinh02NoiDung = list[1] }
+                        if let item0 = list.first(where: { $0.maHinh == "Hinh01" }) ?? (list.indices.contains(0) ? list[0] : nil), let str = item0.noiDungHinh, !str.isEmpty {
+                            found.hinh01NoiDung = str
+                        }
+                        if let item1 = list.first(where: { $0.maHinh == "Hinh02" }) ?? (list.indices.contains(1) ? list[1] : nil), let str = item1.noiDungHinh, !str.isEmpty {
+                            found.hinh02NoiDung = str
+                        }
                     }
                     state = .success(found)
                 } else if let existing = existing {

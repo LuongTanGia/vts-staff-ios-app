@@ -197,10 +197,10 @@ public struct ERPTable<Data: Identifiable>: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Standard full-width layout
-            header(tableWidth)
-            
             if let customHeader = customHeaderBuilder?(tableWidth) {
                 customHeader
+            } else {
+                header(tableWidth)
             }
             
             if disableVerticalScrolling {
@@ -342,16 +342,17 @@ private extension ERPTable {
             if let customView = customRowBuilder?(data, fullWidth) {
                 customView
                     .font(.caption)
+                    .foregroundColor(Color(hex: "0F2D59"))
             } else {
                 HStack(spacing: 0) {
                     ForEach(columns) { column in
                         rowCell(data, column: column, index: index, width: columnWidth(column, fullWidth))
-                        
                     }
                 }
+                .foregroundColor(Color(hex: "0F2D59"))
             }
         }
-            .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity)
         
         let cell = Group {
             if onRowTap != nil || onRowLongPress != nil || onRowAction != nil {
@@ -450,13 +451,12 @@ private extension ERPTable {
     func rowCell(_ data: Data, column: ERPColumn<Data>, index: Int, width: CGFloat) -> some View {
         cell(width: width) {
             column.render(data, index)
+                .font(.vtsTableContent)
+                .foregroundColor(Color(hex: "0F2D59"))
                 .padding(.horizontal, 8)
                 .padding(.vertical, 6)
-                .font(.vtsTableContent)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: column.alignment.swiftUI)
-            //                .background(column.color)
                 .border(Color.vtsBorder, width: 0.5)
-            
         }
     }
     
