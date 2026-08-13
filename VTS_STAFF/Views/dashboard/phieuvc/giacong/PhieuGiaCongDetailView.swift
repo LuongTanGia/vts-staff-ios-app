@@ -457,33 +457,15 @@ struct PhieuGiaCongDetailView: View {
     private func formFieldsCard(details: TPhieuvc_Giacong_DanhSach?) -> some View {
         VTSLiquidFormCard {
             VStack(alignment: .leading, spacing: 14) {
-                // Row 1: Left Barcode / Photo box placeholder & Right Date field
+                // Row 1: Left Số phiếu (Readonly) & Right Date field "Ngày"
                 HStack(spacing: 12) {
-                    // Left: Barcode / slot placeholder box
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(hex: "7C8071"))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.primary.opacity(0.12), lineWidth: 1)
-                            )
-                        if let img = hinh01 {
-                            Image(uiImage: img)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(height: 52)
-                                .clipped()
-                                .cornerRadius(12)
-                        } else {
-                            Image(systemName: "photo.badge.arrow.up")
-                                .font(.system(size: 24))
-                                .foregroundColor(Color.black.opacity(0.85))
-                        }
-                    }
-                    .frame(height: 52)
+                    VTSLiquidTextField(
+                        label: "Số phiếu",
+                        text: .constant((details?.soPhieu ?? viewModel.soPhieu) ?? "—"),
+                        isReadOnly: true
+                    )
                     .frame(maxWidth: .infinity)
                     
-                    // Right: Date field "Ngày"
                     VTSLiquidDateTimeField(
                         label: "Ngày",
                         date: $ngay,
@@ -493,14 +475,7 @@ struct PhieuGiaCongDetailView: View {
                     .frame(maxWidth: .infinity)
                 }
                 
-                // Row 2: Số phiếu
-                VTSLiquidTextField(
-                    label: "Số phiếu",
-                    text: .constant(details?.soPhieu ?? (viewModel.soPhieu ?? "")),
-                    isReadOnly: true
-                )
-                
-                // Row 3: Số xe ngoài (Left) & Số xe nhà (Right)
+                // Row 2: Số xe ngoài (Left) & Số xe nhà (Right)
                 HStack(spacing: 12) {
                     VTSLiquidTextField(
                         label: "Số xe ngoài",
@@ -528,7 +503,7 @@ struct PhieuGiaCongDetailView: View {
                     .disabled(!isEditMode)
                 }
                 
-                // Row 4: Tài xế
+                // Row 3: Tài xế
                 VTSLiquidTextField(
                     label: "Tài xế",
                     text: $taiXe,
@@ -537,7 +512,7 @@ struct PhieuGiaCongDetailView: View {
                     errorMessage: taiXeError
                 )
                 
-                // Row 5: Khách hàng
+                // Row 4: Khách hàng
                 VTSLiquidPickerField(
                     label: "Khách hàng",
                     selection: $khachHang,
@@ -549,7 +524,7 @@ struct PhieuGiaCongDetailView: View {
                 )
                 .disabled(!isEditMode)
                 
-                // Row 6: Hàng giao
+                // Row 5: Hàng giao
                 VTSLiquidPickerField(
                     label: "Hàng giao",
                     selection: $hangHoa,
@@ -561,7 +536,7 @@ struct PhieuGiaCongDetailView: View {
                 )
                 .disabled(!isEditMode)
                 
-                // Row 7: Số lượng (Hàng giao)
+                // Row 6: Số lượng (Hàng giao)
                 VTSLiquidTextField(
                     label: "Số lượng",
                     text: $trongLuongHang,
@@ -570,7 +545,7 @@ struct PhieuGiaCongDetailView: View {
                     errorMessage: trongLuongHangError
                 )
                 
-                // Row 8: Thời điểm cân hàng giao
+                // Row 7: Thời điểm cân hàng giao
                 VTSLiquidPickerField(
                     label: "Thời điểm cân hàng giao",
                     selection: .constant(""),
@@ -579,13 +554,13 @@ struct PhieuGiaCongDetailView: View {
                 )
                 .disabled(!isEditMode)
                 
-                // Row 9: Photo 1 & 2 for Hàng giao
+                // Row 8: Photo 1 & 2 for Hàng giao
                 HStack(spacing: 12) {
-                    photoBox(slotIndex: 1, label: "Ảnh hàng giao 1", image: $hinh01)
-                    photoBox(slotIndex: 2, label: "Ảnh hàng giao 2", image: $hinh02)
+                    photoBox(slotIndex: 1, image: $hinh01)
+                    photoBox(slotIndex: 2, image: $hinh02)
                 }
                 
-                // Row 10: Hàng bán
+                // Row 9: Hàng bán
                 VTSLiquidPickerField(
                     label: "Hàng bán",
                     selection: $hangHoaGC,
@@ -596,7 +571,7 @@ struct PhieuGiaCongDetailView: View {
                 )
                 .disabled(!isEditMode)
                 
-                // Row 11: Số lượng (Hàng bán)
+                // Row 10: Số lượng (Hàng bán)
                 VTSLiquidTextField(
                     label: "Số lượng",
                     text: $trongLuongHangGC,
@@ -604,7 +579,7 @@ struct PhieuGiaCongDetailView: View {
                     isReadOnly: !isEditMode
                 )
                 
-                // Row 12: Thời điểm cân hàng bán
+                // Row 11: Thời điểm cân hàng bán
                 VTSLiquidPickerField(
                     label: "Thời điểm cân hàng bán",
                     selection: .constant(""),
@@ -613,13 +588,13 @@ struct PhieuGiaCongDetailView: View {
                 )
                 .disabled(!isEditMode)
                 
-                // Row 13: Photo 3 & 4 for Hàng bán
+                // Row 12: Photo 3 & 4 for Hàng bán
                 HStack(spacing: 12) {
-                    photoBox(slotIndex: 3, label: "Ảnh hàng bán 1", image: $hinh03)
-                    photoBox(slotIndex: 4, label: "Ảnh hàng bán 2", image: $hinh04)
+                    photoBox(slotIndex: 3, image: $hinh03)
+                    photoBox(slotIndex: 4, image: $hinh04)
                 }
                 
-                // Row 14: Hàng thu về
+                // Row 13: Hàng thu về
                 VTSLiquidPickerField(
                     label: "Hàng thu về",
                     selection: $hangHoaTV,
@@ -630,7 +605,7 @@ struct PhieuGiaCongDetailView: View {
                 )
                 .disabled(!isEditMode)
                 
-                // Row 15: Số lượng (Hàng thu về)
+                // Row 14: Số lượng (Hàng thu về)
                 VTSLiquidTextField(
                     label: "Số lượng",
                     text: $trongLuongHangTV,
@@ -638,7 +613,7 @@ struct PhieuGiaCongDetailView: View {
                     isReadOnly: !isEditMode
                 )
                 
-                // Row 16: Thời điểm cân hàng thu về
+                // Row 15: Thời điểm cân hàng thu về
                 VTSLiquidPickerField(
                     label: "Thời điểm cân hàng thu về",
                     selection: .constant(""),
@@ -647,13 +622,13 @@ struct PhieuGiaCongDetailView: View {
                 )
                 .disabled(!isEditMode)
                 
-                // Row 17: Photo 5 & 6 for Hàng thu về
+                // Row 16: Photo 5 & 6 for Hàng thu về
                 HStack(spacing: 12) {
-                    photoBox(slotIndex: 5, label: "Ảnh hàng thu về 1", image: $hinh05)
-                    photoBox(slotIndex: 6, label: "Ảnh hàng thu về 2", image: $hinh06)
+                    photoBox(slotIndex: 5, image: $hinh05)
+                    photoBox(slotIndex: 6, image: $hinh06)
                 }
                 
-                // Row 18: Ghi chú
+                // Row 17: Ghi chú
                 VTSLiquidTextField(
                     label: "Ghi chú",
                     text: $ghiChu,
@@ -665,14 +640,14 @@ struct PhieuGiaCongDetailView: View {
     }
     
     @ViewBuilder
-    private func photoBox(slotIndex: Int, label: String, image: Binding<UIImage?>) -> some View {
+    private func photoBox(slotIndex: Int, image: Binding<UIImage?>) -> some View {
         ZStack {
             if let img = image.wrappedValue {
                 ZStack(alignment: .bottomTrailing) {
                     Image(uiImage: img)
                         .resizable()
                         .scaledToFill()
-                        .frame(height: 130)
+                        .frame(height: 120)
                         .frame(maxWidth: .infinity)
                         .clipped()
                         .cornerRadius(12)
@@ -721,27 +696,56 @@ struct PhieuGiaCongDetailView: View {
                     .padding(6)
                 }
             } else {
+                let enabled = isSlotEnabled(slotIndex)
                 ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(hex: "7C8071"))
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.white)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.primary.opacity(0.12), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color(hex: "D1D5DB"), lineWidth: 1)
                         )
                     
-                    Image(systemName: "photo.badge.arrow.up")
-                        .font(.system(size: 38, weight: .regular))
-                        .foregroundColor(Color.black.opacity(0.85))
+                    VStack(spacing: 10) {
+                        ZStack {
+                            Circle()
+                                .fill(enabled ? Color(hex: "DCE7F5") : Color.gray.opacity(0.12))
+                                .frame(width: 46, height: 46)
+                            Image(systemName: "photo.fill")
+                                .font(.system(size: 22, weight: .medium))
+                                .foregroundColor(enabled ? Color(hex: "004B87") : Color.gray)
+                        }
+                        
+                        Text(isEditMode ? (enabled ? "Thêm ảnh" : "Thêm ảnh \(slotIndex - 1) trước") : "Chưa có ảnh")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(isEditMode ? (enabled ? Color(hex: "374151") : Color.gray) : Color.gray)
+                    }
                 }
-                .frame(height: 130)
+                .opacity(enabled || !isEditMode ? 1.0 : 0.5)
+                .frame(height: 120)
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
                 .onTapGesture {
                     if isEditMode {
-                        showingActionSheetForSlot = slotIndex
+                        if enabled {
+                            showingActionSheetForSlot = slotIndex
+                        } else {
+                            ErrorManager.shared.showError("Vui lòng thêm ảnh \(slotIndex - 1) trước.")
+                        }
                     }
                 }
             }
+        }
+    }
+    
+    private func isSlotEnabled(_ slotIndex: Int) -> Bool {
+        switch slotIndex {
+        case 1: return true
+        case 2: return hinh01 != nil
+        case 3: return hinh02 != nil
+        case 4: return hinh03 != nil
+        case 5: return hinh04 != nil
+        case 6: return hinh05 != nil
+        default: return false
         }
     }
     

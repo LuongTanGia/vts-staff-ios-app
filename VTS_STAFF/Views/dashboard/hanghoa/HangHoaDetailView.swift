@@ -244,80 +244,57 @@ struct HangHoaDetailView: View {
     
     @ViewBuilder
     private func productInfoCard(details: THangHoa_ThongTin?) -> some View {
-        VTSGlassCard(padding: VTSSpacing.lg) {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    Image(systemName: "box.trend.up.fill")
-                        .foregroundColor(Color.vtsPrimary)
-                    Text("Thông tin hàng hoá")
-                        .font(.vtsHeadline.bold())
-                        .foregroundColor(.vtsTxtPrimary)
-                }
-                Divider()
+        VTSLiquidFormCard {
+            VStack(alignment: .leading, spacing: 14) {
+                VTSLiquidTextField(
+                    label: "Mã hàng",
+                    text: $ma,
+                    isReadOnly: !viewModel.isNew || !isEditMode,
+                    errorMessage: maError
+                )
                 
-                if isEditMode {
-                    VTSLiquidTextField(
-                        label: "Mã hàng",
-                        text: $ma,
-                        isReadOnly: !viewModel.isNew,
-                        errorMessage: maError
-                    )
-                    
-                    VTSLiquidTextField(
-                        label: "Tên hàng",
-                        text: $ten,
-                        isReadOnly: false,
-                        errorMessage: tenError
-                    )
-                    
-                    VTSLiquidTextField(
-                        label: "ĐVT (Đơn vị tính)",
-                        text: $dvt,
-                        isReadOnly: false,
-                        errorMessage: dvtError
-                    )
-                    
-                    VTSLiquidPickerField(
-                        label: "Loại hàng",
-                        selection: $selectedLoai,
-                        options: [""] + viewModel.loaiHHs.map { $0.ma },
-                        displayName: { code in
-                            if code.isEmpty { return "Không chọn" }
-                            return viewModel.loaiHHs.first(where: { $0.ma == code })?.ten ?? code
-                        },
-                        
-                    )
-                    
-                    VTSLiquidPickerField(
-                        label: "Nhóm hàng",
-                        selection: $selectedNhom,
-                        options: [""] + viewModel.nhomHHs.map { $0.ma },
-                        displayName: { code in
-                            if code.isEmpty { return "Không chọn" }
-                            return viewModel.nhomHHs.first(where: { $0.ma == code })?.ten ?? code
-                        },
-                        
-                    )
-                } else {
-                    infoRow(label: "Mã hàng", value: details?.ma ?? "", icon: "tag.fill")
-                    infoRow(label: "Tên hàng", value: details?.ten ?? "", icon: "box.relative.open")
-                    infoRow(label: "Đơn vị tính", value: details?.dvt ?? "", icon: "scalemass.fill")
-                    
-                    let loaiTen = viewModel.loaiHHs.first(where: { $0.ma == details?.loai })?.ten ?? details?.loai ?? ""
-                    infoRow(label: "Loại hàng hoá", value: loaiTen, icon: "square.grid.3x3.fill")
-                    
-                    let nhomTen = viewModel.nhomHHs.first(where: { $0.ma == details?.nhom })?.ten ?? details?.nhom ?? ""
-                    infoRow(label: "Nhóm hàng hoá", value: nhomTen, icon: "shippingbox.fill")
-                }
+                VTSLiquidTextField(
+                    label: "Tên hàng",
+                    text: $ten,
+                    isReadOnly: !isEditMode,
+                    errorMessage: tenError
+                )
                 
-                if isEditMode {
-                    VTSTextArea(label: "Ghi chú", placeholder: "Thêm ghi chú...", text: $ghiChu, minHeight: 100)
-                } else {
-                    Text(details?.ghiChu ?? "Chưa có ghi chú nào")
-                        .font(.vtsBody)
-                        .foregroundColor(details?.ghiChu == nil ? .vtsTxtTertiary : .vtsTxtPrimary)
-                        .padding(.vertical, 4)
-                }
+                VTSLiquidTextField(
+                    label: "ĐVT (Đơn vị tính)",
+                    text: $dvt,
+                    isReadOnly: !isEditMode,
+                    errorMessage: dvtError
+                )
+                
+                VTSLiquidPickerField(
+                    label: "Loại hàng",
+                    selection: $selectedLoai,
+                    options: [""] + viewModel.loaiHHs.map { $0.ma },
+                    displayName: { code in
+                        if code.isEmpty { return "Không chọn" }
+                        return viewModel.loaiHHs.first(where: { $0.ma == code })?.ten ?? code
+                    }
+                )
+                .disabled(!isEditMode)
+                
+                VTSLiquidPickerField(
+                    label: "Nhóm hàng",
+                    selection: $selectedNhom,
+                    options: [""] + viewModel.nhomHHs.map { $0.ma },
+                    displayName: { code in
+                        if code.isEmpty { return "Không chọn" }
+                        return viewModel.nhomHHs.first(where: { $0.ma == code })?.ten ?? code
+                    }
+                )
+                .disabled(!isEditMode)
+                
+                VTSLiquidTextField(
+                    label: "Ghi chú",
+                    text: $ghiChu,
+                    placeholder: "",
+                    isReadOnly: !isEditMode
+                )
             }
         }
     }

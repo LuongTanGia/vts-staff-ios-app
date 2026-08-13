@@ -133,6 +133,7 @@ struct LoginView: View {
                 .padding(VTSSpacing.xl)
             }
         }
+        .environment(\.colorScheme, .light)
         .onTapGesture {
             isFocused = false
         }

@@ -241,104 +241,76 @@ struct KhachHangDetailView: View {
     
     @ViewBuilder
     private func customerInfoCard(details: TKhachhang_ThongTin?) -> some View {
-        VTSGlassCard(padding: VTSSpacing.lg) {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    Image(systemName: "briefcase.fill")
-                        .foregroundColor(Color.vtsPrimary)
-                    Text("Thông tin đối tác")
-                        .font(.vtsHeadline.bold())
-                        .foregroundColor(.vtsTxtPrimary)
-                }
-                Divider()
+        VTSLiquidFormCard {
+            VStack(alignment: .leading, spacing: 14) {
+                VTSLiquidTextField(
+                    label: "Mã khách hàng",
+                    text: $ma,
+                    isReadOnly: !viewModel.isNew || !isEditMode,
+                    errorMessage: maError
+                )
                 
-                if isEditMode {
-                    VTSLiquidTextField(
-                        label: "Mã khách hàng",
-                        text: $ma,
-                        isReadOnly: !viewModel.isNew,
-                        errorMessage: maError
-                    )
-                    
-                    VTSLiquidTextField(
-                        label: "Tên khách hàng",
-                        text: $ten,
-                        isReadOnly: false,
-                        errorMessage: tenError
-                    )
-                    
-                    VTSLiquidTextField(
-                        label: "Địa chỉ",
-                        text: $diaChi,
-                        isReadOnly: false,
-                       
-                    )
-                    
-                    VTSLiquidTextField(
-                        label: "Mã số thuế",
-                        text: $mst,
-                        isReadOnly: false
-                    )
-                    
-                    VTSLiquidTextField(
-                        label: "Điện thoại",
-                        text: $dienThoai,
-                        keyboardType: .phonePad,
-                        isReadOnly: false,
-                       
-                    )
-                    
-                    VTSLiquidTextField(
-                        label: "Email",
-                        text: $email,
-                        keyboardType: .emailAddress,
-                        isReadOnly: false
-                    )
-                    
-                    VTSLiquidPickerField(
-                        label: "Loại khách hàng",
-                        selection: $selectedLoai,
-                        options: [""] + viewModel.loaiKHs.map { $0.ma },
-                        displayName: { code in
-                            if code.isEmpty { return "Không chọn" }
-                            return viewModel.loaiKHs.first(where: { $0.ma == code })?.ten ?? code
-                        },
-                        
-                    )
-                    
-                    VTSLiquidPickerField(
-                        label: "Nhóm khách hàng",
-                        selection: $selectedNhom,
-                        options: [""] + viewModel.nhomKHs.map { $0.ma },
-                        displayName: { code in
-                            if code.isEmpty { return "Không chọn" }
-                            return viewModel.nhomKHs.first(where: { $0.ma == code })?.ten ?? code
-                        },
-                        
-                    )
-                } else {
-                    infoRow(label: "Mã khách hàng", value: details?.ma ?? "", icon: "tag.fill")
-                    infoRow(label: "Tên đối tác", value: details?.ten ?? "", icon: "person.fill")
-                    infoRow(label: "Địa chỉ", value: details?.diaChi ?? "", icon: "mappin.and.ellipse")
-                    infoRow(label: "Mã số thuế (MST)", value: details?.mst ?? "", icon: "doc.text.fill")
-                    infoRow(label: "Điện thoại liên hệ", value: details?.dienThoai ?? "", icon: "phone.fill")
-                    infoRow(label: "Thư điện tử (Email)", value: details?.email ?? "", icon: "envelope.fill")
-                    
-                    let loaiTen = viewModel.loaiKHs.first(where: { $0.ma == details?.loai })?.ten ?? details?.loai ?? ""
-                    infoRow(label: "Loại đối tác", value: loaiTen, icon: "briefcase.fill")
-                    
-                    let nhomTen = viewModel.nhomKHs.first(where: { $0.ma == details?.nhom })?.ten ?? details?.nhom ?? ""
-                    infoRow(label: "Nhóm đối tác", value: nhomTen, icon: "person.3.fill")
-                }
+                VTSLiquidTextField(
+                    label: "Tên khách hàng",
+                    text: $ten,
+                    isReadOnly: !isEditMode,
+                    errorMessage: tenError
+                )
                 
-                if isEditMode {
-                    VTSTextArea(label: "Ghi chú", placeholder: "Thêm ghi chú...", text: $ghiChu, minHeight: 100)
-                } else {
-                    Text(details?.ghiChu ?? "Chưa có ghi chú nào")
-                        .font(.vtsBody)
-                        .foregroundColor(details?.ghiChu == nil ? .vtsTxtTertiary : .vtsTxtPrimary)
-                        .padding(.vertical, 4)
-                }
+                VTSLiquidTextField(
+                    label: "Địa chỉ",
+                    text: $diaChi,
+                    isReadOnly: !isEditMode
+                )
+                
+                VTSLiquidTextField(
+                    label: "Mã số thuế",
+                    text: $mst,
+                    isReadOnly: !isEditMode
+                )
+                
+                VTSLiquidTextField(
+                    label: "Điện thoại",
+                    text: $dienThoai,
+                    keyboardType: .phonePad,
+                    isReadOnly: !isEditMode
+                )
+                
+                VTSLiquidTextField(
+                    label: "Email",
+                    text: $email,
+                    keyboardType: .emailAddress,
+                    isReadOnly: !isEditMode
+                )
+                
+                VTSLiquidPickerField(
+                    label: "Loại khách hàng",
+                    selection: $selectedLoai,
+                    options: [""] + viewModel.loaiKHs.map { $0.ma },
+                    displayName: { code in
+                        if code.isEmpty { return "Không chọn" }
+                        return viewModel.loaiKHs.first(where: { $0.ma == code })?.ten ?? code
+                    }
+                )
+                .disabled(!isEditMode)
+                
+                VTSLiquidPickerField(
+                    label: "Nhóm khách hàng",
+                    selection: $selectedNhom,
+                    options: [""] + viewModel.nhomKHs.map { $0.ma },
+                    displayName: { code in
+                        if code.isEmpty { return "Không chọn" }
+                        return viewModel.nhomKHs.first(where: { $0.ma == code })?.ten ?? code
+                    }
+                )
+                .disabled(!isEditMode)
+                
+                VTSLiquidTextField(
+                    label: "Ghi chú",
+                    text: $ghiChu,
+                    placeholder: "",
+                    isReadOnly: !isEditMode
+                )
             }
         }
     }

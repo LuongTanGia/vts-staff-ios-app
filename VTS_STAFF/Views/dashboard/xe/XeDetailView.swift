@@ -255,86 +255,64 @@ struct XeDetailView: View {
     
     @ViewBuilder
     private func vehicleInfoCard(details: TXe_ThongTin?) -> some View {
-        VTSGlassCard(padding: VTSSpacing.lg) {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    Image(systemName: "car.fill")
-                        .foregroundColor(Color.vtsPrimary)
-                    Text("Thông tin phương tiện")
-                        .font(.vtsHeadline.bold())
-                        .foregroundColor(.vtsTxtPrimary)
-                }
-                Divider()
+        VTSLiquidFormCard {
+            VStack(alignment: .leading, spacing: 14) {
+                VTSLiquidTextField(
+                    label: "Biển số",
+                    text: $ma,
+                    isReadOnly: !viewModel.isNew || !isEditMode,
+                    errorMessage: maError
+                )
                 
-                if isEditMode {
-                    VTSLiquidTextField(
-                        label: "Biển số",
-                        text: $ma,
-                        isReadOnly: !viewModel.isNew,
-                        errorMessage: maError
-                    )
-                    
-                    VTSLiquidTextField(
-                        label: "Tên gợi nhớ của xe",
-                        text: $ten,
-                        isReadOnly: false,
-                        errorMessage: tenError
-                    )
-                    
-                    VTSLiquidPickerField(
-                        label: "Loại xe",
-                        selection: $selectedLoai,
-                        options: [""] + viewModel.loaiXes.map { $0.ma },
-                        displayName: { code in
-                            if code.isEmpty { return "Không chọn" }
-                            return viewModel.loaiXes.first(where: { $0.ma == code })?.ten ?? code
-                        },
-                        errorMessage: loaiError
-                    )
-                    
-                    VTSLiquidPickerField(
-                        label: "Nhóm xe",
-                        selection: $selectedNhom,
-                        options: [""] + viewModel.nhomXes.map { $0.ma },
-                        displayName: { code in
-                            if code.isEmpty { return "Không chọn" }
-                            return viewModel.nhomXes.first(where: { $0.ma == code })?.ten ?? code
-                        },
-                        errorMessage: nhomError
-                    )
-                    
-                    VTSLiquidPickerField(
-                        label: "Tài xế cố định",
-                        selection: $selectedTaiXe,
-                        options: [""] + viewModel.taiXes.map { $0.ma },
-                        displayName: { code in
-                            if code.isEmpty { return "Không chọn" }
-                            return viewModel.taiXes.first(where: { $0.ma == code })?.ten ?? code
-                        },
-                        errorMessage: taiXeError
-                    )
-                } else {
-                    infoRow(label: "Biển số xe", value: details?.ma ?? "", icon: "number")
-                    infoRow(label: "Tên xe", value: details?.ten ?? "", icon: "car")
-                    
-                    let loaiTen = viewModel.loaiXes.first(where: { $0.ma == details?.loai })?.ten ?? details?.loai ?? ""
-                    infoRow(label: "Loại xe", value: loaiTen, icon: "bus")
-                    
-                    let nhomTen = viewModel.nhomXes.first(where: { $0.ma == details?.nhom })?.ten ?? details?.nhom ?? ""
-                    infoRow(label: "Nhóm xe", value: nhomTen, icon: "car.2.fill")
-                    
-                    let txTen = viewModel.taiXes.first(where: { $0.ma == details?.taiXe })?.ten ?? details?.taiXe ?? ""
-                    infoRow(label: "Tài xế cố định", value: txTen, icon: "person.circle.fill")
-                }
+                VTSLiquidTextField(
+                    label: "Tên gợi nhớ của xe",
+                    text: $ten,
+                    isReadOnly: !isEditMode,
+                    errorMessage: tenError
+                )
                 
-                if isEditMode {
-                    VTSTextArea(label: "Ghi chú", placeholder: "Thêm ghi chú...", text: $ghiChu, minHeight: 100)
-                } else {
-                    Text(details?.ghiChu ?? "Chưa có ghi chú nào")
-                        .font(.vtsBody)
-                        .foregroundColor(details?.ghiChu == nil ? .vtsTxtTertiary : .vtsTxtPrimary)
-                        .padding(.vertical, 4)
-                }
+                VTSLiquidPickerField(
+                    label: "Loại xe",
+                    selection: $selectedLoai,
+                    options: [""] + viewModel.loaiXes.map { $0.ma },
+                    displayName: { code in
+                        if code.isEmpty { return "Không chọn" }
+                        return viewModel.loaiXes.first(where: { $0.ma == code })?.ten ?? code
+                    },
+                    errorMessage: loaiError
+                )
+                .disabled(!isEditMode)
+                
+                VTSLiquidPickerField(
+                    label: "Nhóm xe",
+                    selection: $selectedNhom,
+                    options: [""] + viewModel.nhomXes.map { $0.ma },
+                    displayName: { code in
+                        if code.isEmpty { return "Không chọn" }
+                        return viewModel.nhomXes.first(where: { $0.ma == code })?.ten ?? code
+                    },
+                    errorMessage: nhomError
+                )
+                .disabled(!isEditMode)
+                
+                VTSLiquidPickerField(
+                    label: "Tài xế cố định",
+                    selection: $selectedTaiXe,
+                    options: [""] + viewModel.taiXes.map { $0.ma },
+                    displayName: { code in
+                        if code.isEmpty { return "Không chọn" }
+                        return viewModel.taiXes.first(where: { $0.ma == code })?.ten ?? code
+                    },
+                    errorMessage: taiXeError
+                )
+                .disabled(!isEditMode)
+                
+                VTSLiquidTextField(
+                    label: "Ghi chú",
+                    text: $ghiChu,
+                    placeholder: "",
+                    isReadOnly: !isEditMode
+                )
             }
         }
     }

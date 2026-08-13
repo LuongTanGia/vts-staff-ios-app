@@ -61,13 +61,13 @@ struct VTSLiquidTextField: View {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .fill(
                         isReadOnly
-                        ? AnyShapeStyle(Color.primary.opacity(0.07))
-                        : AnyShapeStyle(.regularMaterial)
+                        ? Color(hex: "F1F5F9")
+                        : Color.white
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .stroke(
-                                errorMessage != nil ? Color.red : (focused ? Color.vtsPrimary.opacity(0.8) : Color.primary.opacity(0.15)),
+                                errorMessage != nil ? Color.red : (focused ? Color.vtsPrimary.opacity(0.8) : Color(hex: "C5D2E0")),
                                 lineWidth: (focused || errorMessage != nil) ? 1.5 : 1
                             )
                     )
@@ -80,8 +80,8 @@ struct VTSLiquidTextField: View {
                               ? .system(size: 11, weight: .medium)
                               : .system(size: 15))
                         .foregroundStyle(errorMessage != nil ? Color.red : (shouldFloat
-                                         ? (focused ? Color.vtsPrimary : Color.secondary)
-                                         : Color.secondary))
+                                         ? (focused ? Color.vtsPrimary : Color(hex: "475569"))
+                                         : Color(hex: "64748B")))
                         .offset(y: shouldFloat ? 6 : 16)
                         .padding(.horizontal, 14)
                         .animation(.spring(response: 0.25, dampingFraction: 0.8), value: shouldFloat)
@@ -100,7 +100,7 @@ struct VTSLiquidTextField: View {
                         }
                     }
                     .font(.system(size: 15))
-                    .foregroundStyle(isReadOnly ? .secondary : .primary)
+                    .foregroundStyle(isReadOnly ? Color(hex: "64748B") : Color(hex: "0F2D59"))
                     .focused($focused)
                     .disabled(isReadOnly)
                     
@@ -246,11 +246,11 @@ struct VTSLiquidPickerField<T: Hashable>: View {
             } label: {
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(.regularMaterial)
+                        .fill(Color.white)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
                                 .stroke(
-                                    errorMessage != nil ? Color.red : Color.primary.opacity(0.15),
+                                    errorMessage != nil ? Color.red : Color(hex: "C5D2E0"),
                                     lineWidth: errorMessage != nil ? 1.5 : 1
                                 )
                         )
@@ -259,13 +259,13 @@ struct VTSLiquidPickerField<T: Hashable>: View {
                         if !label.isEmpty {
                             Text(label)
                                 .font(.system(size: 11, weight: .medium))
-                                .foregroundStyle(errorMessage != nil ? Color.red : Color.secondary)
+                                .foregroundStyle(errorMessage != nil ? Color.red : Color(hex: "475569"))
                         }
                         
                         HStack {
                             Text(displayName(selection))
                                 .font(.system(size: 15))
-                                .foregroundColor(.primary)
+                                .foregroundColor(Color(hex: "0F2D59"))
                                 .lineLimit(1)
                             
                             Spacer()
@@ -277,7 +277,7 @@ struct VTSLiquidPickerField<T: Hashable>: View {
                             } else {
                                 Image(systemName: "chevron.down")
                                     .font(.system(size: 12, weight: .semibold))
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color(hex: "64748B"))
                             }
                         }
                     }
@@ -392,6 +392,8 @@ struct VTSLiquidPickerField<T: Hashable>: View {
             }
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
+            .environment(\.colorScheme, .light)
+            .preferredColorScheme(.light)
         }
     }
 }
@@ -457,16 +459,16 @@ struct VTSLiquidDateTimeField: View {
         Button { showPicker = true } label: {
             ZStack(alignment: .topLeading) {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(.regularMaterial)
+                    .fill(Color.white)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(Color.primary.opacity(0.15), lineWidth: 1)
+                            .stroke(Color(hex: "C5D2E0"), lineWidth: 1)
                     )
                 
                 if !label.isEmpty {
                     Text(label)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color(hex: "475569"))
                         .offset(y: 6)
                         .padding(.horizontal, 14)
                 }
@@ -474,7 +476,7 @@ struct VTSLiquidDateTimeField: View {
                 HStack {
                     Text(formattedDate)
                         .font(.system(size: 15))
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(Color(hex: "0F2D59"))
                     Spacer()
                     Image(systemName: "calendar")
                         .font(.system(size: 14))
@@ -508,6 +510,8 @@ struct VTSLiquidDateTimeField: View {
             }
             .presentationDetents([.medium])
             .presentationCornerRadius(24)
+            .environment(\.colorScheme, .light)
+            .preferredColorScheme(.light)
         }
     }
     
@@ -585,14 +589,15 @@ struct VTSLiquidFormCard<Content: View>: View {
         }
         .padding(16)
         .background(
-            .regularMaterial,
+            Color.white,
             in: RoundedRectangle(cornerRadius: 20, style: .continuous)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                .stroke(Color(hex: "C5D2E0"), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 4)
+        .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 4)
+        .environment(\.colorScheme, .light)
     }
 }
 

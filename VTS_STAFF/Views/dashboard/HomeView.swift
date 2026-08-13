@@ -875,7 +875,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Mặt")
+                    Text("Đi làm")
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 2)

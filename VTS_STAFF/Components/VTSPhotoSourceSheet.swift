@@ -97,5 +97,7 @@ struct VTSPhotoSourceSheet: View {
         .presentationDetents([.height(230)])
         .presentationCornerRadius(24)
         .presentationDragIndicator(.visible)
+        .environment(\.colorScheme, .light)
+        .preferredColorScheme(.light)
     }
 }

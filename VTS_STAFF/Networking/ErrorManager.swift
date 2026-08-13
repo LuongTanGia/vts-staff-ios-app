@@ -90,4 +90,11 @@ final class ErrorManager: ObservableObject {
         self.toastType = .warning
         self.showToast = true
     }
+    
+    /// Hiển thị thông báo lỗi
+    func showError(_ message: String) {
+        self.toastMessage = message
+        self.toastType = .error
+        self.showToast = true
+    }
 }

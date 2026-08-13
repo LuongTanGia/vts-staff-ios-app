@@ -125,7 +125,7 @@ struct VTSPageContainer<Content: View>: View {
             content()
             
         }
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)
     }
 }
 

@@ -264,116 +264,131 @@ struct NhanVienDetailView: View {
     
     @ViewBuilder
     private func personalInfoCard(details: TNhanVien_ThongTin) -> some View {
-        VTSGlassCard(padding: VTSSpacing.lg) {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    Image(systemName: "person.text.rectangle.fill")
-                        .foregroundColor(Color.vtsPrimary)
-                    Text("Hồ sơ cá nhân")
-                        .font(.vtsHeadline.bold())
-                        .foregroundColor(.vtsTxtPrimary)
-                }
-                Divider()
-                
-                if isEditMode {
-                    HStack(spacing: 12) {
-                        VTSLiquidTextField(label: "Họ và tên đệm", text: $emHo, isReadOnly: false, errorMessage: hoError)
-                        VTSLiquidTextField(label: "Tên", text: $emTen, isReadOnly: false, errorMessage: tenError)
-                            .frame(width: 120)
-                    }
+        VTSLiquidFormCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(spacing: 12) {
+                    VTSLiquidTextField(
+                        label: "Họ và tên đệm",
+                        text: $emHo,
+                        isReadOnly: !isEditMode,
+                        errorMessage: hoError
+                    )
                     
-                    HStack(spacing: 12) {
-                        VTSLiquidTextField(label: "Ngày sinh", text: $emNgaySinhStr, isReadOnly: false, errorMessage: ngaySinhError)
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Giới tính")
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundStyle(.secondary)
-                                .padding(.leading, 4)
-                            Picker("Giới tính", selection: $isFemale) {
-                                Text("Nam").tag(false)
-                                Text("Nữ").tag(true)
-                            }
-                            .pickerStyle(.segmented)
+                    VTSLiquidTextField(
+                        label: "Tên",
+                        text: $emTen,
+                        isReadOnly: !isEditMode,
+                        errorMessage: tenError
+                    )
+                    .frame(width: 120)
+                }
+                
+                HStack(spacing: 12) {
+                    VTSLiquidTextField(
+                        label: "Ngày sinh",
+                        text: $emNgaySinhStr,
+                        isReadOnly: !isEditMode,
+                        errorMessage: ngaySinhError
+                    )
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Giới tính")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(Color(hex: "475569"))
+                            .padding(.leading, 4)
+                        Picker("Giới tính", selection: $isFemale) {
+                            Text("Nam").tag(false)
+                            Text("Nữ").tag(true)
                         }
+                        .pickerStyle(.segmented)
+                        .disabled(!isEditMode)
                     }
-                    
-                    VTSLiquidTextField(label: "Số căn cước", text: $emcccdppSo, keyboardType: .numberPad, isReadOnly: false, errorMessage: cccdError)
-                } else {
-                    infoRow(label: "Họ và tên", value: getFullName(ho: details.emHo, ten: details.emTen), icon: "person.fill")
-                    infoRow(label: "Giới tính", value: details.emGioiTinh == 0 ? "Nữ" : "Nam", icon: "figure.dress.line.vertical.figure.wave")
-                    infoRow(label: "Ngày sinh", value: (details.emNgaySinh ?? "").toDisplayDate(), icon: "calendar")
-                    infoRow(label: "Số căn cước (CCCD)", value: details.emcccdppSo ?? "", icon: "doc.text.viewfinder")
                 }
                 
-                if isEditMode {
-                    VTSLiquidTextField(label: "Điện thoại liên hệ", text: $emDienThoai, keyboardType: .phonePad, isReadOnly: false)
-                    VTSLiquidTextField(label: "Email", text: $emEmail, keyboardType: .emailAddress, isReadOnly: false)
-                    VTSLiquidTextField(label: "Số, đường", text: $emDiaChiSoDuong, isReadOnly: false, errorMessage: diaChiError)
-                    
-                    VTSLiquidPickerField(
-                        label: "Phường, Xã",
-                        selection: $emDiaChiPhuongXa,
-                        options: {
-                            var list = viewModel.phuongXas.map { $0.ma }
-                            if !emDiaChiPhuongXa.isEmpty && !list.contains(emDiaChiPhuongXa) {
-                                list.insert(emDiaChiPhuongXa, at: 0)
-                            }
-                            return list
-                        }(),
-                        displayName: { code in
-                            if let found = viewModel.phuongXas.first(where: { $0.ma == code }) {
-                                return found.ten
-                            }
-                            if case .success(let details) = viewModel.state, details.emDiaChiPhuongXa == code {
-                                return details.emDiaChiTenPhuongXa ?? code
-                            }
-                            return code
-                        },
-                        displaySubtitle: { code in
-                            if let found = viewModel.phuongXas.first(where: { $0.ma == code }) {
+                VTSLiquidTextField(
+                    label: "Số căn cước",
+                    text: $emcccdppSo,
+                    keyboardType: .numberPad,
+                    isReadOnly: !isEditMode,
+                    errorMessage: cccdError
+                )
+                
+                VTSLiquidTextField(
+                    label: "Điện thoại liên hệ",
+                    text: $emDienThoai,
+                    keyboardType: .phonePad,
+                    isReadOnly: !isEditMode
+                )
+                
+                VTSLiquidTextField(
+                    label: "Email",
+                    text: $emEmail,
+                    keyboardType: .emailAddress,
+                    isReadOnly: !isEditMode
+                )
+                
+                VTSLiquidTextField(
+                    label: "Số, đường",
+                    text: $emDiaChiSoDuong,
+                    isReadOnly: !isEditMode,
+                    errorMessage: diaChiError
+                )
+                
+                VTSLiquidPickerField(
+                    label: "Phường, Xã",
+                    selection: $emDiaChiPhuongXa,
+                    options: {
+                        var list = viewModel.phuongXas.map { $0.ma }
+                        if !emDiaChiPhuongXa.isEmpty && !list.contains(emDiaChiPhuongXa) {
+                            list.insert(emDiaChiPhuongXa, at: 0)
+                        }
+                        return list
+                    }(),
+                    displayName: { code in
+                        if let found = viewModel.phuongXas.first(where: { $0.ma == code }) {
+                            return found.ten
+                        }
+                        if case .success(let details) = viewModel.state, details.emDiaChiPhuongXa == code {
+                            return details.emDiaChiTenPhuongXa ?? code
+                        }
+                        return code
+                    },
+                    displaySubtitle: { code in
+                        if let found = viewModel.phuongXas.first(where: { $0.ma == code }) {
+                            return found.tenTinhThanh
+                        }
+                        if case .success(let details) = viewModel.state, details.emDiaChiPhuongXa == code {
+                            return details.emDiaChiTenTinhThanh ?? ""
+                        }
+                        return ""
+                    },
+                    errorMessage: phuongXaError
+                )
+                .disabled(!isEditMode)
+                
+                VTSLiquidTextField(
+                    label: "Tỉnh, Thành",
+                    text: Binding(
+                        get: {
+                            if let found = viewModel.phuongXas.first(where: { $0.ma == emDiaChiPhuongXa }) {
                                 return found.tenTinhThanh
                             }
-                            if case .success(let details) = viewModel.state, details.emDiaChiPhuongXa == code {
+                            if case .success(let details) = viewModel.state {
                                 return details.emDiaChiTenTinhThanh ?? ""
                             }
                             return ""
                         },
-                        errorMessage: phuongXaError
-                    )
-                    
-                    VTSLiquidTextField(
-                        label: "Tỉnh, Thành",
-                        text: Binding(
-                            get: {
-                                if let found = viewModel.phuongXas.first(where: { $0.ma == emDiaChiPhuongXa }) {
-                                    return found.tenTinhThanh
-                                }
-                                if case .success(let details) = viewModel.state {
-                                    return details.emDiaChiTenTinhThanh ?? ""
-                                }
-                                return ""
-                            },
-                            set: { _ in }
-                        ),
-                        isReadOnly: true
-                    )
-                } else {
-                    infoRow(label: "Điện thoại di động", value: details.emDienThoai ?? "", icon: "phone.fill")
-                    infoRow(label: "Thư điện tử (Email)", value: details.emEmail ?? "", icon: "envelope.fill")
-                    
-                    let address = getFullAddress(details: details)
-                    infoRow(label: "Địa chỉ thường trú", value: address, icon: "mappin.and.ellipse")
-                }
+                        set: { _ in }
+                    ),
+                    isReadOnly: true
+                )
                 
-                if isEditMode {
-                    VTSTextArea(label: "Nội dung ghi chú", placeholder: "Thêm ghi chú...", text: $ghiChu, minHeight: 100)
-                } else {
-                    Text(details.ghiChu ?? "Chưa có ghi chú nào")
-                        .font(.vtsBody)
-                        .foregroundColor(details.ghiChu == nil ? .vtsTxtTertiary : .vtsTxtPrimary)
-                        .padding(.vertical, 4)
-                }
+                VTSLiquidTextField(
+                    label: "Ghi chú",
+                    text: $ghiChu,
+                    placeholder: "",
+                    isReadOnly: !isEditMode
+                )
             }
         }
     }

@@ -581,6 +581,7 @@ struct PhieuNhapDetailView: View {
                     .padding(6)
                 }
             } else {
+                let enabled = isSlotEnabled(slotIndex)
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color(uiColor: .systemGray6))
@@ -592,27 +593,40 @@ struct PhieuNhapDetailView: View {
                     VStack(spacing: 8) {
                         ZStack {
                             Circle()
-                                .fill(Color.vtsPrimary.opacity(0.12))
+                                .fill(enabled ? Color.vtsPrimary.opacity(0.12) : Color.gray.opacity(0.12))
                                 .frame(width: 48, height: 48)
                             Image(systemName: "photo.fill")
                                 .font(.system(size: 24, weight: .medium))
-                                .foregroundColor(.vtsPrimary)
+                                .foregroundColor(enabled ? .vtsPrimary : .gray)
                         }
                         
-                        Text(isEditMode ? "Thêm ảnh" : "Chưa có ảnh")
+                        Text(isEditMode ? (enabled ? "Thêm ảnh" : "Thêm ảnh 1 trước") : "Chưa có ảnh")
                             .font(.vtsCaption)
-                            .foregroundColor(isEditMode ? .vtsTxtSecondary : .vtsTxtTertiary)
+                            .foregroundColor(isEditMode ? (enabled ? .vtsTxtSecondary : .vtsTxtTertiary) : .vtsTxtTertiary)
                     }
                 }
+                .opacity(enabled || !isEditMode ? 1.0 : 0.5)
                 .frame(height: 130)
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
                 .onTapGesture {
                     if isEditMode {
-                        showingActionSheetForSlot = slotIndex
+                        if enabled {
+                            showingActionSheetForSlot = slotIndex
+                        } else {
+                            ErrorManager.shared.showError("Vui lòng thêm ảnh 1 trước.")
+                        }
                     }
                 }
             }
+        }
+    }
+    
+    private func isSlotEnabled(_ slotIndex: Int) -> Bool {
+        switch slotIndex {
+        case 1: return true
+        case 2: return hinh01 != nil
+        default: return false
         }
     }
     
