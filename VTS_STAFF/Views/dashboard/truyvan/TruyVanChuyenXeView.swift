@@ -37,20 +37,22 @@ struct TruyVanChuyenXeView: View {
                         }
                     )
                     .padding(.horizontal, VTSSpacing.xl)
-                    .padding(.top, VTSSpacing.sm)
-                    .padding(.bottom, VTSSpacing.sm)
+                    .padding(.top, 4)
+                    .padding(.bottom, 2)
                     .background(Color.vtsPrimary)
                 }
                 
-                SystemDateFilterHeader(
-                    fromDate: $viewModel.fromDate,
-                    toDate: $viewModel.toDate,
-                    onChanged: {
-                        Task {
-                            await viewModel.loadData()
+                HStack(spacing: 8) {
+                    SystemDateFilterHeader(
+                        fromDate: $viewModel.fromDate,
+                        toDate: $viewModel.toDate,
+                        onChanged: {
+                            Task {
+                                await viewModel.loadData()
+                            }
                         }
-                    }
-                )
+                    )
+                }
                 .padding(.horizontal, VTSSpacing.xl)
                 .background(Color.vtsPrimary)
                 

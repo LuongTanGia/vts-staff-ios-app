@@ -32,8 +32,8 @@ struct TruyVanXuatView: View {
                         }
                     )
                     .padding(.horizontal, VTSSpacing.xl)
-                    .padding(.top, VTSSpacing.sm)
-                    .padding(.bottom, VTSSpacing.sm)
+                    .padding(.top, 4)
+                    .padding(.bottom, 2)
                     .background(Color.vtsPrimary)
                 }
                 
@@ -46,15 +46,17 @@ struct TruyVanXuatView: View {
                 .padding(.horizontal, VTSSpacing.xl)
                 .background(Color.vtsPrimary)
                 
-                SystemDateFilterHeader(
-                    fromDate: $viewModel.fromDate,
-                    toDate: $viewModel.toDate,
-                    onChanged: {
-                        Task {
-                            await viewModel.loadAllData()
+                HStack(spacing: 8) {
+                    SystemDateFilterHeader(
+                        fromDate: $viewModel.fromDate,
+                        toDate: $viewModel.toDate,
+                        onChanged: {
+                            Task {
+                                await viewModel.loadAllData()
+                            }
                         }
-                    }
-                )
+                    )
+                }
                 .padding(.horizontal, VTSSpacing.xl)
                 .background(Color.vtsPrimary)
                 
@@ -199,22 +201,26 @@ struct TruyVanXuatView: View {
                                         .border(Color.vtsBorder, width: 0.5)
                                     
                                     Text(item.colName ?? "")
-                                        .font(.system(size: 11.5, weight: isSubtotal ? .bold : .regular))
+                                        .font(.system(size: 12.5, weight: isSubtotal ? .bold : .regular))
                                         .foregroundColor(Color(hex: "0F2D59"))
+                                        .lineLimit(nil)
+                                        .fixedSize(horizontal: false, vertical: true)
                                         .padding(.horizontal, 4)
+                                        .padding(.vertical, 6)
                                         .frame(width: fullWidth * 0.58, alignment: isSubtotal ? .center : .leading)
                                         .frame(maxHeight: .infinity)
                                         .border(Color.vtsBorder, width: 0.5)
                                     
                                     Text(item.colValue.toFormattedString(maxDecimals: 0))
-                                        .font(.system(size: 11.5, weight: isSubtotal ? .bold : .regular))
+                                        .font(.system(size: 12.5, weight: isSubtotal ? .bold : .regular))
                                         .foregroundColor(Color(hex: "0F2D59"))
                                         .padding(.horizontal, 4)
                                         .frame(width: fullWidth * 0.30, alignment: .trailing)
                                         .frame(maxHeight: .infinity)
                                         .border(Color.vtsBorder, width: 0.5)
                                 }
-                                .frame(height: 28)
+                                .frame(minHeight: 38)
+                                .fixedSize(horizontal: false, vertical: true)
                                 .background(isSubtotal ? Color(hex: "D1F2D9") : Color.white)
                             )
                         },

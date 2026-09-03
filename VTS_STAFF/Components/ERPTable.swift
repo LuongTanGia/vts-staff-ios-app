@@ -223,7 +223,8 @@ public struct ERPTable<Data: Identifiable>: View {
                 VStack(spacing: 0) {
                     ForEach(Array(sortedData.enumerated()), id: \.element.id) { index, row in
                         rowView(row, index: index, fullWidth: tableWidth)
-                            .frame(height: rowHeight)
+                            .frame(minHeight: rowHeight ?? 38)
+                            .fixedSize(horizontal: false, vertical: true)
                             .background(selectedRow == row.id ? Color.vtsPrimary.opacity(0.12) : (index % 2 == 0 ? Color.gray.opacity(0.15) : Color.clear))
                         Divider()
                     }
@@ -235,7 +236,8 @@ public struct ERPTable<Data: Identifiable>: View {
                             LazyVStack(spacing: 0) {
                                 ForEach(Array(sortedData.enumerated()), id: \.element.id) { index, row in
                                     rowView(row, index: index, fullWidth: tableWidth)
-                                        .frame(height: rowHeight)
+                                        .frame(minHeight: rowHeight ?? 38)
+                                        .fixedSize(horizontal: false, vertical: true)
                                         .offset(x: animate ? 0 : (isFirstAppear ? -80 : 80))
                                         .background(selectedRow == row.id ? Color.vtsPrimary.opacity(0.12) : (index % 2 == 0 ? Color.gray.opacity(0.15) : Color.clear))
                                         .opacity(animate ? 1 : 0)
@@ -437,6 +439,8 @@ private extension ERPTable {
             HStack(spacing: 4) {
                 column.title
                     .font(.vtsTableHeader)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
                 if column.sorter != nil {
                     if let icon = sortIcon(column) {
                         LucideIcon(icon == "arrow.down" ? .arrowDown : .arrowUp, size: 12, color: .white)
@@ -444,10 +448,10 @@ private extension ERPTable {
                 }
             }
             .padding(.horizontal, 4)
-            .padding(.vertical, 5)
+            .padding(.vertical, 8)
             .frame(width: width, alignment: .center)
+            .frame(minHeight: 38)
             .background(Color.vtsPrimary.opacity(0.12))
-            .lineLimit(2)
             .foregroundColor(Color.vtsBg)
         }
         .contentShape(Rectangle())
@@ -468,9 +472,11 @@ private extension ERPTable {
             column.render(data, index)
                 .font(.vtsTableContent)
                 .foregroundColor(Color(hex: "0F2D59"))
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 4)
-                .padding(.vertical, 3)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: column.alignment.swiftUI)
+                .padding(.vertical, 6)
+                .frame(maxWidth: .infinity, minHeight: rowHeight ?? 38, maxHeight: .infinity, alignment: column.alignment.swiftUI)
                 .border(Color.vtsBorder, width: 0.5)
         }
     }

@@ -13,7 +13,6 @@ struct ThongBaoView: View {
     @StateObject private var viewModel = ThongBaoViewModel()
     
     @State private var isSearchVisible: Bool = false
-    @State private var showSettingsSheet: Bool = false
     
     var body: some View {
         VTSPageContainer {
@@ -31,8 +30,8 @@ struct ThongBaoView: View {
                             }
                         )
                         .padding(.horizontal, VTSSpacing.xl)
-                        .padding(.top, VTSSpacing.sm)
-                        .padding(.bottom, VTSSpacing.sm)
+                    .padding(.top, 4)
+                    .padding(.bottom, 2)
                         .background(Color.vtsPrimary)
                     }
                     
@@ -90,27 +89,20 @@ struct ThongBaoView: View {
             isWhiteText: true,
             leading: {},
             trailing: {
-                HStack(spacing: 16) {
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            isSearchVisible.toggle()
-                        }
-                    } label: {
-                        LucideIcon(isSearchVisible ? .x : .search, size: 20, color: .white)
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isSearchVisible.toggle()
                     }
+                } label: {
+                    LucideIcon(isSearchVisible ? .x : .search, size: 20, color: .white)
                 }
             },
             primaryAction: {
                 EmptyView()
             }
         )
-        .toolbar(.hidden, for: .tabBar)
         .task {
             await viewModel.loadNotifications()
-        }
-        .sheet(isPresented: $showSettingsSheet) {
-            ThongBaoSettingsSheet(viewModel: viewModel)
-                .environment(\.colorScheme, .light)
         }
     }
     
@@ -220,110 +212,6 @@ struct ThongBaoCard: View {
             .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
         }
         .buttonStyle(.plain)
-    }
-}
-
-// MARK: - Notification Settings & Actions Sheet
-struct ThongBaoSettingsSheet: View {
-    @Environment(\.dismiss) private var dismiss
-    @ObservedObject var viewModel: ThongBaoViewModel
-    
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                // Quick Action Card
-                VTSLiquidFormCard {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text("Thao tác nhanh")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(Color(hex: "0F2D59"))
-                        
-                        Button {
-                            Task {
-                                await viewModel.markAllAsRead()
-                                dismiss()
-                            }
-                        } label: {
-                            HStack {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(Color(hex: "004B87"))
-                                Text("Đánh dấu đọc tất cả thông báo")
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(Color(hex: "0F2D59"))
-                                Spacer()
-                                LucideIcon(.chevronRight, size: 14, color: .gray.opacity(0.6))
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.vertical, 8)
-                        }
-                    }
-                }
-                
-                // Toggle Settings Card
-                VTSLiquidFormCard {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Cài đặt nhận thông báo")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(Color(hex: "0F2D59"))
-                        
-                        Toggle(isOn: Binding(
-                            get: { viewModel.isMsgTaoPhieuEnabled },
-                            set: { val in
-                                Task { await viewModel.toggleMsgTaoPhieu(enabled: val) }
-                            }
-                        )) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Thông báo khi tạo phiếu mới")
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(Color(hex: "0F2D59"))
-                                Text("Nhận tin báo khi có phiếu nhập, xuất, gia công mới")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(Color(hex: "64748B"))
-                            }
-                        }
-                        .tint(Color(hex: "004B87"))
-                        
-                        Divider()
-                        
-                        Toggle(isOn: Binding(
-                            get: { viewModel.isMsgXoaPhieuEnabled },
-                            set: { val in
-                                Task { await viewModel.toggleMsgXoaPhieu(enabled: val) }
-                            }
-                        )) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Thông báo khi xóa phiếu")
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(Color(hex: "0F2D59"))
-                                Text("Nhận tin báo khi có thao tác xóa phiếu vận chuyển")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(Color(hex: "64748B"))
-                            }
-                        }
-                        .tint(Color(hex: "004B87"))
-                    }
-                }
-                
-                Spacer()
-            }
-            .padding(16)
-            .background(Color(hex: "F8FAFC").ignoresSafeArea())
-            .navigationTitle("Tùy chọn thông báo")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Đóng") {
-                        dismiss()
-                    }
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(hex: "004B87"))
-                }
-            }
-        }
-        .task {
-            await viewModel.loadNotificationSettings()
-        }
     }
 }
 

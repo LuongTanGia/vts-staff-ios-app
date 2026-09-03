@@ -140,7 +140,9 @@ struct SystemDateFilterHeader: View {
                 .buttonStyle(VTSPressButtonStyle())
             }
         }
-        .padding(VTSSpacing.sm)
+        .padding(.horizontal, VTSSpacing.sm)
+        .padding(.top, 4)
+        .padding(.bottom, VTSSpacing.sm)
         .background(Color.vtsPrimary)
         .foregroundColor(.white)
         .frame(maxWidth: .infinity)

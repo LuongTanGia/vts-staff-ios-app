@@ -28,8 +28,8 @@ struct XeListView: View {
                         }
                     )
                     .padding(.horizontal, VTSSpacing.xl)
-                    .padding(.top, VTSSpacing.sm)
-                    .padding(.bottom, VTSSpacing.sm)
+                    .padding(.top, 4)
+                    .padding(.bottom, 2)
                     .background(Color.vtsPrimary)
                 }
                 
