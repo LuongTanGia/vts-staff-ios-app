@@ -120,48 +120,74 @@ struct VTSInputField: View {
 struct VTSSearchBar: View {
     @Binding var text: String
     let placeholder: String
+    var onClose: (() -> Void)?
     var onSubmit: (() -> Void)?
     
     @FocusState private var isFocused: Bool
     
-    init(text: Binding<String>, placeholder: String = "Tìm kiếm...", onSubmit: (() -> Void)? = nil) {
+    init(
+        text: Binding<String>,
+        placeholder: String = "Nhập nội dung để tìm",
+        onClose: (() -> Void)? = nil,
+        onSubmit: (() -> Void)? = nil
+    ) {
         self._text       = text
         self.placeholder = placeholder
+        self.onClose     = onClose
         self.onSubmit    = onSubmit
     }
     
     var body: some View {
-        HStack(spacing: VTSSpacing.md) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 15, weight: .medium))
-                .foregroundColor(isFocused ? .vtsPrimary : .vtsTxtTertiary)
+        HStack(spacing: 12) {
+            // Inner outlined input box (Android style)
+            HStack(spacing: 8) {
+                TextField("", text: $text, prompt: Text(placeholder).foregroundColor(Color(hex: "0F2D59").opacity(0.75)))
+                    .font(.system(size: 14.5, weight: .regular))
+                    .foregroundColor(Color(hex: "0F2D59"))
+                    .focused($isFocused)
+                    .onSubmit { onSubmit?() }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(isFocused ? Color.vtsPrimary : Color.gray.opacity(0.4), lineWidth: 1)
+                    .background(RoundedRectangle(cornerRadius: 10).fill(Color.white))
+            )
             
-            TextField("", text: $text,
-                      prompt: Text(placeholder).foregroundColor(.vtsTxtTertiary))
-            .font(.vtsBody)
-            .foregroundColor(.vtsTxtPrimary)
-            .focused($isFocused)
-            .onSubmit { onSubmit?() }
-            
-            if !text.isEmpty {
-                Button { text = "" } label: {
-                    LucideIcon(.xCircle, size: 18, color: .gray)
-                        .font(.system(size: 15))
-                        .foregroundColor(.vtsTxtTertiary)
+            // Trailing actions: Red 'X' and Blue Search icon (Android style)
+            HStack(spacing: 12) {
+                if !text.isEmpty {
+                    Button {
+                        text = ""
+                    } label: {
+                        LucideIcon(.x, size: 20, color: Color(hex: "BA1A1A"))
+                    }
+                    .buttonStyle(.plain)
+                } else if let onClose = onClose {
+                    Button {
+                        onClose()
+                    } label: {
+                        LucideIcon(.x, size: 20, color: Color(hex: "BA1A1A"))
+                    }
+                    .buttonStyle(.plain)
                 }
+                
+                Button {
+                    onSubmit?()
+                } label: {
+                    LucideIcon(.search, size: 22, color: Color(hex: "00497C"))
+                }
+                .buttonStyle(.plain)
             }
         }
-        .padding(.horizontal, VTSSpacing.xl)
-        .padding(.vertical, VTSSpacing.md)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
         .background(
-            RoundedRectangle(cornerRadius: VTSRadius.xxl, style: .continuous)
-                .fill(Color.vtsSurface)
-                .overlay(
-                    RoundedRectangle(cornerRadius: VTSRadius.xxl, style: .continuous)
-                        .stroke(isFocused ? Color.vtsBorderFocus : Color.vtsBorder, lineWidth: 1.5)
-                )
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.white)
+                .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 2)
         )
-        .animation(.easeInOut(duration: 0.2), value: isFocused)
     }
 }
 

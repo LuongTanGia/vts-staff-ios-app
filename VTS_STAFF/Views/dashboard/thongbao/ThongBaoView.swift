@@ -21,10 +21,19 @@ struct ThongBaoView: View {
                 // MARK: - Header & Standard System Date Filter Bar
                 VStack(spacing: 0) {
                     if isSearchVisible {
-                        VTSSearchBar(text: $viewModel.searchText, placeholder: "Tìm kiếm thông báo...")
-                            .padding(.horizontal, VTSSpacing.xl)
-                            .padding(.top, VTSSpacing.md)
-                            .padding(.bottom, VTSSpacing.md)
+                        VTSSearchBar(
+                            text: $viewModel.searchText,
+                            placeholder: "Nhập nội dung để tìm",
+                            onClose: {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    isSearchVisible = false
+                                }
+                            }
+                        )
+                        .padding(.horizontal, VTSSpacing.xl)
+                        .padding(.top, VTSSpacing.sm)
+                        .padding(.bottom, VTSSpacing.sm)
+                        .background(Color.vtsPrimary)
                     }
                     
                     HStack(spacing: 8) {
@@ -37,8 +46,6 @@ struct ThongBaoView: View {
                                 }
                             }
                         )
-                        
-                        
                     }
                     .padding(.horizontal, VTSSpacing.xl)
                     .background(Color.vtsPrimary)
@@ -80,29 +87,24 @@ struct ThongBaoView: View {
             isPrimaryActionVisible: false,
             title: "",
             subtitle: "Thông báo",
-            isWhiteText: !isSearchVisible,
+            isWhiteText: true,
             leading: {},
-           
             trailing: {
                 HStack(spacing: 16) {
                     Button {
-                        withAnimation(.easeInOut) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
                             isSearchVisible.toggle()
                         }
                     } label: {
-                        Image(systemName: isSearchVisible ? "magnifyingglass.circle.fill" : "magnifyingglass")
-                            .font(.title3)
-                            .foregroundColor(isSearchVisible ? .primary : .white)
-                            .contentTransition(.symbolEffect(.replace))
+                        LucideIcon(isSearchVisible ? .x : .search, size: 20, color: .white)
                     }
-                    
-                   
                 }
             },
             primaryAction: {
                 EmptyView()
             }
         )
+        .toolbar(.hidden, for: .tabBar)
         .task {
             await viewModel.loadNotifications()
         }

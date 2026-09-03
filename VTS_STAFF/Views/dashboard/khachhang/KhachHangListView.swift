@@ -18,11 +18,20 @@ struct KhachHangListView: View {
     var body: some View {
         VTSPageContainer {
             VStack(spacing: 0) {
-                if showSearchBar {
-                    VTSSearchBar(text: $viewModel.searchText, placeholder: "Tìm kiếm mã, tên, MST, loại...")
-                        .padding(.horizontal, VTSSpacing.xl)
-                        .padding(.top, VTSSpacing.lg)
-                        .padding(.bottom, VTSSpacing.md)
+                                if showSearchBar {
+                    VTSSearchBar(
+                        text: $viewModel.searchText,
+                        placeholder: "Nhập nội dung để tìm",
+                        onClose: {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                showSearchBar = false
+                            }
+                        }
+                    )
+                    .padding(.horizontal, VTSSpacing.xl)
+                    .padding(.top, VTSSpacing.sm)
+                    .padding(.bottom, VTSSpacing.sm)
+                    .background(Color.vtsPrimary)
                 }
                 
                 VTSAsyncContent(
@@ -170,7 +179,7 @@ struct KhachHangListView: View {
             isPrimaryActionVisible: false,
             title: "",
             subtitle: "Khách hàng",
-            isWhiteText: !showSearchBar,
+            isWhiteText: true,
             leading: {
                 
             },
@@ -181,10 +190,7 @@ struct KhachHangListView: View {
                             showSearchBar.toggle()
                         }
                     } label: {
-                        Image(systemName: showSearchBar ? "magnifyingglass.circle.fill" : "magnifyingglass")
-                            .font(.title3)
-                            .foregroundColor(showSearchBar ? .primary : .white)
-                            .contentTransition(.symbolEffect(.replace))
+                        LucideIcon(showSearchBar ? .x : .search, size: 20, color: .white)
                     }
                     
                     if AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_KHACHHANG")?.add == true {
@@ -195,7 +201,7 @@ struct KhachHangListView: View {
                         } label: {
                             LucideIcon(.plus, size: 18)
                                 .font(.title3)
-                                .foregroundColor(showSearchBar ? .primary : .white)
+                                .foregroundColor(.white)
                                 .symbolEffect(.bounce, value: showSearchBar)
                         }
                     }

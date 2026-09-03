@@ -317,7 +317,7 @@ struct VTSLiquidPickerField<T: Hashable>: View {
                 .padding(.bottom, VTSSpacing.md)
                 
                 // Search Input
-                VTSSearchBar(text: $searchText, placeholder: "Tìm kiếm...")
+                VTSSearchBar(text: $searchText, placeholder: "Nhập nội dung để tìm")
                     .padding(.horizontal, VTSSpacing.xl)
                     .padding(.bottom, VTSSpacing.md)
                 

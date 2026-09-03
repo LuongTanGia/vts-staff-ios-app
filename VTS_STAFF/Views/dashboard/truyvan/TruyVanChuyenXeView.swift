@@ -27,10 +27,19 @@ struct TruyVanChuyenXeView: View {
 //                .padding(.bottom, showSearchBar ? 0 : VTSSpacing.md)
                 
                 if showSearchBar {
-                    VTSSearchBar(text: $viewModel.searchText, placeholder: "Tìm kiếm mã, hàng hóa...")
-                        .padding(.horizontal, VTSSpacing.xl)
-                        .padding(.top, VTSSpacing.md)
-                        .padding(.bottom, VTSSpacing.md)
+                    VTSSearchBar(
+                        text: $viewModel.searchText,
+                        placeholder: "Nhập nội dung để tìm",
+                        onClose: {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                showSearchBar = false
+                            }
+                        }
+                    )
+                    .padding(.horizontal, VTSSpacing.xl)
+                    .padding(.top, VTSSpacing.sm)
+                    .padding(.bottom, VTSSpacing.sm)
+                    .background(Color.vtsPrimary)
                 }
                 
                 SystemDateFilterHeader(

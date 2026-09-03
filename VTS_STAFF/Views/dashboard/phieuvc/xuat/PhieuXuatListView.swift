@@ -49,12 +49,21 @@ struct PhieuXuatListView: View {
         VTSPageContainer {
             VStack(spacing: 0) {
                 VStack(spacing: 0) {
-                    if showSearchBar {
-                        VTSSearchBar(text: $viewModel.searchText, placeholder: "Tìm kiếm số phiếu, số xe, tài xế...")
-                            .padding(.horizontal, VTSSpacing.xl)
-                            .padding(.top, VTSSpacing.md)
-                            .padding(.bottom, VTSSpacing.md)
-                    }
+                                    if showSearchBar {
+                    VTSSearchBar(
+                        text: $viewModel.searchText,
+                        placeholder: "Nhập nội dung để tìm",
+                        onClose: {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                showSearchBar = false
+                            }
+                        }
+                    )
+                    .padding(.horizontal, VTSSpacing.xl)
+                    .padding(.top, VTSSpacing.sm)
+                    .padding(.bottom, VTSSpacing.sm)
+                    .background(Color.vtsPrimary)
+                }
                     SystemDateFilterHeader(
                         fromDate: $viewModel.fromDate,
                         toDate: $viewModel.toDate,
@@ -172,7 +181,7 @@ struct PhieuXuatListView: View {
             isPrimaryActionVisible: false,
             title: "",
             subtitle: "Chuyển hàng giao",
-            isWhiteText: !showSearchBar,
+            isWhiteText: true,
             leading: {},
             trailing: {
                 HStack(spacing: 16) {
@@ -181,10 +190,7 @@ struct PhieuXuatListView: View {
                             showSearchBar.toggle()
                         }
                     } label: {
-                        Image(systemName: showSearchBar ? "magnifyingglass.circle.fill" : "magnifyingglass")
-                            .font(.title3)
-                            .foregroundColor(showSearchBar ? .primary : .white)
-                            .contentTransition(.symbolEffect(.replace))
+                        LucideIcon(showSearchBar ? .x : .search, size: 20, color: .white)
                     }
                     
                     if AuthManager.shared.getPermission(for: "VTSSTAFF_DULIEU_PHIEUXUAT")?.add == true {
@@ -195,7 +201,7 @@ struct PhieuXuatListView: View {
                         } label: {
                             LucideIcon(.plus, size: 18)
                                 .font(.title3)
-                                .foregroundColor(showSearchBar ? .primary : .white)
+                                .foregroundColor(.white)
                                 .symbolEffect(.bounce, value: showSearchBar)
                         }
                     }

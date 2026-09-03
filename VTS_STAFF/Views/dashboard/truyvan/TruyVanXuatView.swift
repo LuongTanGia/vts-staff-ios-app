@@ -22,10 +22,19 @@ struct TruyVanXuatView: View {
         VTSPageContainer {
             VStack(spacing: 0) {
                 if showSearchBar {
-                    VTSSearchBar(text: $viewModel.searchText, placeholder: "Tìm kiếm tên, mã...")
-                        .padding(.horizontal, VTSSpacing.xl)
-                        .padding(.top, VTSSpacing.sm)
-                        .padding(.bottom, VTSSpacing.sm)
+                    VTSSearchBar(
+                        text: $viewModel.searchText,
+                        placeholder: "Nhập nội dung để tìm",
+                        onClose: {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                showSearchBar = false
+                            }
+                        }
+                    )
+                    .padding(.horizontal, VTSSpacing.xl)
+                    .padding(.top, VTSSpacing.sm)
+                    .padding(.bottom, VTSSpacing.sm)
+                    .background(Color.vtsPrimary)
                 }
                 
                 Picker("Loại truy vấn", selection: $viewModel.queryType) {
