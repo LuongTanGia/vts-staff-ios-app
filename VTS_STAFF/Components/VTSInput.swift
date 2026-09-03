@@ -110,6 +110,29 @@ struct VTSInputField: View {
             }
         }
         .animation(.easeInOut(duration: 0.2), value: errorMessage)
+        .toolbar {
+            if isFocused {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button {
+                        isFocused = false
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "keyboard.chevron.compact.down")
+                                .font(.system(size: 14, weight: .bold))
+                            Text("Xong")
+                                .font(.system(size: 14, weight: .bold))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 5)
+                        .background(Color.vtsPrimary)
+                        .cornerRadius(8)
+                    }
+                }
+            }
+        }
     }
 }
 

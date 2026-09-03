@@ -170,7 +170,7 @@ struct VTSLiquidImageSlot: View {
             // Action buttons: Xem + Cắt/Xoay + Xoá
             HStack(spacing: 8) {
                 // Xem
-                imageActionButton(icon: "eye.fill", color: .vtsPrimary) {
+                imageActionButton(icon: .eye, bgColor: Color.black.opacity(0.65)) {
                     if let onView = onView {
                         onView()
                     } else {
@@ -178,11 +178,11 @@ struct VTSLiquidImageSlot: View {
                     }
                 }
                 // Cắt - Xoay
-                imageActionButton(icon: "crop", color: .vtsPrimary) {
+                imageActionButton(icon: .crop, bgColor: Color.black.opacity(0.65)) {
                     editingImage = IdentifiableImage(image: img)
                 }
                 // Xoá
-                imageActionButton(icon: "trash.fill", color: .vtsDanger) {
+                imageActionButton(icon: .trash2, bgColor: Color(hex: "BA1A1A").opacity(0.85)) {
                     withAnimation(.spring(response: 0.3)) {
                         state = .empty
                         onDelete?()
@@ -198,15 +198,19 @@ struct VTSLiquidImageSlot: View {
     }
     
     @ViewBuilder
-    private func imageActionButton(icon: String, color: Color, action: @escaping () -> Void) -> some View {
+    private func imageActionButton(icon: LucideIconName, bgColor: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             ZStack {
                 Circle()
-                    .fill(.regularMaterial)
-                    .frame(width: 42, height: 42)
-                LucideIcon(icon, size: 20, color: .vtsPrimary)
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(color)
+                    .fill(bgColor)
+                    .frame(width: 38, height: 38)
+                    .overlay(
+                        Circle()
+                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                    )
+                    .shadow(color: Color.black.opacity(0.35), radius: 4, x: 0, y: 2)
+                
+                LucideIcon(icon, size: 18, color: .white)
             }
         }
         .buttonStyle(VTSPressButtonStyle())

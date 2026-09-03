@@ -249,7 +249,7 @@ struct PhieuGiaCongCardView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Row 1: Số, Trạng thái, Ngày
+            // Row 1: Số, Ngày
             HStack {
                 HStack(spacing: 4) {
                     Text("Số:")
@@ -261,8 +261,6 @@ struct PhieuGiaCongCardView: View {
                 }
                 
                 Spacer()
-                
-                VTSPhieuStatusChip(trangThai: item.tenTrangThai ?? item.trangThai)
                 
                 Text(item.ngay.toUIDateString)
                     .font(.system(size: 13))

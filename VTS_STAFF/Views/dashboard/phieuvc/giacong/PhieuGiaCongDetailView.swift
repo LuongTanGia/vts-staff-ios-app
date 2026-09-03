@@ -19,9 +19,9 @@ struct PhieuGiaCongDetailView: View {
     // Form fields State
     @State private var ngay: Date = Date()
     @State private var soThamChieu: String = ""
-    @State private var nhanVien: String = ""
     @State private var xeNgoai: Bool = false
-    @State private var soXe: String = ""
+    @State private var soXeNgoai: String = ""
+    @State private var soXeNha: String = ""
     @State private var taiXe: String = ""
     @State private var khachHang: String = ""
     @State private var hangHoa: String = ""
@@ -66,6 +66,7 @@ struct PhieuGiaCongDetailView: View {
     @State private var editingImage: IdentifiableImage? = nil
     @State private var editingSlot: Int? = nil
     @State private var activeSlot: Int? = nil
+    
     @State private var isSaving: Bool = false
     
     private var galleryItems: [VTSPhotoGalleryItem] {
@@ -84,7 +85,6 @@ struct PhieuGiaCongDetailView: View {
     @State private var taiXeError: String? = nil
     @State private var hangHoaError: String? = nil
     @State private var khachHangError: String? = nil
-    @State private var trongLuongXeError: String? = nil
     @State private var trongLuongHangError: String? = nil
     
     private var hasEditPermission: Bool {
@@ -99,14 +99,29 @@ struct PhieuGiaCongDetailView: View {
         AuthManager.shared.getPermission(for: "VTSSTAFF_DULIEU_PHIEUGIACONG")?.del == true
     }
     
-    private var currentNhanVienDisplay: String {
-        if let found = viewModel.nhanVienOptions.first(where: { $0.emid == nhanVien }) {
-            return found.emHoTen
+    private func normalizePlate(_ text: String) -> String {
+        return text.replacingOccurrences(of: "-", with: "")
+            .replacingOccurrences(of: ".", with: "")
+            .replacingOccurrences(of: " ", with: "")
+            .uppercased()
+    }
+    
+    private var currentTaiXeDisplay: String {
+        if let found = viewModel.taiXeOptions.first(where: { $0.ma == taiXe }) {
+            return found.ten
         }
-        if case .success(let details) = viewModel.state, let details = details, let name = details.tenNhanVien, !name.isEmpty {
-            return name
+        if let foundNV = viewModel.nhanVienOptions.first(where: { $0.emid == taiXe }) {
+            return foundNV.emHoTen
         }
-        return nhanVien.isEmpty ? "---" : nhanVien
+        if case .success(let details) = viewModel.state, let details = details {
+            if let name = details.taiXe, !name.isEmpty {
+                return name
+            }
+            if let name = details.tenNhanVien, !name.isEmpty {
+                return name
+            }
+        }
+        return taiXe.isEmpty ? "---" : taiXe
     }
     
     private var currentHangHoaDisplay: String {
@@ -161,8 +176,8 @@ struct PhieuGiaCongDetailView: View {
                 VStack(spacing: 0) {
                     VTSVoucherHeaderProfileCard(
                         iconName: "building.2.fill",
-                        soXe: soXe,
-                        tenNhanVien: currentNhanVienDisplay,
+                        soXe: (xeNgoai ? soXeNgoai : soXeNha).isEmpty ? "---" : (xeNgoai ? soXeNgoai : soXeNha),
+                        tenNhanVien: currentTaiXeDisplay,
                         tenHangHoa: currentHangHoaDisplay,
                         trongLuongHang: trongLuongHang,
                         tenKhachHang: currentKhachHangDisplay
@@ -451,38 +466,83 @@ struct PhieuGiaCongDetailView: View {
                 HStack(spacing: 12) {
                     VTSLiquidTextField(
                         label: "Số xe ngoài",
-                        text: $soXe,
+                        text: $soXeNgoai,
                         placeholder: "",
-                        isReadOnly: !isEditMode,
-                        errorMessage: soXeError
+                        isReadOnly: !isEditMode
                     )
-                    .onChange(of: soXe) { _, newValue in
+                    .onChange(of: soXeNgoai) { _, newValue in
                         let upper = newValue.uppercased()
-                        if soXe != upper {
-                            soXe = upper
+                        if soXeNgoai != upper {
+                            soXeNgoai = upper
+                        }
+                        let normalizedInput = normalizePlate(upper)
+                        if !normalizedInput.isEmpty,
+                           let matchedXe = viewModel.xeOptions.first(where: {
+                               normalizePlate($0.ma) == normalizedInput || normalizePlate($0.ten) == normalizedInput
+                           }) {
+                            xeNgoai = false
+                            soXeNha = matchedXe.ma
+                            soXeNgoai = ""
+                            soXeError = nil
+                            if !matchedXe.maTaiXe.isEmpty {
+                                taiXe = matchedXe.maTaiXe
+                            }
+                        } else if !upper.isEmpty {
+                            xeNgoai = true
+                            soXeNha = ""
+                            soXeError = nil
                         }
                     }
                     
                     VTSLiquidPickerField(
                         label: "Số xe nhà",
-                        selection: $soXe,
+                        selection: $soXeNha,
                         options: viewModel.xeOptions.map { $0.ma },
                         displayName: { code in
-                            viewModel.xeOptions.first(where: { $0.ma == code })?.ten ?? (code.isEmpty ? "Số xe nhà" : code)
+                            viewModel.xeOptions.first(where: { $0.ma == code })?.ten ?? code
+                        },
+                        displaySubtitle: { code in
+                            if let xe = viewModel.xeOptions.first(where: { $0.ma == code }) {
+                                return "Tài xế: \(xe.tenTaiXe)"
+                            }
+                            return ""
                         },
                         errorMessage: soXeError
                     )
+                    .onChange(of: soXeNha) { _, newSoXe in
+                        if !newSoXe.isEmpty {
+                            xeNgoai = false
+                            soXeNgoai = ""
+                            soXeError = nil
+                            if let foundXe = viewModel.xeOptions.first(where: { $0.ma == newSoXe }) {
+                                taiXe = foundXe.maTaiXe
+                            }
+                        }
+                    }
                     .disabled(!isEditMode)
                 }
                 
-                // Row 3: Tài xế
-                VTSLiquidTextField(
-                    label: "Tài xế",
-                    text: $taiXe,
-                    placeholder: "",
-                    isReadOnly: !isEditMode,
-                    errorMessage: taiXeError
-                )
+                // Row 3: Tài xế / Nhân viên (Picker nếu xe nhà, Text Input nếu xe ngoài)
+                if xeNgoai {
+                    VTSLiquidTextField(
+                        label: "Tài xế ngoài",
+                        text: $taiXe,
+                        placeholder: "Nhập tên tài xế...",
+                        isReadOnly: !isEditMode,
+                        errorMessage: taiXeError
+                    )
+                } else {
+                    VTSLiquidPickerField(
+                        label: "Tài xế",
+                        selection: $taiXe,
+                        options: viewModel.taiXeOptions.map { $0.ma },
+                        displayName: { code in
+                            viewModel.taiXeOptions.first(where: { $0.ma == code })?.ten ?? code
+                        },
+                        errorMessage: taiXeError
+                    )
+                    .disabled(!isEditMode)
+                }
                 
                 // Row 4: Khách hàng
                 VTSLiquidPickerField(
@@ -647,10 +707,13 @@ struct PhieuGiaCongDetailView: View {
                             ZStack {
                                 Circle()
                                     .fill(Color.black.opacity(0.65))
-                                    .frame(width: 42, height: 42)
-                                LucideIcon(.eye, size: 18)
-                                    .font(.system(size: 18, weight: .bold))
-                                    .foregroundColor(.white)
+                                    .frame(width: 38, height: 38)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                    )
+                                    .shadow(color: Color.black.opacity(0.35), radius: 4, x: 0, y: 2)
+                                LucideIcon(.eye, size: 18, color: .white)
                             }
                         }
                         
@@ -661,11 +724,14 @@ struct PhieuGiaCongDetailView: View {
                             } label: {
                                 ZStack {
                                     Circle()
-                                        .fill(Color.vtsPrimary)
-                                        .frame(width: 42, height: 42)
-                                    LucideIcon(.crop, size: 18)
-                                        .font(.system(size: 18, weight: .bold))
-                                        .foregroundColor(.white)
+                                        .fill(Color.black.opacity(0.65))
+                                        .frame(width: 38, height: 38)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                        )
+                                        .shadow(color: Color.black.opacity(0.35), radius: 4, x: 0, y: 2)
+                                    LucideIcon(.crop, size: 18, color: .white)
                                 }
                             }
                             
@@ -674,11 +740,14 @@ struct PhieuGiaCongDetailView: View {
                             } label: {
                                 ZStack {
                                     Circle()
-                                        .fill(Color.vtsDanger)
-                                        .frame(width: 42, height: 42)
-                                    LucideIcon(.trash2, size: 18, color: .vtsDanger)
-                                        .font(.system(size: 18, weight: .bold))
-                                        .foregroundColor(.white)
+                                        .fill(Color(hex: "BA1A1A").opacity(0.85))
+                                        .frame(width: 38, height: 38)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                        )
+                                        .shadow(color: Color.black.opacity(0.35), radius: 4, x: 0, y: 2)
+                                    LucideIcon(.trash2, size: 18, color: .white)
                                 }
                             }
                         }
@@ -780,37 +849,21 @@ struct PhieuGiaCongDetailView: View {
         .buttonStyle(.plain)
     }
     
-    private func normalizePlate(_ input: String) -> String {
-        input.uppercased()
-            .replacingOccurrences(of: "-", with: "")
-            .replacingOccurrences(of: ".", with: "")
-            .replacingOccurrences(of: " ", with: "")
-    }
-    
     private func populateFields(with details: TPhieuvc_Giacong_DanhSach) {
         ngay = Date.fromAPIString(details.ngay) ?? Date()
         soThamChieu = details.soThamChieu ?? ""
-        nhanVien = details.nhanVien ?? ""
         khachHang = details.khachHang ?? ""
         
-        let plate = details.soXe ?? ""
-        soXe = plate
-        let upperPlate = plate.uppercased()
-        let normalizedPlate = normalizePlate(upperPlate)
-        
-        if !normalizedPlate.isEmpty,
-           let found = viewModel.xeOptions.first(where: {
-               normalizePlate($0.ma) == normalizedPlate || normalizePlate($0.ten) == normalizedPlate
-           }) {
-            xeNgoai = false
-            soXe = found.ma
-            if !found.maTaiXe.isEmpty {
-                nhanVien = found.maTaiXe
-            }
-            taiXe = details.taiXe ?? found.tenTaiXe
-        } else {
-            xeNgoai = details.xeNgoai
+        if details.xeNgoai == true {
+            xeNgoai = true
+            soXeNgoai = details.soXe ?? ""
+            soXeNha = ""
             taiXe = details.taiXe ?? ""
+        } else {
+            xeNgoai = false
+            soXeNha = details.soXe ?? ""
+            soXeNgoai = ""
+            taiXe = details.nhanVien ?? details.taiXe ?? ""
         }
         
         hangHoa = details.hangHoa
@@ -855,7 +908,8 @@ struct PhieuGiaCongDetailView: View {
     private func validateForm() -> Bool {
         var isValid = true
         
-        if soXe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        let currentSoXe = xeNgoai ? soXeNgoai : soXeNha
+        if currentSoXe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             soXeError = "Không được để trống."
             isValid = false
         } else {
@@ -915,7 +969,8 @@ struct PhieuGiaCongDetailView: View {
         let tg5 = thoiGian05 ?? (hinh05 != nil ? now : nil)
         let tg6 = thoiGian06 ?? (hinh06 != nil ? now : nil)
         
-        let finalNhanVien: String? = xeNgoai ? nil : (nhanVien.isEmpty ? nil : nhanVien)
+        let currentSoXe = xeNgoai ? soXeNgoai : soXeNha
+        let finalNhanVien: String? = xeNgoai ? nil : (taiXe.isEmpty ? nil : taiXe)
         let finalTaiXe: String? = xeNgoai ? (taiXe.isEmpty ? nil : taiXe) : nil
         
         do {
@@ -924,7 +979,7 @@ struct PhieuGiaCongDetailView: View {
                     ngay: ngay,
                     soThamChieu: soThamChieu.isEmpty ? nil : soThamChieu,
                     xeNgoai: xeNgoai,
-                    soXe: soXe,
+                    soXe: currentSoXe,
                     nhanVien: finalNhanVien,
                     taiXe: finalTaiXe,
                     khachHang: khachHang,
@@ -955,7 +1010,7 @@ struct PhieuGiaCongDetailView: View {
                     ngay: ngay,
                     soThamChieu: soThamChieu.isEmpty ? nil : soThamChieu,
                     xeNgoai: xeNgoai,
-                    soXe: soXe,
+                    soXe: currentSoXe,
                     nhanVien: finalNhanVien,
                     taiXe: finalTaiXe,
                     khachHang: khachHang,

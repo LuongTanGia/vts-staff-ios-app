@@ -138,6 +138,29 @@ struct VTSLiquidTextField: View {
                     .padding(.horizontal, 4)
             }
         }
+        .toolbar {
+            if focused {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button {
+                        focused = false
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "keyboard.chevron.compact.down")
+                                .font(.system(size: 14, weight: .bold))
+                            Text("Xong")
+                                .font(.system(size: 14, weight: .bold))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 5)
+                        .background(Color.vtsPrimary)
+                        .cornerRadius(8)
+                    }
+                }
+            }
+        }
     }
 }
 

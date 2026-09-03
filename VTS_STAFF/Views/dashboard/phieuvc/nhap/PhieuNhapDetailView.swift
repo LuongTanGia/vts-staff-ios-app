@@ -522,10 +522,13 @@ struct PhieuNhapDetailView: View {
                             ZStack {
                                 Circle()
                                     .fill(Color.black.opacity(0.65))
-                                    .frame(width: 42, height: 42)
-                                LucideIcon(.eye, size: 18)
-                                    .font(.system(size: 18, weight: .bold))
-                                    .foregroundColor(.white)
+                                    .frame(width: 38, height: 38)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                    )
+                                    .shadow(color: Color.black.opacity(0.35), radius: 4, x: 0, y: 2)
+                                LucideIcon(.eye, size: 18, color: .white)
                             }
                         }
                         
@@ -536,11 +539,14 @@ struct PhieuNhapDetailView: View {
                             } label: {
                                 ZStack {
                                     Circle()
-                                        .fill(Color.vtsPrimary)
-                                        .frame(width: 42, height: 42)
-                                    LucideIcon(.crop, size: 18)
-                                        .font(.system(size: 18, weight: .bold))
-                                        .foregroundColor(.white)
+                                        .fill(Color.black.opacity(0.65))
+                                        .frame(width: 38, height: 38)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                        )
+                                        .shadow(color: Color.black.opacity(0.35), radius: 4, x: 0, y: 2)
+                                    LucideIcon(.crop, size: 18, color: .white)
                                 }
                             }
                             
@@ -549,11 +555,14 @@ struct PhieuNhapDetailView: View {
                             } label: {
                                 ZStack {
                                     Circle()
-                                        .fill(Color.vtsDanger)
-                                        .frame(width: 42, height: 42)
-                                    LucideIcon(.trash2, size: 18, color: .vtsDanger)
-                                        .font(.system(size: 18, weight: .bold))
-                                        .foregroundColor(.white)
+                                        .fill(Color(hex: "BA1A1A").opacity(0.85))
+                                        .frame(width: 38, height: 38)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                        )
+                                        .shadow(color: Color.black.opacity(0.35), radius: 4, x: 0, y: 2)
+                                    LucideIcon(.trash2, size: 18, color: .white)
                                 }
                             }
                         }

@@ -177,51 +177,6 @@ struct VTSPhotoGalleryView: View {
                         .disabled(selectedIndex >= items.count)
                     }
                     .padding(.horizontal, 16)
-                    
-                    // OCR Scanned text preview box (if present)
-                    if let text = currentItem?.ocrText, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                Image(systemName: "doc.text.viewfinder")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.blue)
-                                Text("Văn bản quét được (OCR)")
-                                    .font(.system(size: 12, weight: .bold))
-                                    .foregroundColor(.white)
-                                
-                                Spacer()
-                                
-                                Button {
-                                    UIPasteboard.general.string = text
-                                    ErrorManager.shared.showSuccess("Đã sao chép văn bản OCR")
-                                } label: {
-                                    HStack(spacing: 4) {
-                                        LucideIcon(.copy, size: 14, color: .vtsTxtTertiary)
-                                        Text("Sao chép")
-                                    }
-                                    .font(.system(size: 11, weight: .semibold))
-                                    .foregroundColor(.blue)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(Color.blue.opacity(0.2))
-                                    .cornerRadius(8)
-                                }
-                            }
-                            
-                            Text(text)
-                                .font(.system(size: 12))
-                                .foregroundColor(.white.opacity(0.9))
-                                .lineLimit(3)
-                        }
-                        .padding(12)
-                        .background(Color.black.opacity(0.75))
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.white.opacity(0.15), lineWidth: 1)
-                        )
-                        .padding(.horizontal, 16)
-                    }
                 }
                 .padding(.bottom, 30)
                 .background(
