@@ -114,7 +114,7 @@ struct NhanVienDetailView: View {
                             }
                         } label: {
                             HStack(spacing: 6) {
-                                Image(systemName: "xmark")
+                                LucideIcon(.x, size: 18)
                                 Text("Huỷ")
                                     .font(.vtsHeadline)
                             }
@@ -132,7 +132,7 @@ struct NhanVienDetailView: View {
                                     ProgressView()
                                         .tint(.primary)
                                 } else {
-                                    Image(systemName: "checkmark")
+                                    LucideIcon(.check, size: 18)
                                     Text("Lưu")
                                         .font(.vtsHeadline)
                                 }
@@ -149,7 +149,7 @@ struct NhanVienDetailView: View {
                             }
                         } label: {
                             HStack(spacing: 6) {
-                                Image(systemName: "square.and.pencil")
+                                LucideIcon(.pencil, size: 18)
                                 Text("Sửa")
                                     .font(.vtsHeadline)
                             }
@@ -205,61 +205,39 @@ struct NhanVienDetailView: View {
     
     @ViewBuilder
     private func profileHeaderCard(details: TNhanVien_ThongTin) -> some View {
-        VStack {
-            HStack(spacing: 16) {
-                // Avatar with initials
-                ZStack {
-                    Circle()
-                        .fill(Color.white.opacity(0.15))
-                        .frame(width: 60, height: 60)
-                    
-                    Text(getInitials(name: getFullName(ho: emHo, ten: emTen)))
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(.white)
-                }
-                .overlay(
-                    Circle()
-                        .stroke(Color.white.opacity(0.35), lineWidth: 1.5)
-                )
-                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        HStack(alignment: .center, spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 48, height: 48)
+                    .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
                 
-                VStack(alignment: .leading, spacing: 4) {
-                    let fullName = getFullName(ho: emHo, ten: emTen)
-                    Text(fullName.isEmpty ? "Nhân viên" : fullName)
-                        .font(.title3.bold())
-                        .foregroundColor(.white)
-                    
-                    // Job Information (Moved up to header card)
-                    HStack(spacing: 12) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Phòng ban")
-                                .font(.system(size: 10))
-                                .foregroundColor(.white.opacity(0.6))
-                            Text(details.emTenPhongBanHH ?? "Chưa phân phòng")
-                                .font(.subheadline.bold())
-                                .foregroundColor(.white)
-                        }
-                        
-                        Rectangle()
-                            .fill(Color.white.opacity(0.15))
-                            .frame(width: 1, height: 24)
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Ngày vào làm")
-                                .font(.system(size: 10))
-                                .foregroundColor(.white.opacity(0.6))
-                            Text((details.emNgayBatDauHH ?? "").toDisplayDate())
-                                .font(.subheadline.bold())
-                                .foregroundColor(.white)
-                        }
-                        
-                        Spacer()
-                    }
-                }
+                LucideIcon(.users, size: 24, color: Color(hex: "00497C"))
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 16)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                let fullName = getFullName(ho: emHo, ten: emTen)
+                Text(fullName.isEmpty ? "Nhân viên" : fullName)
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+                
+                Text(details.emid ?? "—")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+                
+                let sub = details.emTenPhongBanHH ?? (details.emDienThoai ?? "—")
+                Text(sub)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .padding(.horizontal, 16)
+        .padding(.top, 4)
+        .padding(.bottom, 12)
     }
     
     @ViewBuilder
@@ -402,7 +380,7 @@ struct NhanVienDetailView: View {
             }
         } label: {
             HStack(spacing: 12) {
-                Image(systemName: icon)
+                LucideIcon(icon, size: 20, color: .vtsPrimary)
                     .foregroundColor(Color.vtsPrimary)
                     .frame(width: 28, height: 28)
                     .background(Color.vtsPrimary.opacity(0.1))
@@ -422,7 +400,7 @@ struct NhanVienDetailView: View {
                 Spacer()
                 
                 if !value.isEmpty {
-                    Image(systemName: "doc.on.doc")
+                    LucideIcon(.copy, size: 14, color: .vtsTxtTertiary)
                         .font(.system(size: 11))
                         .foregroundColor(.vtsTxtTertiary)
                         .padding(4)

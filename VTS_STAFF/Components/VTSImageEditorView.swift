@@ -160,7 +160,7 @@ struct VTSImageEditorView: View {
                         Circle()
                             .fill(showPreviewOnly ? Color.vtsPrimary : Color.white.opacity(0.2))
                             .frame(width: 34, height: 34)
-                        Image(systemName: "eye.fill")
+                        LucideIcon(.eye, size: 18)
                             .font(.system(size: 15, weight: .bold))
                             .foregroundColor(.white)
                     }

@@ -101,11 +101,21 @@ struct NhanVienListView: View {
                                     ),
                                     
                                  ],
-                                 defaultSortKey: "emTen",
-                                 onRowLongPress: { row in
-                                     selectedModalItem = row
-                                 },
-
+                                defaultSortKey: "emTen",
+                                onRowLongPress: { row in
+                                    router.showScreen(.push) { _ in
+                                        NhanVienDetailView(maNV: row.emid, isEditMode: false)
+                                    }
+                                },
+                                onRowAction: { action, row in
+                                    handleRowAction(action, row: row)
+                                },
+                                actions: {
+                                    var list: [VTSRowAction] = []
+                                    let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_NHANVIEN")
+                                    if perm?.view == true || perm == nil { list.append(.xem) }
+                                    return list
+                                }(),
                                 loadDataIfNeeded: {
                                     Task {
                                         await viewModel.loadDataIfNeeded()
@@ -119,7 +129,8 @@ struct NhanVienListView: View {
                                 backgroundPreferenceValue: Color.vtsPrimary,
                                 customFooterBuilder: { width in
                                     AnyView(Text("Tổng cộng: \(viewModel.filteredNhanVien.count) nhân viên")
-                                        .padding()
+                                        .font(.system(size: 12, weight: .bold))
+                                        .padding(.vertical, 6)
                                         .foregroundColor(Color.vtsBg)
                                         .frame(width: width * 1, alignment: .center)
                                         .background(Color.vtsPrimary))
@@ -135,30 +146,6 @@ struct NhanVienListView: View {
             }
             .ignoresSafeArea(edges: .bottom)
         }
-        
-        .sheet(item: $selectedModalItem) { item in
-            VTSActionModalSheet(
-                title: item.emHo + " " + item.emTen,
-                subtitle: "Mã: \(item.emid)" + (!item.emDienThoai.isEmpty ? " • SĐT: \(item.emDienThoai)" : ""),
-                actions: {
-                    var acts: [VTSModalAction] = []
-                    let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_NHANVIEN")
-                    if perm?.view == true || perm == nil {
-                        acts.append(VTSModalAction(title: "Xem chi tiết", icon: "eye.fill") {
-                            router.showScreen(.push) { _ in
-                                NhanVienDetailView(maNV: item.emid, isEditMode: false)
-                            }
-                        })
-                    }
-                    return acts
-                }(),
-                onClose: {
-                    selectedModalItem = nil
-                }
-            )
-            .presentationDetents([.fraction(0.3), .medium])
-            .presentationDragIndicator(.visible)
-        }
         .task {
             if !hasLoadedData {
                 await viewModel.loadData()
@@ -170,18 +157,15 @@ struct NhanVienListView: View {
             isPrimaryActionVisible: false,
             title: "",
             subtitle: "Nhân viên",
-            isWhiteText: !showSearchBar,
+            isWhiteText: true,
             leading: {},
             trailing: {
                 Button {
-                    withAnimation(.easeInOut) {
+                    withAnimation(.easeInOut(duration: 0.2)) {
                         showSearchBar.toggle()
                     }
                 } label: {
-                    Image(systemName: showSearchBar ? "magnifyingglass.circle.fill" : "magnifyingglass")
-                        .font(.title3)
-                        .foregroundColor(showSearchBar ? .primary : .white)
-                        .contentTransition(.symbolEffect(.replace))
+                    LucideIcon(showSearchBar ? .x : .search, size: 20, color: .white)
                 }
             },
             primaryAction: {
@@ -189,6 +173,17 @@ struct NhanVienListView: View {
             }
         )
         .toolbar(.hidden, for: .tabBar)
+    }
+    
+    private func handleRowAction(_ action: VTSRowAction, row: TNhanVien_DanhSach) {
+        switch action {
+        case .xem:
+            router.showScreen(.push) { _ in
+                NhanVienDetailView(maNV: row.emid, isEditMode: false)
+            }
+        default:
+            break
+        }
     }
 }
 

@@ -103,7 +103,7 @@ struct LoginView: View {
                                             await viewModel.loginWithBiometrics()
                                         }
                                     } label: {
-                                        Image(systemName: "faceid")
+                                        LucideIcon(.scanFace, size: 28, color: .vtsPrimary)
                                             .font(.system(size: 26))
                                             .foregroundColor(.vtsPrimary)
                                             .frame(width: 52, height: 52)

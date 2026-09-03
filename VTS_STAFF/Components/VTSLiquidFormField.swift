@@ -105,7 +105,7 @@ struct VTSLiquidTextField: View {
                     .disabled(isReadOnly)
                     
                     if let errorMessage {
-                        Image(systemName: "exclamationmark.circle.fill")
+                        LucideIcon(.alertCircle, size: 16, color: .red)
                             .font(.system(size: 18))
                             .foregroundStyle(.red)
                     } else if isReadOnly && !text.isEmpty {
@@ -271,11 +271,11 @@ struct VTSLiquidPickerField<T: Hashable>: View {
                             Spacer()
                             
                             if errorMessage != nil {
-                                Image(systemName: "exclamationmark.circle.fill")
+                                LucideIcon(.alertCircle, size: 16, color: .red)
                                     .font(.system(size: 18))
                                     .foregroundColor(.red)
                             } else {
-                                Image(systemName: "chevron.down")
+                                LucideIcon(.chevronDown, size: 14, color: .vtsPrimary)
                                     .font(.system(size: 12, weight: .semibold))
                                     .foregroundColor(Color(hex: "64748B"))
                             }
@@ -307,7 +307,7 @@ struct VTSLiquidPickerField<T: Hashable>: View {
                     Button {
                         isSheetPresented = false
                     } label: {
-                        Image(systemName: "xmark.circle.fill")
+                        LucideIcon(.xCircle, size: 18, color: .gray)
                             .font(.system(size: 22))
                             .foregroundColor(.vtsTxtTertiary)
                     }
@@ -372,7 +372,7 @@ struct VTSLiquidPickerField<T: Hashable>: View {
                                         Spacer()
                                         
                                         if selection == option {
-                                            Image(systemName: "checkmark")
+                                            LucideIcon(.check, size: 18)
                                                 .font(.system(size: 14, weight: .bold))
                                                 .foregroundColor(.vtsPrimary)
                                         }
@@ -478,7 +478,7 @@ struct VTSLiquidDateTimeField: View {
                         .font(.system(size: 15))
                         .foregroundStyle(Color(hex: "0F2D59"))
                     Spacer()
-                    Image(systemName: "calendar")
+                    LucideIcon(.calendar, size: 16, color: .vtsPrimary)
                         .font(.system(size: 14))
                         .foregroundStyle(Color.vtsPrimary)
                 }
@@ -549,7 +549,7 @@ struct VTSLiquidSaveButton: View {
                     if isLoading {
                         ProgressView().progressViewStyle(.circular).tint(.white).scaleEffect(0.8)
                     } else {
-                        Image(systemName: "checkmark")
+                        LucideIcon(.check, size: 18)
                             .font(.system(size: 14, weight: .bold))
                     }
                     Text(title)

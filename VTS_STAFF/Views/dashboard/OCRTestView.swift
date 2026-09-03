@@ -53,7 +53,7 @@ struct OCRTestView: View {
                                         recognizedText = ""
                                     }
                                 } label: {
-                                    Image(systemName: "xmark.circle.fill")
+                                    LucideIcon(.xCircle, size: 18, color: .gray)
                                         .font(.title)
                                         .foregroundColor(.red)
                                         .background(Color.white.clipShape(Circle()))
@@ -65,7 +65,7 @@ struct OCRTestView: View {
                                 showActionSheet = true
                             } label: {
                                 VStack(spacing: 12) {
-                                    Image(systemName: "photo.on.rectangle.angled")
+                                    LucideIcon(.image, size: 22, color: Color(hex: "0284C7"))
                                         .font(.system(size: 40))
                                         .foregroundColor(.vtsPrimary)
                                     
@@ -138,7 +138,7 @@ struct OCRTestView: View {
                                     ErrorManager.shared.showSuccess("Đã sao chép văn bản vào bộ nhớ tạm")
                                 } label: {
                                     HStack(spacing: 4) {
-                                        Image(systemName: "doc.on.doc")
+                                        LucideIcon(.copy, size: 14, color: .vtsTxtTertiary)
                                         Text("Sao chép")
                                     }
                                     .font(.vtsCaption.bold())
@@ -309,7 +309,7 @@ private struct ImageFullscreenView: View {
                 )
             
             Button(action: onDismiss) {
-                Image(systemName: "xmark.circle.fill")
+                LucideIcon(.xCircle, size: 18, color: .gray)
                     .font(.system(size: 32))
                     .foregroundStyle(.white.opacity(0.8))
                     .padding(20)

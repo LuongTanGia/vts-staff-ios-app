@@ -292,7 +292,7 @@ struct SettingsView: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
-                Image(systemName: icon)
+                LucideIcon(icon, size: 20, color: .vtsPrimary)
                     .font(.system(size: 11, weight: .bold))
                     .foregroundColor(.vtsPrimary)
                 Text(title)
@@ -320,7 +320,7 @@ struct SettingsView: View {
                     .fill(iconBg.opacity(0.12))
                     .frame(width: 32, height: 32)
                 
-                Image(systemName: icon)
+                LucideIcon(icon, size: 20, color: .vtsPrimary)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(iconBg)
             }

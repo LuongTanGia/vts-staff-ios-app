@@ -439,8 +439,7 @@ private extension ERPTable {
                     .font(.vtsTableHeader)
                 if column.sorter != nil {
                     if let icon = sortIcon(column) {
-                        Image(systemName: icon)
-                            .font(.subheadline.bold())
+                        LucideIcon(icon == "arrow.down" ? .arrowDown : .arrowUp, size: 12, color: .white)
                     }
                 }
             }
@@ -520,14 +519,14 @@ private extension ERPTable {
         Group {
             if #available(iOS 26.0, *) {
                 Button(action: action) {
-                    Image(systemName: icon)
+                    LucideIcon(icon, size: 20, color: .vtsPrimary)
                         .font(.headline)
                         .frame(width: 40, height: 40)
                 }
                 .buttonStyle(.glass)
             } else {
                 Button(action: action) {
-                    Image(systemName: icon)
+                    LucideIcon(icon, size: 20, color: .vtsPrimary)
                         .font(.headline)
                         .frame(width: 52, height: 52)
                         .background(.ultraThinMaterial)

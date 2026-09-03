@@ -46,7 +46,7 @@ struct MainTabView: View {
                     HomeView()
                 }
                 .tabItem {
-                    Label("Trang chủ", systemImage: "house.fill")
+                    Label("Trang chủ", image: "lucide_home")
                 }
                 .tag(0)
             }
@@ -56,7 +56,7 @@ struct MainTabView: View {
                 DataListView()
             }
             .tabItem {
-                Label("Dữ liệu", systemImage: "square.grid.3x3.fill")
+                Label("Dữ liệu", image: "lucide_layout_grid")
             }
             .tag(1)
             
@@ -65,7 +65,7 @@ struct MainTabView: View {
                 ThongBaoView()
             }
             .tabItem {
-                Label("Thông báo", systemImage: "bell.fill")
+                Label("Thông báo", image: "lucide_bell")
             }
             .tag(2)
             
@@ -74,7 +74,7 @@ struct MainTabView: View {
                 InfoView()
             }
             .tabItem {
-                Label("Thông tin", systemImage: "info.circle.fill")
+                Label("Thông tin", image: "lucide_info")
             }
             .tag(3)
             
@@ -83,7 +83,7 @@ struct MainTabView: View {
                 SettingsView()
             }
             .tabItem {
-                Label("Cài đặt", systemImage: "gearshape.fill")
+                Label("Cài đặt", image: "lucide_settings")
             }
             .tag(4)
         }

@@ -201,7 +201,7 @@ struct ERPTableShowcaseView: View {
                 Button {
                     router.dismissScreen()
                 } label: {
-                    Image(systemName: "chevron.left")
+                    LucideIcon(.chevronLeft, size: 16)
                         .foregroundColor(.vtsPrimary)
                         .font(.title3)
                 }

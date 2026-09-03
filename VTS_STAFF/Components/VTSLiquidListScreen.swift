@@ -57,7 +57,7 @@ struct VTSLiquidSearchBar: View {
                     text = ""
                     focused = false
                 } label: {
-                    Image(systemName: "xmark.circle.fill")
+                    LucideIcon(.xCircle, size: 18, color: .gray)
                         .font(.system(size: 20))
                         .foregroundStyle(Color.vtsDanger)
                         .padding(.leading, 10)
@@ -241,7 +241,7 @@ struct VTSLiquidFAB: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: label != nil ? 8 : 0) {
-                Image(systemName: icon)
+                LucideIcon(icon, size: 20, color: .vtsPrimary)
                     .font(.system(size: 22, weight: .bold))
                 if let label {
                     Text(label).font(.system(size: 15, weight: .semibold))
@@ -312,7 +312,7 @@ struct VTSLiquidMenuCard: View {
                         )
                         .shadow(color: accentColor.opacity(0.4), radius: 8, x: 0, y: 4)
                     
-                    Image(systemName: icon)
+                    LucideIcon(icon, size: 20, color: .vtsPrimary)
                         .font(.system(size: 24, weight: .semibold))
                         .foregroundStyle(.white)
                 }
@@ -332,7 +332,7 @@ struct VTSLiquidMenuCard: View {
                 
                 Spacer()
                 
-                Image(systemName: "chevron.right")
+                LucideIcon(.chevronRight, size: 14, color: .gray.opacity(0.6))
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.tertiary)
             }

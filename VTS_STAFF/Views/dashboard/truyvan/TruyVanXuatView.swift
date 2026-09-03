@@ -49,14 +49,14 @@ struct TruyVanXuatView: View {
                 .padding(.horizontal, VTSSpacing.xl)
                 .background(Color.vtsPrimary)
                 
-                TabView(selection: $viewModel.queryType) {
-                    tabContent(for: .byItem)
-                        .tag(QueryType.byItem)
-                    
-                    tabContent(for: .byCus)
-                        .tag(QueryType.byCus)
+                Group {
+                    if viewModel.queryType == .byItem {
+                        tabContent(for: .byItem)
+                    } else {
+                        tabContent(for: .byCus)
+                    }
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.vtsPrimary)
             }
             .ignoresSafeArea(edges: .bottom)
@@ -71,18 +71,15 @@ struct TruyVanXuatView: View {
             isPrimaryActionVisible: false,
             title: "",
             subtitle: "Thống kê hàng giao",
-            isWhiteText: !showSearchBar,
+            isWhiteText: true,
             leading: {},
             trailing: {
                 Button {
-                    withAnimation(.easeInOut) {
+                    withAnimation(.easeInOut(duration: 0.2)) {
                         showSearchBar.toggle()
                     }
                 } label: {
-                    Image(systemName: showSearchBar ? "magnifyingglass.circle.fill" : "magnifyingglass")
-                        .font(.title3)
-                        .foregroundColor(showSearchBar ? .primary : .white)
-                        .contentTransition(.symbolEffect(.replace))
+                    LucideIcon(showSearchBar ? .x : .search, size: 20, color: .white)
                 }
             },
             primaryAction: {

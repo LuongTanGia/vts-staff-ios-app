@@ -259,18 +259,15 @@ struct TruyVanChuyenXeView: View {
             isPrimaryActionVisible: false,
             title: "",
             subtitle: "Hàng hóa theo chuyến",
-            isWhiteText: !showSearchBar,
+            isWhiteText: true,
             leading: {},
             trailing: {
                 Button {
-                    withAnimation(.easeInOut) {
+                    withAnimation(.easeInOut(duration: 0.2)) {
                         showSearchBar.toggle()
                     }
                 } label: {
-                    Image(systemName: showSearchBar ? "magnifyingglass.circle.fill" : "magnifyingglass")
-                        .font(.title3)
-                        .foregroundColor(showSearchBar ? .primary : .white)
-                        .contentTransition(.symbolEffect(.replace))
+                    LucideIcon(showSearchBar ? .x : .search, size: 20, color: .white)
                 }
             },
             primaryAction: {

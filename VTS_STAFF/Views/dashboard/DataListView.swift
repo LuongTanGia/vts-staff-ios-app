@@ -164,19 +164,19 @@ struct DataListView: View {
     private func iconForFunction(_ code: String) -> String {
         switch code {
         case "VTSSTAFF_DANHMUC_HANGHOA":
-            return "doc.text.fill"
+            return "package"
         case "VTSSTAFF_DANHMUC_KHACHHANG":
-            return "person.2.fill"
+            return "building-2"
         case "VTSSTAFF_DANHMUC_NHANVIEN":
-            return "person.3.fill"
+            return "users"
         case "VTSSTAFF_DANHMUC_XE":
-            return "truck.box.fill"
+            return "truck"
         case "VTSSTAFF_DULIEU_PHIEUGIACONG":
-            return "gearshape.fill"
+            return "cog"
         case "VTSSTAFF_DULIEU_PHIEUNHAP":
-            return "building.2.fill"
+            return "arrow-down-to-dot"
         case "VTSSTAFF_DULIEU_PHIEUXUAT":
-            return "shippingbox.fill"
+            return "arrow-up-from-dot"
         default:
             let codeLower = code.lowercased()
             if codeLower.contains("profile") || codeLower.contains("user") || codeLower.contains("nhanvien") || codeLower.contains("hrm") {

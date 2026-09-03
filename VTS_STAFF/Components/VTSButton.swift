@@ -58,7 +58,7 @@ struct VTSButton: View {
                         .tint(textColor)
                         .scaleEffect(0.8)
                 } else if let icon {
-                    Image(systemName: icon)
+                    LucideIcon(icon, size: 20, color: .vtsPrimary)
                         .font(.system(size: iconSize, weight: .semibold))
                 }
                 if !title.isEmpty {
@@ -165,7 +165,7 @@ struct VTSIconButton: View {
     
     var body: some View {
         Button(action: action) {
-            Image(systemName: icon)
+            LucideIcon(icon, size: 20, color: .vtsPrimary)
                 .font(.system(size: size * 0.4, weight: .semibold))
                 .foregroundColor(style == .destructive ? .vtsDanger : .vtsPrimary)
                 .frame(width: size, height: size)

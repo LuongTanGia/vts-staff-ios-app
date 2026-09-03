@@ -128,7 +128,8 @@ struct XeListView: View {
                                 backgroundPreferenceValue: Color.vtsPrimary,
                                 customFooterBuilder: { width in
                                     AnyView(Text("Tổng cộng: \(viewModel.filteredXe.count) phương tiện")
-                                        .padding()
+                                        .font(.system(size: 12, weight: .bold))
+                                        .padding(.vertical, 6)
                                         .foregroundColor(Color.vtsBg)
                                         .frame(width: width * 1, alignment: .center)
                                         .background(Color.vtsPrimary))
@@ -202,7 +203,7 @@ struct XeListView: View {
                                 XeDetailView(maXe: nil)
                             }
                         } label: {
-                            Image(systemName: "plus")
+                            LucideIcon(.plus, size: 18)
                                 .font(.title3)
                                 .foregroundColor(showSearchBar ? .primary : .white)
                                 .symbolEffect(.bounce, value: showSearchBar)

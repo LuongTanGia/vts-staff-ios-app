@@ -188,7 +188,7 @@ struct PhieuXuatDetailView: View {
                             }
                         } label: {
                             HStack(spacing: 6) {
-                                Image(systemName: "xmark")
+                                LucideIcon(.x, size: 18)
                                 Text("Huỷ")
                                     .font(.vtsHeadline)
                             }
@@ -206,7 +206,7 @@ struct PhieuXuatDetailView: View {
                                     ProgressView()
                                         .tint(.white)
                                 } else {
-                                    Image(systemName: "checkmark")
+                                    LucideIcon(.check, size: 18)
                                     Text("Lưu")
                                         .font(.vtsHeadline)
                                 }
@@ -223,7 +223,7 @@ struct PhieuXuatDetailView: View {
                             }
                         } label: {
                             HStack(spacing: 6) {
-                                Image(systemName: "square.and.pencil")
+                                LucideIcon(.pencil, size: 18)
                                 Text("Sửa")
                                     .font(.vtsHeadline)
                             }
@@ -524,7 +524,7 @@ struct PhieuXuatDetailView: View {
                                 Circle()
                                     .fill(Color.black.opacity(0.65))
                                     .frame(width: 42, height: 42)
-                                Image(systemName: "eye.fill")
+                                LucideIcon(.eye, size: 18)
                                     .font(.system(size: 18, weight: .bold))
                                     .foregroundColor(.white)
                             }
@@ -539,7 +539,7 @@ struct PhieuXuatDetailView: View {
                                     Circle()
                                         .fill(Color.vtsPrimary)
                                         .frame(width: 42, height: 42)
-                                    Image(systemName: "crop")
+                                    LucideIcon(.crop, size: 18)
                                         .font(.system(size: 18, weight: .bold))
                                         .foregroundColor(.white)
                                 }
@@ -552,7 +552,7 @@ struct PhieuXuatDetailView: View {
                                     Circle()
                                         .fill(Color.vtsDanger)
                                         .frame(width: 42, height: 42)
-                                    Image(systemName: "trash.fill")
+                                    LucideIcon(.trash2, size: 18, color: .vtsDanger)
                                         .font(.system(size: 18, weight: .bold))
                                         .foregroundColor(.white)
                                 }
@@ -577,7 +577,7 @@ struct PhieuXuatDetailView: View {
                                 Circle()
                                     .fill(enabled ? Color.vtsPrimary.opacity(0.12) : Color.gray.opacity(0.12))
                                     .frame(width: 60, height: 60)
-                                Image(systemName: iconName)
+                                LucideIcon(iconName, size: 20, color: .vtsPrimary)
                                     .font(.system(size: 28, weight: .bold))
                                     .foregroundColor(enabled ? .vtsPrimary : .gray)
                             }

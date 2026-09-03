@@ -292,7 +292,7 @@ struct VTSQuickDatePresetSheet: View {
                                 isPresented = false
                             } label: {
                                 HStack(spacing: 10) {
-                                    Image(systemName: "calendar")
+                                    LucideIcon(.calendar, size: 16, color: .vtsPrimary)
                                         .font(.system(size: 18, weight: .bold))
                                         .foregroundColor(Color(hex: "0F2D59"))
                                     
@@ -425,7 +425,7 @@ struct CenteredDatePickerModal: View {
                                     isPresented = false
                                 } label: {
                                     HStack(spacing: 10) {
-                                        Image(systemName: "calendar")
+                                        LucideIcon(.calendar, size: 16, color: .vtsPrimary)
                                             .font(.system(size: 18, weight: .bold))
                                             .foregroundColor(Color(hex: "0F2D59"))
                                         

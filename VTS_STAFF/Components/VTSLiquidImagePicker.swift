@@ -79,7 +79,7 @@ struct VTSLiquidImageSlot: View {
                         Circle()
                             .fill(Color.vtsPrimary.opacity(0.12))
                             .frame(width: 60, height: 60)
-                        Image(systemName: "camera.fill")
+                        LucideIcon(.camera, size: 22, color: .vtsPrimary)
                             .font(.system(size: 28, weight: .bold))
                             .foregroundStyle(Color.vtsPrimary)
                     }
@@ -204,7 +204,7 @@ struct VTSLiquidImageSlot: View {
                 Circle()
                     .fill(.regularMaterial)
                     .frame(width: 42, height: 42)
-                Image(systemName: icon)
+                LucideIcon(icon, size: 20, color: .vtsPrimary)
                     .font(.system(size: 18, weight: .bold))
                     .foregroundStyle(color)
             }
@@ -331,7 +331,7 @@ private struct ImageFullscreenView: View {
                 )
             
             Button(action: onDismiss) {
-                Image(systemName: "xmark.circle.fill")
+                LucideIcon(.xCircle, size: 18, color: .gray)
                     .font(.system(size: 32))
                     .foregroundStyle(.white.opacity(0.8))
                     .padding(20)

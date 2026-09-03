@@ -502,8 +502,7 @@ public final class KeyboardDoneButtonManager {
         
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         
-        let checkImage = UIImage(systemName: "checkmark.circle.fill")?.withRenderingMode(.alwaysTemplate)
-            ?? UIImage(systemName: "checkmark")?.withRenderingMode(.alwaysTemplate)
+        let checkImage = UIImage(named: "lucide_check")?.withRenderingMode(.alwaysTemplate)
             
         let doneButton = UIBarButtonItem(
             image: checkImage,

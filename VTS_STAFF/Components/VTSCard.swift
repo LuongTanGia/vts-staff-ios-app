@@ -80,7 +80,7 @@ struct VTSStatCard: View {
                     RoundedRectangle(cornerRadius: VTSRadius.md, style: .continuous)
                         .fill(gradient)
                         .frame(width: 40, height: 40)
-                    Image(systemName: icon)
+                    LucideIcon(icon, size: 20, color: .vtsPrimary)
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.white)
                 }
@@ -155,7 +155,7 @@ struct VTSInfoRow: View {
     var body: some View {
         HStack(alignment: .top, spacing: VTSSpacing.md) {
             if let icon {
-                Image(systemName: icon)
+                LucideIcon(icon, size: 20, color: .vtsPrimary)
                     .font(.system(size: 13))
                     .foregroundColor(.vtsTxtSecondary)
                     .frame(width: 18)
@@ -244,16 +244,14 @@ struct VTSListItemRow: View {
                 if let icon = leadingIcon {
                     ZStack {
                         Circle()
-                            .fill(Color.vtsBg.opacity(0.08))
-                            .frame(width: 42, height: 42)
+                            .fill(Color.white.opacity(0.18))
+                            .frame(width: 44, height: 44)
                         
                         Circle()
-                            .stroke(Color.vtsBg.opacity(0.15), lineWidth: 1)
-                            .frame(width: 42, height: 42)
+                            .stroke(Color.white.opacity(0.25), lineWidth: 1)
+                            .frame(width: 44, height: 44)
                         
-                        Image(systemName: icon)
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.vtsBg)
+                        LucideIcon(icon, size: 22, color: .white)
                     }
                 }
                 
@@ -285,7 +283,7 @@ struct VTSListItemRow: View {
                     }
                 }
                 
-                Image(systemName: "chevron.right")
+                LucideIcon(.chevronRight, size: 14, color: .white.opacity(0.8))
                     .font(.system(size: 11, weight: .bold))
                     .foregroundColor(Color.vtsBg)
             }

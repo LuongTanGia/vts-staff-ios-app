@@ -97,7 +97,7 @@ public struct VTSActionModalSheet: View {
                                 Circle()
                                     .fill(item.isDestructive ? Color.vtsDanger.opacity(0.12) : Color.vtsPrimary.opacity(0.12))
                                     .frame(width: 38, height: 38)
-                                Image(systemName: item.icon)
+                                LucideIcon(item.icon, size: 20, color: item.isDestructive ? .vtsDanger : .vtsPrimary)
                                     .font(.system(size: 16, weight: .semibold))
                                     .foregroundColor(item.isDestructive ? .vtsDanger : .vtsPrimary)
                             }
@@ -108,7 +108,7 @@ public struct VTSActionModalSheet: View {
                             
                             Spacer()
                             
-                            Image(systemName: "chevron.right")
+                            LucideIcon(.chevronRight, size: 14, color: .gray.opacity(0.6))
                                 .font(.system(size: 12, weight: .semibold))
                                 .foregroundColor(.vtsTxtTertiary)
                         }

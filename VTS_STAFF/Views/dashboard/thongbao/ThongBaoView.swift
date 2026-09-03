@@ -163,7 +163,7 @@ struct ThongBaoCard: View {
         Button(action: onTap) {
             HStack(alignment: .top, spacing: 14) {
                 // Icon Header Box
-                Image(systemName: iconName)
+                LucideIcon(iconName, size: 20, color: .vtsPrimary)
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(accentColor)
                     .frame(width: 36, height: 36)
@@ -249,7 +249,7 @@ struct ThongBaoSettingsSheet: View {
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(Color(hex: "0F2D59"))
                                 Spacer()
-                                Image(systemName: "chevron.right")
+                                LucideIcon(.chevronRight, size: 14, color: .gray.opacity(0.6))
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }

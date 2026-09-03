@@ -115,7 +115,8 @@ struct KhachHangListView: View {
                                 backgroundPreferenceValue: Color.vtsPrimary,
                                 customFooterBuilder: { width in
                                     AnyView(Text("Tổng cộng: \(viewModel.filteredKhachHang.count) khách hàng")
-                                        .padding()
+                                        .font(.system(size: 12, weight: .bold))
+                                        .padding(.vertical, 6)
                                         .foregroundColor(Color.vtsBg)
                                         .frame(width: width * 1, alignment: .center)
                                         .background(Color.vtsPrimary))
@@ -192,7 +193,7 @@ struct KhachHangListView: View {
                                 KhachHangDetailView(maKH: nil)
                             }
                         } label: {
-                            Image(systemName: "plus")
+                            LucideIcon(.plus, size: 18)
                                 .font(.title3)
                                 .foregroundColor(showSearchBar ? .primary : .white)
                                 .symbolEffect(.bounce, value: showSearchBar)

@@ -200,7 +200,7 @@ struct InfoView: View {
                 Circle()
                     .fill(iconColor.opacity(0.12))
                     .frame(width: 36, height: 36)
-                Image(systemName: icon)
+                LucideIcon(icon, size: 20, color: .vtsPrimary)
                     .foregroundColor(iconColor)
                     .font(.system(size: 14, weight: .semibold))
             }
@@ -225,7 +225,7 @@ struct InfoView: View {
                 Circle()
                     .fill(iconColor.opacity(0.12))
                     .frame(width: 36, height: 36)
-                Image(systemName: icon)
+                LucideIcon(icon, size: 20, color: .vtsPrimary)
                     .foregroundColor(iconColor)
                     .font(.system(size: 14, weight: .semibold))
             }
@@ -262,7 +262,7 @@ struct InfoView: View {
                 Text("Xem nội dung")
                     .font(.vtsCallout.bold())
                     .foregroundColor(.vtsPrimary)
-                Image(systemName: "chevron.right")
+                LucideIcon(.chevronRight, size: 14, color: .gray.opacity(0.6))
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.vtsPrimary)
             }

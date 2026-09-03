@@ -152,7 +152,7 @@ struct VTSEmptyState: View {
                 Circle()
                     .fill(Color.vtsBg.opacity(0.08))
                     .frame(width: 90, height: 90)
-                Image(systemName: icon)
+                LucideIcon(icon, size: 20, color: .vtsPrimary)
                     .font(.system(size: 38, weight: .light))
                     .foregroundColor(.vtsPrimary.opacity(0.5))
             }
@@ -256,7 +256,7 @@ struct VTSToast: View {
     
     var body: some View {
         HStack(spacing: VTSSpacing.md) {
-            Image(systemName: icon)
+            LucideIcon(icon, size: 20, color: .vtsPrimary)
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundColor(color)
             Text(message)

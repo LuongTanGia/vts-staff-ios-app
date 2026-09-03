@@ -96,7 +96,7 @@ struct VTSPhotoGalleryView: View {
                     Spacer()
                     
                     Button(action: onClose) {
-                        Image(systemName: "xmark.circle.fill")
+                        LucideIcon(.xCircle, size: 18, color: .gray)
                             .font(.system(size: 28))
                             .foregroundColor(.white.opacity(0.8))
                     }
@@ -126,7 +126,7 @@ struct VTSPhotoGalleryView: View {
                             }
                         } label: {
                             HStack(spacing: 4) {
-                                Image(systemName: "chevron.left")
+                                LucideIcon(.chevronLeft, size: 16)
                                 Text("Ảnh trước")
                             }
                             .font(.system(size: 13, weight: .semibold))
@@ -165,7 +165,7 @@ struct VTSPhotoGalleryView: View {
                         } label: {
                             HStack(spacing: 4) {
                                 Text("Ảnh sau")
-                                Image(systemName: "chevron.right")
+                                LucideIcon(.chevronRight, size: 14, color: .gray.opacity(0.6))
                             }
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundColor(selectedIndex < items.count ? .white : .white.opacity(0.3))
@@ -196,7 +196,7 @@ struct VTSPhotoGalleryView: View {
                                     ErrorManager.shared.showSuccess("Đã sao chép văn bản OCR")
                                 } label: {
                                     HStack(spacing: 4) {
-                                        Image(systemName: "doc.on.doc")
+                                        LucideIcon(.copy, size: 14, color: .vtsTxtTertiary)
                                         Text("Sao chép")
                                     }
                                     .font(.system(size: 11, weight: .semibold))

@@ -21,7 +21,7 @@ struct VTSPhotoSourceSheet: View {
                     .foregroundColor(.vtsTxtPrimary)
                 Spacer()
                 Button(action: onCancel) {
-                    Image(systemName: "xmark.circle.fill")
+                    LucideIcon(.xCircle, size: 18, color: .gray)
                         .font(.system(size: 22))
                         .foregroundColor(.vtsTxtTertiary)
                 }
@@ -35,7 +35,7 @@ struct VTSPhotoSourceSheet: View {
                     onCamera()
                 } label: {
                     HStack(spacing: 14) {
-                        Image(systemName: "camera.fill")
+                        LucideIcon(.camera, size: 22, color: .vtsPrimary)
                             .font(.system(size: 20))
                             .foregroundColor(.vtsPrimary)
                             .frame(width: 42, height: 42)
@@ -48,7 +48,7 @@ struct VTSPhotoSourceSheet: View {
                         
                         Spacer()
                         
-                        Image(systemName: "chevron.right")
+                        LucideIcon(.chevronRight, size: 14, color: .gray.opacity(0.6))
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(.vtsTxtTertiary)
                     }
@@ -65,7 +65,7 @@ struct VTSPhotoSourceSheet: View {
                     onLibrary()
                 } label: {
                     HStack(spacing: 14) {
-                        Image(systemName: "photo.on.rectangle.angled")
+                        LucideIcon(.image, size: 22, color: Color(hex: "0284C7"))
                             .font(.system(size: 20))
                             .foregroundColor(.vtsPrimary)
                             .frame(width: 42, height: 42)
@@ -78,7 +78,7 @@ struct VTSPhotoSourceSheet: View {
                         
                         Spacer()
                         
-                        Image(systemName: "chevron.right")
+                        LucideIcon(.chevronRight, size: 14, color: .gray.opacity(0.6))
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(.vtsTxtTertiary)
                     }

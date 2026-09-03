@@ -217,7 +217,7 @@ struct PhieuGiaCongDetailView: View {
                             }
                         } label: {
                             HStack(spacing: 6) {
-                                Image(systemName: "xmark")
+                                LucideIcon(.x, size: 18)
                                 Text("Huỷ")
                                     .font(.vtsHeadline)
                             }
@@ -235,7 +235,7 @@ struct PhieuGiaCongDetailView: View {
                                     ProgressView()
                                         .tint(.white)
                                 } else {
-                                    Image(systemName: "checkmark")
+                                    LucideIcon(.check, size: 18)
                                     Text("Lưu")
                                         .font(.vtsHeadline)
                                 }
@@ -252,7 +252,7 @@ struct PhieuGiaCongDetailView: View {
                             }
                         } label: {
                             HStack(spacing: 6) {
-                                Image(systemName: "square.and.pencil")
+                                LucideIcon(.pencil, size: 18)
                                 Text("Sửa")
                                     .font(.vtsHeadline)
                             }
@@ -396,7 +396,7 @@ struct PhieuGiaCongDetailView: View {
                         .fill(Color.white.opacity(0.2))
                         .frame(width: 44, height: 44)
                     
-                    Image(systemName: "gearshape.2.fill")
+                    LucideIcon(.cog, size: 22, color: .white)
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.white)
                 }
@@ -648,7 +648,7 @@ struct PhieuGiaCongDetailView: View {
                                 Circle()
                                     .fill(Color.black.opacity(0.65))
                                     .frame(width: 42, height: 42)
-                                Image(systemName: "eye.fill")
+                                LucideIcon(.eye, size: 18)
                                     .font(.system(size: 18, weight: .bold))
                                     .foregroundColor(.white)
                             }
@@ -663,7 +663,7 @@ struct PhieuGiaCongDetailView: View {
                                     Circle()
                                         .fill(Color.vtsPrimary)
                                         .frame(width: 42, height: 42)
-                                    Image(systemName: "crop")
+                                    LucideIcon(.crop, size: 18)
                                         .font(.system(size: 18, weight: .bold))
                                         .foregroundColor(.white)
                                 }
@@ -676,7 +676,7 @@ struct PhieuGiaCongDetailView: View {
                                     Circle()
                                         .fill(Color.vtsDanger)
                                         .frame(width: 42, height: 42)
-                                    Image(systemName: "trash.fill")
+                                    LucideIcon(.trash2, size: 18, color: .vtsDanger)
                                         .font(.system(size: 18, weight: .bold))
                                         .foregroundColor(.white)
                                 }
@@ -701,7 +701,7 @@ struct PhieuGiaCongDetailView: View {
                                 Circle()
                                     .fill(enabled ? Color(hex: "DCE7F5") : Color.gray.opacity(0.12))
                                     .frame(width: 60, height: 60)
-                                Image(systemName: "camera.fill")
+                                LucideIcon(.camera, size: 22, color: .vtsPrimary)
                                     .font(.system(size: 28, weight: .bold))
                                     .foregroundColor(enabled ? Color(hex: "004B87") : Color.gray)
                             }
@@ -753,7 +753,7 @@ struct PhieuGiaCongDetailView: View {
             }
         } label: {
             HStack(spacing: 12) {
-                Image(systemName: icon)
+                LucideIcon(icon, size: 20, color: .vtsPrimary)
                     .foregroundColor(Color.vtsPrimary)
                     .frame(width: 28, height: 28)
                     .background(Color.vtsPrimary.opacity(0.1))
@@ -770,7 +770,7 @@ struct PhieuGiaCongDetailView: View {
                 }
                 Spacer()
                 if !value.isEmpty {
-                    Image(systemName: "doc.on.doc")
+                    LucideIcon(.copy, size: 14, color: .vtsTxtTertiary)
                         .font(.system(size: 11))
                         .foregroundColor(.vtsTxtTertiary)
                 }

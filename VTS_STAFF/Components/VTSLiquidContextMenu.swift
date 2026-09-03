@@ -67,7 +67,7 @@ struct VTSLiquidContextMenu: View {
                     Circle()
                         .fill(action.tintColor.opacity(0.12))
                         .frame(width: 32, height: 32)
-                    Image(systemName: action.icon)
+                    LucideIcon(action.icon, size: 18, color: action.tintColor)
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(action.tintColor)
                 }

@@ -131,7 +131,7 @@ struct NhanVienDetailDemoView: View {
                         }
                     } label: {
                         HStack(spacing: 6) {
-                            Image(systemName: "square.and.pencil")
+                            LucideIcon(.pencil, size: 18)
                             Text("Sửa")
                                 .font(.vtsHeadline)
                         }
@@ -336,7 +336,7 @@ struct NhanVienDetailDemoView: View {
             }
         } label: {
             HStack(spacing: 12) {
-                Image(systemName: icon)
+                LucideIcon(icon, size: 20, color: .vtsPrimary)
                     .foregroundColor(Color.vtsPrimary)
                     .frame(width: 28, height: 28)
                     .background(Color.vtsPrimary.opacity(0.1))
@@ -356,7 +356,7 @@ struct NhanVienDetailDemoView: View {
                 Spacer()
                 
                 if !value.isEmpty {
-                    Image(systemName: "doc.on.doc")
+                    LucideIcon(.copy, size: 14, color: .vtsTxtTertiary)
                         .font(.system(size: 11))
                         .foregroundColor(.vtsTxtTertiary)
                         .padding(4)

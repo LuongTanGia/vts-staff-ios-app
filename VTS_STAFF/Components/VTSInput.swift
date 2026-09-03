@@ -53,7 +53,7 @@ struct VTSInputField: View {
             // Input
             HStack(spacing: VTSSpacing.md) {
                 if let icon {
-                    Image(systemName: icon)
+                    LucideIcon(icon, size: 20, color: .vtsPrimary)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(isFocused ? .vtsPrimary : .vtsTxtTertiary)
                         .frame(width: 18)
@@ -79,7 +79,7 @@ struct VTSInputField: View {
                 // Clear button
                 if !text.isEmpty && isFocused {
                     Button { text = "" } label: {
-                        Image(systemName: "xmark.circle.fill")
+                        LucideIcon(.xCircle, size: 18, color: .gray)
                             .font(.system(size: 14))
                             .foregroundColor(.vtsTxtTertiary)
                     }
@@ -145,7 +145,7 @@ struct VTSSearchBar: View {
             
             if !text.isEmpty {
                 Button { text = "" } label: {
-                    Image(systemName: "xmark.circle.fill")
+                    LucideIcon(.xCircle, size: 18, color: .gray)
                         .font(.system(size: 15))
                         .foregroundColor(.vtsTxtTertiary)
                 }
@@ -375,7 +375,7 @@ struct VTSSelectField<T: Hashable>: View {
             } label: {
                 HStack(spacing: VTSSpacing.md) {
                     if let icon {
-                        Image(systemName: icon)
+                        LucideIcon(icon, size: 20, color: .vtsPrimary)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.vtsTxtTertiary)
                             .frame(width: 18)
@@ -393,7 +393,7 @@ struct VTSSelectField<T: Hashable>: View {
                     .font(.vtsBody)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     
-                    Image(systemName: "chevron.down")
+                    LucideIcon(.chevronDown, size: 14, color: .vtsPrimary)
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.vtsTxtTertiary)
                 }
@@ -436,7 +436,7 @@ struct VTSSelectField<T: Hashable>: View {
                     Button {
                         isSheetPresented = false
                     } label: {
-                        Image(systemName: "xmark.circle.fill")
+                        LucideIcon(.xCircle, size: 18, color: .gray)
                             .font(.system(size: 22))
                             .foregroundColor(.vtsTxtTertiary)
                     }
@@ -501,7 +501,7 @@ struct VTSSelectField<T: Hashable>: View {
                                         Spacer()
                                         
                                         if selection == option {
-                                            Image(systemName: "checkmark")
+                                            LucideIcon(.check, size: 18)
                                                 .font(.system(size: 14, weight: .bold))
                                                 .foregroundColor(.vtsPrimary)
                                         }

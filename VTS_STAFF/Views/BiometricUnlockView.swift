@@ -43,7 +43,7 @@ struct BiometricUnlockView: View {
                             .animation(.linear(duration: 8).repeatForever(autoreverses: false), value: isAnimating)
                         
                         // Icon FaceID
-                        Image(systemName: "faceid")
+                        LucideIcon(.scanFace, size: 28, color: .vtsPrimary)
                             .font(.system(size: 64))
                             .foregroundColor(.vtsPrimary)
                             .scaleEffect(isAnimating ? 1.05 : 0.95)

@@ -63,19 +63,18 @@ fileprivate struct CustomToolbarModifier<Leading: View, Trailing: View, PrimaryA
                                     ? "\(title!)"
                                     : "VTS-Staff"
                                 )
-                                .font(.vtsScreenTitle)
-                                .fontWeight(.bold)
+                                .font(.system(size: 20, weight: .bold))
                                 .foregroundColor(
-                                    isWhiteText ? Color.vtsBg : .vtsTxtPrimary
+                                    isWhiteText ? Color.white : .vtsTxtPrimary
                                 )
                                 .id(title ?? "")
                                 .transition(.offset(y: 10).combined(with: AnyTransition(.blurReplace)))
                                 
                                 if let subtitle, !subtitle.isEmpty {
                                     Text(subtitle)
-                                        .font(.vtsScreenSubtitle)
+                                        .font(.system(size: 15, weight: .bold))
                                         .foregroundColor(
-                                            isWhiteText ? Color.vtsBg.opacity(0.85) : .vtsTxtSecondary
+                                            isWhiteText ? Color.white : .vtsTxtSecondary
                                         )
                                         .id(subtitle)
                                         .transition(.blurReplace)

@@ -193,7 +193,7 @@ struct PhieuXuatListView: View {
                                 PhieuXuatDetailView(soPhieu: nil, isEditMode: true)
                             }
                         } label: {
-                            Image(systemName: "plus")
+                            LucideIcon(.plus, size: 18)
                                 .font(.title3)
                                 .foregroundColor(showSearchBar ? .primary : .white)
                                 .symbolEffect(.bounce, value: showSearchBar)
