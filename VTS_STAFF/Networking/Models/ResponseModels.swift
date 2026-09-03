@@ -465,6 +465,12 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
     let hinh04: String?
     let hinh05: String?
     let hinh06: String?
+    let thoiGian01: String?
+    let thoiGian02: String?
+    let thoiGian03: String?
+    let thoiGian04: String?
+    let thoiGian05: String?
+    let thoiGian06: String?
     
     var image1Base64: String? {
         if let h = hinh01NoiDung, !h.isEmpty { return h }
@@ -562,6 +568,12 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
         case hinh04 = "Hinh04"
         case hinh05 = "Hinh05"
         case hinh06 = "Hinh06"
+        case thoiGian01 = "ThoiGian01"
+        case thoiGian02 = "ThoiGian02"
+        case thoiGian03 = "ThoiGian03"
+        case thoiGian04 = "ThoiGian04"
+        case thoiGian05 = "ThoiGian05"
+        case thoiGian06 = "ThoiGian06"
     }
     
     init(
@@ -615,7 +627,13 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
         hinh03: String? = nil,
         hinh04: String? = nil,
         hinh05: String? = nil,
-        hinh06: String? = nil
+        hinh06: String? = nil,
+        thoiGian01: String? = nil,
+        thoiGian02: String? = nil,
+        thoiGian03: String? = nil,
+        thoiGian04: String? = nil,
+        thoiGian05: String? = nil,
+        thoiGian06: String? = nil
     ) {
         self.soPhieu = soPhieu
         self.soPhieuInt = soPhieuInt
@@ -668,6 +686,12 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
         self.hinh04 = hinh04
         self.hinh05 = hinh05
         self.hinh06 = hinh06
+        self.thoiGian01 = thoiGian01
+        self.thoiGian02 = thoiGian02
+        self.thoiGian03 = thoiGian03
+        self.thoiGian04 = thoiGian04
+        self.thoiGian05 = thoiGian05
+        self.thoiGian06 = thoiGian06
     }
     
     init(from decoder: Decoder) throws {
@@ -754,6 +778,12 @@ struct TPhieuvc_Giacong_DanhSach: Decodable, Sendable, Identifiable {
         self.hinh04 = try? container.decodeIfPresent(String.self, forKey: .hinh04)
         self.hinh05 = try? container.decodeIfPresent(String.self, forKey: .hinh05)
         self.hinh06 = try? container.decodeIfPresent(String.self, forKey: .hinh06)
+        self.thoiGian01 = try? container.decodeIfPresent(String.self, forKey: .thoiGian01)
+        self.thoiGian02 = try? container.decodeIfPresent(String.self, forKey: .thoiGian02)
+        self.thoiGian03 = try? container.decodeIfPresent(String.self, forKey: .thoiGian03)
+        self.thoiGian04 = try? container.decodeIfPresent(String.self, forKey: .thoiGian04)
+        self.thoiGian05 = try? container.decodeIfPresent(String.self, forKey: .thoiGian05)
+        self.thoiGian06 = try? container.decodeIfPresent(String.self, forKey: .thoiGian06)
     }
 }
 

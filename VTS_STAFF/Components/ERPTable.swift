@@ -176,16 +176,32 @@ public struct ERPTable<Data: Identifiable>: View {
         else { return dataSource }
         
         if let groupKey = groupKey {
-            let groups = Dictionary(grouping: dataSource, by: groupKey)
-            var result: [Data] = []
+            var orderedKeys: [String] = []
+            var groupDict: [String: [Data]] = [:]
             
-            for (_, items) in groups {
-                let sorted = items.sorted {
-                    sortDirection == .ascending ? sorter($0, $1) : sorter($1, $0)
+            for item in dataSource {
+                let key = groupKey(item)
+                if groupDict[key] == nil {
+                    orderedKeys.append(key)
+                    groupDict[key] = []
                 }
-                result.append(contentsOf: sorted)
+                groupDict[key]?.append(item)
             }
-            return result
+            
+            let blocks: [(items: [Data], representative: Data)] = orderedKeys.compactMap { key in
+                guard let items = groupDict[key], let rep = items.last else { return nil }
+                return (items: items, representative: rep)
+            }
+            
+            let sortedBlocks = blocks.sorted { b1, b2 in
+                if sortDirection == .ascending {
+                    return sorter(b1.representative, b2.representative)
+                } else {
+                    return sorter(b2.representative, b1.representative)
+                }
+            }
+            
+            return sortedBlocks.flatMap { $0.items }
         }
         
         return dataSource.sorted {
@@ -428,8 +444,8 @@ private extension ERPTable {
                     }
                 }
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 4)
+            .padding(.vertical, 5)
             .frame(width: width, alignment: .center)
             .background(Color.vtsPrimary.opacity(0.12))
             .lineLimit(2)
@@ -453,8 +469,8 @@ private extension ERPTable {
             column.render(data, index)
                 .font(.vtsTableContent)
                 .foregroundColor(Color(hex: "0F2D59"))
-                .padding(.horizontal, 8)
-                .padding(.vertical, 6)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 3)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: column.alignment.swiftUI)
                 .border(Color.vtsBorder, width: 0.5)
         }
@@ -470,8 +486,8 @@ private extension ERPTable {
                     Text("")
                 }
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
+            .padding(.horizontal, 4)
+            .padding(.vertical, 3)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: column.alignment.swiftUI)
             .font(.vtsTableFooter)
             .foregroundColor(Color.vtsBg)

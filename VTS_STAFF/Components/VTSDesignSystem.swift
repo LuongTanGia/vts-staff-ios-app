@@ -64,9 +64,9 @@ extension Font {
     static let vtsScreenTitle    = vtsLargeTitle        // Tiêu đề màn hình (Cấp 1 - Lớn nhất 28pt)
     static let vtsCardTitle      = vtsTitle2.bold()     // Tiêu đề trong các Card/Profile (Cấp 2 - 17pt bold)
     static let vtsScreenSubtitle = vtsCallout           // Chi tiết tiêu đề màn hình
-    static let vtsTableHeader    = vtsCallout.bold()    // Tiêu đề cột của bảng
-    static let vtsTableContent   = vtsCallout           // Nội dung trong bảng
-    static let vtsTableFooter    = vtsCallout.bold()    // Tổng kết ở cuối bảng (footer)
+    static let vtsTableHeader    = Font.system(size: 12, weight: .bold)    // Tiêu đề cột của bảng
+    static let vtsTableContent   = Font.system(size: 11.5, weight: .regular) // Nội dung trong bảng
+    static let vtsTableFooter    = Font.system(size: 12, weight: .bold)    // Tổng kết ở cuối bảng (footer)
     static let vtsFooter         = vtsCaption           // Chú thích, thông tin chân trang
 }
 

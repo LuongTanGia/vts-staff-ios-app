@@ -87,20 +87,30 @@ final class TruyVanNhapViewModel: ObservableObject {
             groupDict[key]?.append(item)
         }
         
-        // Tạo danh sách kết quả: chi tiết các dòng (datatype = 0) + dòng tổng nhóm (datatype = 1)
+        // Tạo danh sách kết quả: chi tiết các dòng (được đánh số thứ tự từ 1..N trong group) + dòng tổng nhóm (datatype = 1)
         var result: [THangNhap_ByCus] = []
         for key in orderedGroupKeys {
             guard let itemsInGroup = groupDict[key], !itemsInGroup.isEmpty else { continue }
             
-            // Thêm các dòng chi tiết datatype = 0
-            result.append(contentsOf: itemsInGroup)
+            // Đánh số thứ tự 1, 2, 3... cho các dòng chi tiết trong group này
+            for (idx, item) in itemsInGroup.enumerated() {
+                let reindexedItem = THangNhap_ByCus(
+                    colGroup: item.colGroup,
+                    colOrder: idx + 1,
+                    colCode: item.colCode,
+                    colName: item.colName,
+                    colValue: item.colValue,
+                    colDataType: 0
+                )
+                result.append(reindexedItem)
+            }
             
             // Tính tổng nhóm và tạo dòng tổng hợp datatype = 1
             let groupSum = itemsInGroup.reduce(0.0) { $0 + $1.colValue }
             let groupName = groupNameMap[key] ?? itemsInGroup.first?.colGroup ?? "Tổng"
             let subtotalRow = THangNhap_ByCus(
                 colGroup: key,
-                colOrder: (itemsInGroup.last?.colOrder ?? 0) + 1,
+                colOrder: itemsInGroup.count + 1,
                 colCode: key,
                 colName: groupName,
                 colValue: groupSum,

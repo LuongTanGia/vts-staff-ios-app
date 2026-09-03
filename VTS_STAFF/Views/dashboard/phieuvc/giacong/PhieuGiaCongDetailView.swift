@@ -517,12 +517,14 @@ struct PhieuGiaCongDetailView: View {
                     errorMessage: trongLuongHangError
                 )
                 
-                // Row 7: Thời điểm cân hàng giao
-                VTSLiquidPickerField(
-                    label: "Thời điểm cân hàng giao",
-                    selection: .constant(""),
-                    options: [],
-                    displayName: { _ in "Thời điểm cân hàng giao" }
+                // Row 7: Thời điểm giao hàng
+                VTSLiquidDateTimeField(
+                    label: "Thời điểm giao hàng",
+                    date: Binding(
+                        get: { thoiGian01 ?? Date() },
+                        set: { thoiGian01 = $0; thoiGian02 = $0 }
+                    ),
+                    displayStyle: .dateTime
                 )
                 .disabled(!isEditMode)
                 
@@ -554,11 +556,13 @@ struct PhieuGiaCongDetailView: View {
                 )
                 
                 // Row 11: Thời điểm cân hàng bán
-                VTSLiquidPickerField(
+                VTSLiquidDateTimeField(
                     label: "Thời điểm cân hàng bán",
-                    selection: .constant(""),
-                    options: [],
-                    displayName: { _ in "Thời điểm cân hàng bán" }
+                    date: Binding(
+                        get: { thoiGian03 ?? Date() },
+                        set: { thoiGian03 = $0; thoiGian04 = $0 }
+                    ),
+                    displayStyle: .dateTime
                 )
                 .disabled(!isEditMode)
                 
@@ -590,11 +594,13 @@ struct PhieuGiaCongDetailView: View {
                 )
                 
                 // Row 15: Thời điểm cân hàng thu về
-                VTSLiquidPickerField(
+                VTSLiquidDateTimeField(
                     label: "Thời điểm cân hàng thu về",
-                    selection: .constant(""),
-                    options: [],
-                    displayName: { _ in "Thời điểm cân hàng thu về" }
+                    date: Binding(
+                        get: { thoiGian05 ?? Date() },
+                        set: { thoiGian05 = $0; thoiGian06 = $0 }
+                    ),
+                    displayStyle: .dateTime
                 )
                 .disabled(!isEditMode)
                 
@@ -837,6 +843,13 @@ struct PhieuGiaCongDetailView: View {
         
         if let img6 = UIImage.fromBase64(details.image6Base64) { hinh06 = img6 }
         hinh06Text = details.hinh06NoiDungText
+        
+        if let tg1 = details.thoiGian01, let d = Date.fromAPIString(tg1) { thoiGian01 = d }
+        if let tg2 = details.thoiGian02, let d = Date.fromAPIString(tg2) { thoiGian02 = d }
+        if let tg3 = details.thoiGian03, let d = Date.fromAPIString(tg3) { thoiGian03 = d }
+        if let tg4 = details.thoiGian04, let d = Date.fromAPIString(tg4) { thoiGian04 = d }
+        if let tg5 = details.thoiGian05, let d = Date.fromAPIString(tg5) { thoiGian05 = d }
+        if let tg6 = details.thoiGian06, let d = Date.fromAPIString(tg6) { thoiGian06 = d }
     }
     
     private func validateForm() -> Bool {

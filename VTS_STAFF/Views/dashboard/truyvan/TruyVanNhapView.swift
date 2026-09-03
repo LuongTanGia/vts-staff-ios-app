@@ -24,8 +24,8 @@ struct TruyVanNhapView: View {
                 if showSearchBar {
                     VTSSearchBar(text: $viewModel.searchText, placeholder: "Tìm kiếm tên, mã...")
                         .padding(.horizontal, VTSSpacing.xl)
-                        .padding(.top, VTSSpacing.md)
-                        .padding(.bottom, VTSSpacing.md)
+                        .padding(.top, VTSSpacing.sm)
+                        .padding(.bottom, VTSSpacing.sm)
                 }
                 
                 Picker("Loại truy vấn", selection: $viewModel.queryType) {
@@ -128,16 +128,16 @@ struct TruyVanNhapView: View {
                                 key: "colOrder",
                                 width: 0.12,
                                 alignment: .center,
-                                render: { item, index in
+                                render: { item, _ in
                                     if item.colDataType == 1 {
                                         return AnyView(Text(""))
                                     }
-                                    let detailIndex = (filtered.prefix(index).filter { $0.colDataType == 0 }.count) + 1
                                     return AnyView(
-                                        Text("\(detailIndex)")
-                                            .font(.system(size: 13, weight: .regular))
+                                        Text("\(item.colOrder)")
+                                            .font(.system(size: 11.5, weight: .regular))
                                     )
-                                }
+                                },
+                                sorter: { $0.colOrder < $1.colOrder }
                             ),
                             ERPColumn(
                                 title: AnyView(Text(type == .byItem ? "Hàng hoá" : "Khách hàng")),
@@ -147,11 +147,12 @@ struct TruyVanNhapView: View {
                                 render: { item, _ in
                                     AnyView(
                                         Text(item.colName ?? "")
-                                            .font(.system(size: 13, weight: item.colDataType == 1 ? .bold : .regular))
+                                            .font(.system(size: 11.5, weight: item.colDataType == 1 ? .bold : .regular))
                                             .foregroundColor(Color(hex: "0F2D59"))
                                             .frame(maxWidth: .infinity, alignment: item.colDataType == 1 ? .center : .leading)
                                     )
-                                }
+                                },
+                                sorter: { ($0.colName ?? "").localizedCompare($1.colName ?? "") == .orderedAscending }
                             ),
                             ERPColumn(
                                 title: AnyView(Text("Số lượng")),
@@ -161,10 +162,11 @@ struct TruyVanNhapView: View {
                                 render: { item, _ in
                                     AnyView(
                                         Text(item.colValue.toFormattedString(maxDecimals: 0))
-                                            .font(.system(size: 13, weight: item.colDataType == 1 ? .bold : .regular))
+                                            .font(.system(size: 11.5, weight: item.colDataType == 1 ? .bold : .regular))
                                             .foregroundColor(Color(hex: "0F2D59"))
                                     )
-                                }
+                                },
+                                sorter: { $0.colValue < $1.colValue }
                             )
                         ],
                         loadDataIfNeeded: {
@@ -177,37 +179,36 @@ struct TruyVanNhapView: View {
                                 await viewModel.loadData(for: type)
                             }
                         },
+                        groupKey: { $0.colGroup ?? $0.colCode ?? "" },
                         customRowBuilder: { item, fullWidth in
                             let isSubtotal = (item.colDataType == 1)
-                            let rowIndex = filtered.firstIndex(where: { $0.id == item.id }) ?? 0
-                            let detailIndex = filtered.prefix(rowIndex).filter { $0.colDataType == 0 }.count + 1
                             
                             return AnyView(
                                 HStack(spacing: 0) {
-                                    Text(isSubtotal ? "" : "\(detailIndex)")
-                                        .font(.system(size: 13, weight: isSubtotal ? .bold : .regular))
+                                    Text(isSubtotal ? "" : "\(item.colOrder)")
+                                        .font(.system(size: 11.5, weight: isSubtotal ? .bold : .regular))
                                         .foregroundColor(Color(hex: "0F2D59"))
                                         .frame(width: fullWidth * 0.12, alignment: .center)
                                         .frame(maxHeight: .infinity)
                                         .border(Color.vtsBorder, width: 0.5)
                                     
                                     Text(item.colName ?? "")
-                                        .font(.system(size: 13, weight: isSubtotal ? .bold : .regular))
+                                        .font(.system(size: 11.5, weight: isSubtotal ? .bold : .regular))
                                         .foregroundColor(Color(hex: "0F2D59"))
-                                        .padding(.horizontal, 8)
+                                        .padding(.horizontal, 4)
                                         .frame(width: fullWidth * 0.58, alignment: isSubtotal ? .center : .leading)
                                         .frame(maxHeight: .infinity)
                                         .border(Color.vtsBorder, width: 0.5)
                                     
                                     Text(item.colValue.toFormattedString(maxDecimals: 0))
-                                        .font(.system(size: 13, weight: isSubtotal ? .bold : .regular))
+                                        .font(.system(size: 11.5, weight: isSubtotal ? .bold : .regular))
                                         .foregroundColor(Color(hex: "0F2D59"))
-                                        .padding(.horizontal, 8)
+                                        .padding(.horizontal, 4)
                                         .frame(width: fullWidth * 0.30, alignment: .trailing)
                                         .frame(maxHeight: .infinity)
                                         .border(Color.vtsBorder, width: 0.5)
                                 }
-                                .frame(height: 38)
+                                .frame(height: 28)
                                 .background(isSubtotal ? Color(hex: "D1F2D9") : Color.white)
                             )
                         },
@@ -215,18 +216,18 @@ struct TruyVanNhapView: View {
                             AnyView(
                                 HStack(spacing: 0) {
                                     Text("Cộng")
-                                        .font(.system(size: 13, weight: .bold))
+                                        .font(.system(size: 12, weight: .bold))
                                         .foregroundColor(.white)
                                         .frame(width: width * 0.70, alignment: .center)
                                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(Color.white.opacity(0.3)), alignment: .trailing)
                                     
                                     Text(grandTotal.toFormattedString(maxDecimals: 0))
-                                        .font(.system(size: 13, weight: .bold))
+                                        .font(.system(size: 12, weight: .bold))
                                         .foregroundColor(.white)
-                                        .padding(.horizontal, 8)
+                                        .padding(.horizontal, 6)
                                         .frame(width: width * 0.30, alignment: .trailing)
                                 }
-                                .padding(.vertical, 10)
+                                .padding(.vertical, 6)
                                 .background(Color.vtsPrimary)
                             )
                         },
