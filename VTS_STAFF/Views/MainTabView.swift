@@ -60,23 +60,32 @@ struct MainTabView: View {
             }
             .tag(1)
             
-            // Tab 3: Thông tin
+            // Tab 3: Thông báo
+            RouterView { _ in
+                ThongBaoView()
+            }
+            .tabItem {
+                Label("Thông báo", systemImage: "bell.fill")
+            }
+            .tag(2)
+            
+            // Tab 4: Thông tin
             RouterView { _ in
                 InfoView()
             }
             .tabItem {
                 Label("Thông tin", systemImage: "info.circle.fill")
             }
-            .tag(2)
+            .tag(3)
             
-            // Tab 4: Cài đặt
+            // Tab 5: Cài đặt
             RouterView { _ in
                 SettingsView()
             }
             .tabItem {
                 Label("Cài đặt", systemImage: "gearshape.fill")
             }
-            .tag(3)
+            .tag(4)
         }
         .onAppear {
             if !hasHomePermission {
@@ -87,7 +96,6 @@ struct MainTabView: View {
         }
         .tint(.vtsPrimary)
         .tabViewStyle(.sidebarAdaptable)
-        .preferredColorScheme(.light)
         
         
         

@@ -7,239 +7,258 @@
 
 import SwiftUI
 import SwiftfulRouting
-
-import SwiftUI
-import SwiftfulRouting
+import LocalAuthentication
+import UserNotifications
 
 struct SettingsView: View {
     @Environment(\.router) private var router
     @ObservedObject private var authManager = AuthManager.shared
     
-    @AppStorage("vts_enable_notifications") private var enableNotifications = true
+    // AppStorage Settings
     @AppStorage("vts_enable_biometrics") private var enableBiometrics = false
-    @AppStorage("vts_remember_account") private var savePasswordLocal = true
+    @AppStorage("vts_notify_ticket_created") private var notifyTicketCreated = true
+    @AppStorage("vts_notify_ticket_deleted") private var notifyTicketDeleted = true
     
     // Hàng Nhận (Nhập)
     @AppStorage("vts_show_nhap_homnay") private var showNhapHomNay = true
     @AppStorage("vts_show_nhap_tuannay") private var showNhapTuanNay = false
-    @AppStorage("vts_show_nhap_tuantruoc") private var showNhapTuanTruoc = false
     
     // Hàng Giao (Xuất)
     @AppStorage("vts_show_xuat_homnay") private var showXuatHomNay = true
     @AppStorage("vts_show_xuat_tuannay") private var showXuatTuanNay = false
-    @AppStorage("vts_show_xuat_tuantruoc") private var showXuatTuanTruoc = false
     
+    // Device / UI States
+    @State private var isBiometricsAvailable = false
+    @State private var savedUsername = "gia"
     @State private var showLogoutConfirm = false
     
-    private var hasHomePermission: Bool {
-        authManager.getPermission(for: "VTSSTAFF_DASBOARD_NHANVIEN")?.visible == true &&
-        authManager.getPermission(for: "VTSSTAFF_DASBOARD_NHANVIEN")?.view == true
+    private var userInitials: String {
+        let name = authManager.hoTen ?? savedUsername
+        let parts = name.split(separator: " ")
+        if parts.count >= 2 {
+            let first = parts[0].prefix(1)
+            let last = parts[parts.count - 1].prefix(1)
+            return "\(first)\(last)".uppercased()
+        } else if let first = name.first {
+            return String(first).uppercased()
+        }
+        return "V"
     }
     
     var body: some View {
         VTSPageContainer {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: VTSSpacing.xl) {
+                VStack(spacing: VTSSpacing.lg) {
                     
-                    // MARK: General Settings
+                    // MARK: - 1. User Profile Hero Header Card
                     VTSGlassCard {
-                        VStack(alignment: .leading, spacing: VTSSpacing.xl) {
-                            Text("Cấu hình chung")
-                                .font(.vtsTitle2.bold())
-                                .foregroundColor(.vtsTxtPrimary)
+                        HStack(spacing: VTSSpacing.md) {
+                            ZStack {
+                                Circle()
+                                    .fill(LinearGradient.vtsPrimary)
+                                    .frame(width: 52, height: 52)
+                                    .shadow(color: Color.vtsPrimary.opacity(0.3), radius: 6, x: 0, y: 3)
+                                
+                                Text(userInitials)
+                                    .font(.system(size: 19, weight: .bold))
+                                    .foregroundColor(.white)
+                            }
                             
-                            VStack(spacing: VTSSpacing.lg) {
-                                // Notification Switch
-                                Toggle(isOn: $enableNotifications) {
-                                    Label {
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text("Thông báo đẩy")
-                                                .font(.vtsCallout.bold())
-                                                .foregroundColor(.vtsTxtPrimary)
-                                            Text("Nhận thông báo khi có phiếu vận chuyển mới")
-                                                .font(.vtsCaption)
-                                                .foregroundColor(.vtsTxtSecondary)
-                                        }
-                                    } icon: {
-                                        Image(systemName: "bell.badge.fill")
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(authManager.hoTen ?? savedUsername)
+                                    .font(.system(size: 17, weight: .bold))
+                                    .foregroundColor(Color(hex: "0F2D59"))
+                                
+                                HStack(spacing: 6) {
+                                    Text("@\(savedUsername)")
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundColor(.vtsTxtSecondary)
+                                    
+                                    if let maNV = authManager.maNV, !maNV.isEmpty {
+                                        Text("• \(maNV)")
+                                            .font(.system(size: 12, weight: .semibold))
                                             .foregroundColor(.vtsPrimary)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 2)
+                                            .background(Color.vtsPrimary.opacity(0.1))
+                                            .cornerRadius(8)
                                     }
                                 }
-                                .tint(.vtsPrimary)
-                                
-                                VTSDivider()
-                                
-                                // FaceID / TouchID Switch
-                                Toggle(isOn: $enableBiometrics) {
-                                    Label {
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text("Xác thực sinh trắc học")
-                                                .font(.vtsCallout.bold())
-                                                .foregroundColor(.vtsTxtPrimary)
-                                            Text("Sử dụng FaceID / Vân tay để mở khóa")
-                                                .font(.vtsCaption)
-                                                .foregroundColor(.vtsTxtSecondary)
-                                        }
-                                    } icon: {
-                                        Image(systemName: "faceid")
-                                            .foregroundColor(.vtsPrimary)
-                                    }
-                                }
-                                .tint(.vtsPrimary)
-                                
-                                VTSDivider()
-                                
-                                // Save Password Switch
-                                Toggle(isOn: $savePasswordLocal) {
-                                    Label {
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text("Ghi nhớ tài khoản")
-                                                .font(.vtsCallout.bold())
-                                                .foregroundColor(.vtsTxtPrimary)
-                                            Text("Lưu tài khoản đăng nhập cho lần sau")
-                                                .font(.vtsCaption)
-                                                .foregroundColor(.vtsTxtSecondary)
-                                        }
-                                    } icon: {
-                                        Image(systemName: "key.fill")
-                                            .foregroundColor(.vtsPrimary)
-                                    }
-                                }
-                                .tint(.vtsPrimary)
+                            }
+                            
+                            Spacer()
+                        }
+                    }
+                    
+                    // MARK: - 2. Bảo mật & Xác thực
+                    settingsSection(title: "BẢO MẬT & XÁC THỰC", icon: "shield.lock.fill") {
+                        VStack(spacing: 0) {
+                            settingRow(
+                                icon: "faceid",
+                                iconBg: Color.purple,
+                                title: "Sử dụng Face ID thay cho mã bảo vệ"
+                            ) {
+                                Toggle("", isOn: $enableBiometrics)
+                                    .labelsHidden()
+                                    .tint(.vtsPrimary)
+                                    .disabled(!isBiometricsAvailable)
                             }
                         }
                     }
                     
-                    // MARK: Nhận (Nhập) Settings Card
-                    VTSGlassCard {
-                        VStack(alignment: .leading, spacing: VTSSpacing.xl) {
-                            Text("Dữ liệu Hàng nhận (Nhập)")
-                                .font(.vtsTitle2.bold())
-                                .foregroundColor(.vtsTxtPrimary)
+                    // MARK: - 3. Thông báo
+                    settingsSection(title: "THÔNG BÁO", icon: "bell.badge.fill") {
+                        VStack(spacing: 0) {
+                            settingRow(
+                                icon: "doc.badge.plus",
+                                iconBg: Color.indigo,
+                                title: "Nhận thông báo khi phiếu được Tạo"
+                            ) {
+                                Toggle("", isOn: $notifyTicketCreated)
+                                    .labelsHidden()
+                                    .tint(.vtsPrimary)
+                            }
                             
-                            VStack(spacing: VTSSpacing.lg) {
-                                Toggle(isOn: $showNhapHomNay) {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Dữ liệu hôm nay")
-                                            .font(.vtsCallout.bold())
-                                            .foregroundColor(.vtsTxtPrimary)
-                                        Text("Hiển thị hàng nhận hôm nay")
-                                            .font(.vtsCaption)
-                                            .foregroundColor(.vtsTxtSecondary)
-                                    }
-                                }
-                                .tint(.vtsPrimary)
-                                
-                                VTSDivider()
-                                
-                                Toggle(isOn: $showNhapTuanNay) {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Dữ liệu tuần này")
-                                            .font(.vtsCallout.bold())
-                                            .foregroundColor(.vtsTxtPrimary)
-                                        Text("Hiển thị hàng nhận tuần này")
-                                            .font(.vtsCaption)
-                                            .foregroundColor(.vtsTxtSecondary)
-                                    }
-                                }
-                                .tint(.vtsPrimary)
-                                
-                                VTSDivider()
-                                
-                                Toggle(isOn: $showNhapTuanTruoc) {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Dữ liệu tuần trước")
-                                            .font(.vtsCallout.bold())
-                                            .foregroundColor(.vtsTxtPrimary)
-                                        Text("Hiển thị hàng nhận tuần trước")
-                                            .font(.vtsCaption)
-                                            .foregroundColor(.vtsTxtSecondary)
-                                    }
-                                }
-                                .tint(.vtsPrimary)
+                            VTSDivider()
+                                .padding(.leading, 46)
+                            
+                            settingRow(
+                                icon: "doc.badge.gearshape",
+                                iconBg: Color.pink,
+                                title: "Nhận thông báo khi phiếu được Xóa"
+                            ) {
+                                Toggle("", isOn: $notifyTicketDeleted)
+                                    .labelsHidden()
+                                    .tint(.vtsPrimary)
                             }
                         }
                     }
-                    .disabled(!hasHomePermission)
-                    .opacity(hasHomePermission ? 1.0 : 0.6)
                     
-                    // MARK: Giao (Xuất) Settings Card
-                    VTSGlassCard {
-                        VStack(alignment: .leading, spacing: VTSSpacing.xl) {
-                            Text("Dữ liệu Hàng giao (Xuất)")
-                                .font(.vtsTitle2.bold())
-                                .foregroundColor(.vtsTxtPrimary)
-                            
-                            VStack(spacing: VTSSpacing.lg) {
-                                Toggle(isOn: $showXuatHomNay) {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Dữ liệu hôm nay")
-                                            .font(.vtsCallout.bold())
-                                            .foregroundColor(.vtsTxtPrimary)
-                                        Text("Hiển thị hàng giao hôm nay")
-                                            .font(.vtsCaption)
-                                            .foregroundColor(.vtsTxtSecondary)
+                    // MARK: - 4. Hiển thị Dashboard
+                    settingsSection(title: "HIỂN THỊ DASHBOARD", icon: "chart.bar.fill") {
+                        VStack(spacing: 0) {
+                            // Thống kê hàng nhận (Nhập) - Xếp trên/dưới
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(spacing: 12) {
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                            .fill(Color.blue.opacity(0.12))
+                                            .frame(width: 32, height: 32)
+                                        Image(systemName: "arrow.down.square.fill")
+                                            .font(.system(size: 14, weight: .bold))
+                                            .foregroundColor(.blue)
+                                    }
+                                    
+                                    Text("Hiện thống kê hàng nhận")
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundColor(Color(hex: "0F2D59"))
+                                }
+                                
+                                VStack(spacing: 8) {
+                                    HStack {
+                                        Text("Hôm nay")
+                                            .font(.system(size: 13, weight: .regular))
+                                            .foregroundColor(Color(hex: "0F2D59"))
+                                        Spacer()
+                                        Toggle("", isOn: $showNhapHomNay)
+                                            .labelsHidden()
+                                            .tint(.vtsPrimary)
+                                    }
+                                    
+                                    HStack {
+                                        Text("Tuần này")
+                                            .font(.system(size: 13, weight: .regular))
+                                            .foregroundColor(Color(hex: "0F2D59"))
+                                        Spacer()
+                                        Toggle("", isOn: $showNhapTuanNay)
+                                            .labelsHidden()
+                                            .tint(.vtsPrimary)
                                     }
                                 }
-                                .tint(.vtsPrimary)
-                                
-                                VTSDivider()
-                                
-                                Toggle(isOn: $showXuatTuanNay) {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Dữ liệu tuần này")
-                                            .font(.vtsCallout.bold())
-                                            .foregroundColor(.vtsTxtPrimary)
-                                        Text("Hiển thị hàng giao tuần này")
-                                            .font(.vtsCaption)
-                                            .foregroundColor(.vtsTxtSecondary)
-                                    }
-                                }
-                                .tint(.vtsPrimary)
-                                
-                                VTSDivider()
-                                
-                                Toggle(isOn: $showXuatTuanTruoc) {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Dữ liệu tuần trước")
-                                            .font(.vtsCallout.bold())
-                                            .foregroundColor(.vtsTxtPrimary)
-                                        Text("Hiển thị hàng giao tuần trước")
-                                            .font(.vtsCaption)
-                                            .foregroundColor(.vtsTxtSecondary)
-                                    }
-                                }
-                                .tint(.vtsPrimary)
+                                .padding(.leading, 44)
                             }
+                            .padding(.vertical, 4)
+                            
+                            VTSDivider()
+                                .padding(.leading, 46)
+                            
+                            // Thống kê hàng giao (Xuất) - Xếp trên/dưới
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(spacing: 12) {
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                            .fill(Color.green.opacity(0.12))
+                                            .frame(width: 32, height: 32)
+                                        Image(systemName: "arrow.up.square.fill")
+                                            .font(.system(size: 14, weight: .bold))
+                                            .foregroundColor(.green)
+                                    }
+                                    
+                                    Text("Hiện thống kê hàng giao")
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundColor(Color(hex: "0F2D59"))
+                                }
+                                
+                                VStack(spacing: 8) {
+                                    HStack {
+                                        Text("Hôm nay")
+                                            .font(.system(size: 13, weight: .regular))
+                                            .foregroundColor(Color(hex: "0F2D59"))
+                                        Spacer()
+                                        Toggle("", isOn: $showXuatHomNay)
+                                            .labelsHidden()
+                                            .tint(.vtsPrimary)
+                                    }
+                                    
+                                    HStack {
+                                        Text("Tuần này")
+                                            .font(.system(size: 13, weight: .regular))
+                                            .foregroundColor(Color(hex: "0F2D59"))
+                                        Spacer()
+                                        Toggle("", isOn: $showXuatTuanNay)
+                                            .labelsHidden()
+                                            .tint(.vtsPrimary)
+                                    }
+                                }
+                                .padding(.leading, 44)
+                            }
+                            .padding(.vertical, 4)
                         }
                     }
-                    .disabled(!hasHomePermission)
-                    .opacity(hasHomePermission ? 1.0 : 0.6)
                     
-                    // MARK: Danger Logout Button
-                    VTSButton(
-                        "Đăng xuất khỏi hệ thống",
-                        icon: "rectangle.portrait.and.arrow.right",
-                        style: .destructive,
-                        size: .large
-                    ) {
-                        showLogoutConfirm = true
+                    // Button Đăng xuất khỏi tài khoản
+                    Button(action: { showLogoutConfirm = true }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                .font(.system(size: 15, weight: .bold))
+                            Text("Đăng xuất khỏi tài khoản")
+                                .font(.system(size: 15, weight: .bold))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            LinearGradient(
+                                colors: [Color.vtsDanger, Color.red.opacity(0.85)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(20)
+                        .shadow(color: Color.vtsDanger.opacity(0.25), radius: 8, x: 0, y: 4)
                     }
+                    .padding(.top, 4)
                     
                     Spacer(minLength: 20)
                 }
                 .padding(VTSSpacing.xl)
             }
         }
-        .onChange(of: savePasswordLocal) { _, newValue in
-            if !newValue {
-                enableBiometrics = false
-            }
+        .task {
+            updateDeviceSettingsState()
         }
-        .onChange(of: enableBiometrics) { _, newValue in
-            if newValue && !savePasswordLocal {
-                savePasswordLocal = true
-            }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            updateDeviceSettingsState()
         }
         .vtsConfirm(
             isPresented: $showLogoutConfirm,
@@ -254,21 +273,95 @@ struct SettingsView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Cài đặt"
-            
-        ){
-            
+            subtitle: "Cài đặt",
+            isWhiteText: true
+        ) {
+            EmptyView()
         } trailing: {
+            EmptyView()
+        } primaryAction: {
+            EmptyView()
+        }
+    }
+    
+    // MARK: - Modern UI Helper Components
+    private func settingsSection<Content: View>(
+        title: String,
+        icon: String,
+        @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(.vtsPrimary)
+                Text(title)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(.vtsTxtSecondary)
+            }
+            .padding(.leading, 4)
             
-            Button(
-                "Options",
-                systemImage: "ellipsis"
-            ) {
+            VTSGlassCard {
+                content()
+            }
+        }
+    }
+    
+    private func settingRow<Control: View>(
+        icon: String,
+        iconBg: Color,
+        title: String,
+        subtitle: String? = nil,
+        @ViewBuilder control: @escaping () -> Control
+    ) -> some View {
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(iconBg.opacity(0.12))
+                    .frame(width: 32, height: 32)
                 
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(iconBg)
             }
             
-        } primaryAction: {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(Color(hex: "0F2D59"))
+                
+                if let subtitle {
+                    Text(subtitle)
+                        .font(.system(size: 11, weight: .regular))
+                        .foregroundColor(.vtsTxtSecondary)
+                }
+            }
             
+            Spacer()
+            
+            control()
+        }
+        .padding(.vertical, 4)
+    }
+    
+    // MARK: - Device Settings Synchronization
+    private func updateDeviceSettingsState() {
+        // 1. Check Biometrics Availability from Device
+        let context = LAContext()
+        var error: NSError?
+        let canEvaluate = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+        self.isBiometricsAvailable = canEvaluate
+        if !canEvaluate {
+            self.enableBiometrics = false
+        }
+        
+        // 2. Username Display
+        if let saved = KeychainHelper.shared.load(forKey: "vts_saved_username"), !saved.isEmpty {
+            self.savedUsername = saved
+        } else if let maNV = authManager.maNV, !maNV.isEmpty {
+            self.savedUsername = maNV
+        } else {
+            self.savedUsername = "gia"
         }
     }
 }

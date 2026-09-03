@@ -47,12 +47,19 @@ struct VTSLiquidImageSlot: View {
     @State private var showActionSheet = false
     @State private var editingImage: IdentifiableImage? = nil
     
+    @State private var showFullscreen = false
+    
     var body: some View {
         switch state {
         case .empty:
             addPhotoButton
         case .hasImage(let img):
             thumbnailView(img)
+                .fullScreenCover(isPresented: $showFullscreen) {
+                    ImageFullscreenView(image: img) {
+                        showFullscreen = false
+                    }
+                }
         }
     }
     
@@ -71,13 +78,13 @@ struct VTSLiquidImageSlot: View {
                     ZStack {
                         Circle()
                             .fill(Color.vtsPrimary.opacity(0.12))
-                            .frame(width: 52, height: 52)
-                        Image(systemName: "camera.badge.plus")
-                            .font(.system(size: 22, weight: .semibold))
+                            .frame(width: 60, height: 60)
+                        Image(systemName: "camera.fill")
+                            .font(.system(size: 28, weight: .bold))
                             .foregroundStyle(Color.vtsPrimary)
                     }
                     Text("Thêm ảnh")
-                        .font(.caption.bold())
+                        .font(.system(size: 13, weight: .bold))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -164,7 +171,11 @@ struct VTSLiquidImageSlot: View {
             HStack(spacing: 8) {
                 // Xem
                 imageActionButton(icon: "eye.fill", color: .vtsPrimary) {
-                    onView?()
+                    if let onView = onView {
+                        onView()
+                    } else {
+                        showFullscreen = true
+                    }
                 }
                 // Cắt - Xoay
                 imageActionButton(icon: "crop", color: .vtsPrimary) {
@@ -192,9 +203,9 @@ struct VTSLiquidImageSlot: View {
             ZStack {
                 Circle()
                     .fill(.regularMaterial)
-                    .frame(width: 36, height: 36)
+                    .frame(width: 42, height: 42)
                 Image(systemName: icon)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 18, weight: .bold))
                     .foregroundStyle(color)
             }
         }

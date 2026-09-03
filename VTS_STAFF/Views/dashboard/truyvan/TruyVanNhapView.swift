@@ -11,6 +11,7 @@ import SwiftfulRouting
 struct TruyVanNhapView: View {
     @Environment(\.router) private var router
     @StateObject private var viewModel: TruyVanNhapViewModel
+    @State private var showSearchBar = false
     @State private var hasLoadedData = false
     
     init(fromDate: Date, toDate: Date) {
@@ -20,6 +21,13 @@ struct TruyVanNhapView: View {
     var body: some View {
         VTSPageContainer {
             VStack(spacing: 0) {
+                if showSearchBar {
+                    VTSSearchBar(text: $viewModel.searchText, placeholder: "Tìm kiếm tên, mã...")
+                        .padding(.horizontal, VTSSpacing.xl)
+                        .padding(.top, VTSSpacing.md)
+                        .padding(.bottom, VTSSpacing.md)
+                }
+                
                 Picker("Loại truy vấn", selection: $viewModel.queryType) {
                     ForEach(QueryType.allCases) { type in
                         Text(type.rawValue).tag(type)
@@ -63,9 +71,20 @@ struct TruyVanNhapView: View {
             isPrimaryActionVisible: false,
             title: "",
             subtitle: "Thống kê hàng nhận",
-            isWhiteText: true,
+            isWhiteText: !showSearchBar,
             leading: {},
-            trailing: {},
+            trailing: {
+                Button {
+                    withAnimation(.easeInOut) {
+                        showSearchBar.toggle()
+                    }
+                } label: {
+                    Image(systemName: showSearchBar ? "magnifyingglass.circle.fill" : "magnifyingglass")
+                        .font(.title3)
+                        .foregroundColor(showSearchBar ? .primary : .white)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+            },
             primaryAction: {
                 EmptyView()
             }
@@ -99,39 +118,53 @@ struct TruyVanNhapView: View {
                     )
                     Spacer()
                 } else {
-                    let totalValue = filtered.filter { $0.colDataType == 0 }.sum(by: \.colValue)
+                    let grandTotal = filtered.filter { $0.colDataType == 0 }.reduce(0.0) { $0 + $1.colValue }
                     
                     ERPTable(
                         dataSource: filtered,
                         columns: [
                             ERPColumn(
                                 title: AnyView(Text("#")),
-                                key: "colCode",
-                                width: 0.1,
+                                key: "colOrder",
+                                width: 0.12,
                                 alignment: .center,
-                                render: { _, _ in AnyView(Text("")) }
+                                render: { item, index in
+                                    if item.colDataType == 1 {
+                                        return AnyView(Text(""))
+                                    }
+                                    let detailIndex = (filtered.prefix(index).filter { $0.colDataType == 0 }.count) + 1
+                                    return AnyView(
+                                        Text("\(detailIndex)")
+                                            .font(.system(size: 13, weight: .regular))
+                                    )
+                                }
                             ),
                             ERPColumn(
-                                title: AnyView(Text("Khách hàng / Hàng hoá")),
+                                title: AnyView(Text(type == .byItem ? "Hàng hoá" : "Khách hàng")),
                                 key: "colName",
-                                width: 0.6,
+                                width: 0.58,
                                 alignment: .leading,
-                                render: { _, _ in AnyView(Text("")) },
-                                footer: AnyView(
-                                    Text("Tổng")
-                                        .frame(maxWidth: .infinity, alignment: .center)
-                                )
+                                render: { item, _ in
+                                    AnyView(
+                                        Text(item.colName ?? "")
+                                            .font(.system(size: 13, weight: item.colDataType == 1 ? .bold : .regular))
+                                            .foregroundColor(Color(hex: "0F2D59"))
+                                            .frame(maxWidth: .infinity, alignment: item.colDataType == 1 ? .center : .leading)
+                                    )
+                                }
                             ),
                             ERPColumn(
-                                title: AnyView(Text("Số/ Trọng lượng")),
+                                title: AnyView(Text("Số lượng")),
                                 key: "colValue",
-                                width: 0.3,
+                                width: 0.30,
                                 alignment: .trailing,
-                                render: { _, _ in AnyView(Text("")) },
-                                footer: AnyView(
-                                    Text(totalValue.toFormattedString(maxDecimals: 0))
-                                        .frame(maxWidth: .infinity, alignment: .trailing)
-                                )
+                                render: { item, _ in
+                                    AnyView(
+                                        Text(item.colValue.toFormattedString(maxDecimals: 0))
+                                            .font(.system(size: 13, weight: item.colDataType == 1 ? .bold : .regular))
+                                            .foregroundColor(Color(hex: "0F2D59"))
+                                    )
+                                }
                             )
                         ],
                         loadDataIfNeeded: {
@@ -144,43 +177,59 @@ struct TruyVanNhapView: View {
                                 await viewModel.loadData(for: type)
                             }
                         },
-                        customRowBuilder: { item, width in
-                            if item.colDataType == 0 {
-                                return AnyView(
-                                    HStack(spacing: 0) {
-                                        Text(String(item.colOrder))
-                                            .padding(5)
-                                            .frame(width: width * 0.1, alignment: .center)
-                                            .frame(maxHeight: .infinity)
-                                            .border(Color.vtsBorder, width: 0.5)
-                                        
-                                        Text(item.colName ?? "")
-                                            .padding(5)
-                                            .frame(width: width * 0.6, alignment: .leading)
-                                            .frame(maxHeight: .infinity)
-                                            .border(Color.vtsBorder, width: 0.5)
-                                        
-                                        Text(item.colValue.toFormattedString(maxDecimals: 0))
-                                            .padding(5)
-                                            .frame(width: width * 0.3, alignment: .trailing)
-                                            .frame(maxHeight: .infinity)
-                                            .border(Color.vtsBorder, width: 0.5)
-                                    }
-                                    .background(Color.white)
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                )
-                            } else if item.colDataType == 1 {
-                                return AnyView(
-                                    Text(item.colName ?? "")
-                                        .padding(5)
-                                        .frame(width: width * 1, alignment: .center)
-                                        .background(Color.green.opacity(0.5))
+                        customRowBuilder: { item, fullWidth in
+                            let isSubtotal = (item.colDataType == 1)
+                            let rowIndex = filtered.firstIndex(where: { $0.id == item.id }) ?? 0
+                            let detailIndex = filtered.prefix(rowIndex).filter { $0.colDataType == 0 }.count + 1
+                            
+                            return AnyView(
+                                HStack(spacing: 0) {
+                                    Text(isSubtotal ? "" : "\(detailIndex)")
+                                        .font(.system(size: 13, weight: isSubtotal ? .bold : .regular))
+                                        .foregroundColor(Color(hex: "0F2D59"))
+                                        .frame(width: fullWidth * 0.12, alignment: .center)
+                                        .frame(maxHeight: .infinity)
                                         .border(Color.vtsBorder, width: 0.5)
-                                )
-                            }
-                            return nil
+                                    
+                                    Text(item.colName ?? "")
+                                        .font(.system(size: 13, weight: isSubtotal ? .bold : .regular))
+                                        .foregroundColor(Color(hex: "0F2D59"))
+                                        .padding(.horizontal, 8)
+                                        .frame(width: fullWidth * 0.58, alignment: isSubtotal ? .center : .leading)
+                                        .frame(maxHeight: .infinity)
+                                        .border(Color.vtsBorder, width: 0.5)
+                                    
+                                    Text(item.colValue.toFormattedString(maxDecimals: 0))
+                                        .font(.system(size: 13, weight: isSubtotal ? .bold : .regular))
+                                        .foregroundColor(Color(hex: "0F2D59"))
+                                        .padding(.horizontal, 8)
+                                        .frame(width: fullWidth * 0.30, alignment: .trailing)
+                                        .frame(maxHeight: .infinity)
+                                        .border(Color.vtsBorder, width: 0.5)
+                                }
+                                .frame(height: 38)
+                                .background(isSubtotal ? Color(hex: "D1F2D9") : Color.white)
+                            )
                         },
-                     
+                        customFooterBuilder: { width in
+                            AnyView(
+                                HStack(spacing: 0) {
+                                    Text("Cộng")
+                                        .font(.system(size: 13, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .frame(width: width * 0.70, alignment: .center)
+                                        .overlay(Rectangle().frame(width: 0.5).foregroundColor(Color.white.opacity(0.3)), alignment: .trailing)
+                                    
+                                    Text(grandTotal.toFormattedString(maxDecimals: 0))
+                                        .font(.system(size: 13, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 8)
+                                        .frame(width: width * 0.30, alignment: .trailing)
+                                }
+                                .padding(.vertical, 10)
+                                .background(Color.vtsPrimary)
+                            )
+                        },
                         disableVerticalScrolling: false,
                         showCompanyFooter: true
                     )

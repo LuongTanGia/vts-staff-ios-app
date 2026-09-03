@@ -41,6 +41,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // 5. Đăng ký nhận Remote Notification từ Apple APNs (Sinh ra APNs Device Token)
         application.registerForRemoteNotifications()
 
+        // 6. Cấu hình tự động thêm thanh icon nút "Check" đóng bàn phím cho mọi ô nhập liệu
+        KeyboardDoneButtonManager.shared.setup()
+
         return true
     }
 

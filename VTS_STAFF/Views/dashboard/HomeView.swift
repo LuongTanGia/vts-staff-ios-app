@@ -16,13 +16,12 @@ struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @State private var hasLoadedData = false
     
+    @AppStorage("vts_show_nhan_vien") private var showNhanVienStats = true
     @AppStorage("vts_show_nhap_homnay") private var showNhapHomNay = true
     @AppStorage("vts_show_nhap_tuannay") private var showNhapTuanNay = false
-    @AppStorage("vts_show_nhap_tuantruoc") private var showNhapTuanTruoc = false
     
     @AppStorage("vts_show_xuat_homnay") private var showXuatHomNay = true
     @AppStorage("vts_show_xuat_tuannay") private var showXuatTuanNay = false
-    @AppStorage("vts_show_xuat_tuantruoc") private var showXuatTuanTruoc = false
     
     private var hasNHANVIENPermission: Bool {
         authManager.getPermission(for: "VTSSTAFF_DANHMUC_NHANVIEN")?.visible == true &&
@@ -45,7 +44,7 @@ struct HomeView: View {
     }
     
     var body: some View {
-        VTSPageContainer {
+        VTSPageContainer(hasGradient: true){
             VStack(spacing: 0) {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 14) {
@@ -63,16 +62,14 @@ struct HomeView: View {
                             
                             let nhapHomNay = data.hangNhap.filter { $0.colGroup.localizedCaseInsensitiveContains("HOMNAY") }
                             let nhapTuanNay = data.hangNhap.filter { $0.colGroup.localizedCaseInsensitiveContains("TUANNAY") }
-                            let nhapTuanTruoc = data.hangNhap.filter { $0.colGroup.localizedCaseInsensitiveContains("TUANTRUOC") }
                             
                             let xuatHomNay = data.hangXuat.filter { $0.colGroup.localizedCaseInsensitiveContains("HOMNAY") }
                             let xuatTuanNay = data.hangXuat.filter { $0.colGroup.localizedCaseInsensitiveContains("TUANNAY") }
-                            let xuatTuanTruoc = data.hangXuat.filter { $0.colGroup.localizedCaseInsensitiveContains("TUANTRUOC") }
                             
                             return VStack(alignment: .leading, spacing: 14) {
                                 
                                 // Bảng Phân bố nhân sự
-                                if hasNHANVIENPermission {
+                                if showNhanVienStats && hasNHANVIENPermission {
                                     if !data.nhanVienPhongBan.isEmpty || !data.nhanVienInOut.isEmpty {
                                         homeCardContainer(title: "Phân bố nhân sự") {
                                             VStack(spacing: 12) {
@@ -113,7 +110,7 @@ struct HomeView: View {
                                     }
                                 }
                                 
-                                // Hàng nhận hôm nay / tuần này / tuần trước
+                                // Hàng nhận hôm nay / tuần này
                                 if hasNHAPPermission {
                                     if showNhapHomNay {
                                         if !nhapHomNay.isEmpty {
@@ -158,31 +155,9 @@ struct HomeView: View {
                                             }
                                         }
                                     }
-                                    
-                                    if showNhapTuanTruoc {
-                                        if !nhapTuanTruoc.isEmpty {
-                                            homeCardContainer(title: "Hàng nhận tuần trước") {
-                                                importCustomTable(list: nhapTuanTruoc)
-                                            }
-                                            .contentShape(Rectangle())
-                                            .onTapGesture {
-                                                let range = Date.getWeekRange(offsetWeeks: -1)
-                                                router.showScreen(.push) { _ in
-                                                    TruyVanNhapView(fromDate: range.from, toDate: range.to)
-                                                }
-                                            }
-                                        } else {
-                                            emptySectionPill(title: "Hàng nhận tuần trước") {
-                                                let range = Date.getWeekRange(offsetWeeks: -1)
-                                                router.showScreen(.push) { _ in
-                                                    TruyVanNhapView(fromDate: range.from, toDate: range.to)
-                                                }
-                                            }
-                                        }
-                                    }
                                 }
                                 
-                                // Hàng giao hôm nay / tuần này / tuần trước
+                                // Hàng giao hôm nay / tuần này
                                 if hasXUATPermission {
                                     if showXuatHomNay {
                                         if !xuatHomNay.isEmpty {
@@ -227,28 +202,6 @@ struct HomeView: View {
                                             }
                                         }
                                     }
-                                    
-                                    if showXuatTuanTruoc {
-                                        if !xuatTuanTruoc.isEmpty {
-                                            homeCardContainer(title: "Hàng giao tuần trước") {
-                                                exportCustomTable(list: xuatTuanTruoc)
-                                            }
-                                            .contentShape(Rectangle())
-                                            .onTapGesture {
-                                                let range = Date.getWeekRange(offsetWeeks: -1)
-                                                router.showScreen(.push) { _ in
-                                                    TruyVanXuatView(fromDate: range.from, toDate: range.to)
-                                                }
-                                            }
-                                        } else {
-                                            emptySectionPill(title: "Hàng giao tuần trước") {
-                                                let range = Date.getWeekRange(offsetWeeks: -1)
-                                                router.showScreen(.push) { _ in
-                                                    TruyVanXuatView(fromDate: range.from, toDate: range.to)
-                                                }
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -269,7 +222,8 @@ struct HomeView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Trang chủ"
+            subtitle: "Trang chủ",
+            isWhiteText: true
         ) {
             EmptyView()
         } trailing: {
@@ -325,7 +279,7 @@ struct HomeView: View {
                         .font(.vtsBody)
                         .foregroundColor(.vtsTxtPrimary)
                     Spacer()
-                    Text("\(item.colValue)")
+                    Text(item.colValue.toFormattedString(maxDecimals: 0))
                         .font(.vtsBody.bold())
                         .foregroundColor(.vtsPrimary)
                 }
@@ -445,7 +399,7 @@ struct HomeView: View {
                             .frame(maxHeight: .infinity)
                             .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                         
-                        Text("\(item.colValue1)")
+                        Text(item.colValue1.toFormattedString(maxDecimals: 2))
                             .font(.system(size: 13))
                             .foregroundColor(Color(hex: "0F2D59"))
                             .padding(.horizontal, 4)
@@ -453,7 +407,7 @@ struct HomeView: View {
                             .frame(maxHeight: .infinity)
                             .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                         
-                        Text("\(item.colValue2)")
+                        Text(item.colValue2.toFormattedString(maxDecimals: 2))
                             .font(.system(size: 13))
                             .foregroundColor(Color(hex: "0F2D59"))
                             .padding(.horizontal, 4)
@@ -461,7 +415,7 @@ struct HomeView: View {
                             .frame(maxHeight: .infinity)
                             .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                         
-                        Text("\(item.colValue3)")
+                        Text(item.colValue3.toFormattedString(maxDecimals: 2))
                             .font(.system(size: 13))
                             .foregroundColor(Color(hex: "0F2D59"))
                             .padding(.horizontal, 4)
@@ -469,7 +423,7 @@ struct HomeView: View {
                             .frame(maxHeight: .infinity)
                             .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                         
-                        Text("\(item.colValue4)")
+                        Text(item.colValue4.toFormattedString(maxDecimals: 2))
                             .font(.system(size: 13))
                             .foregroundColor(Color(hex: "0F2D59"))
                             .padding(.horizontal, 4)
@@ -499,7 +453,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("\(totalCol1)")
+                    Text(totalCol1.toFormattedString(maxDecimals: 2))
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
@@ -507,7 +461,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("\(totalCol2)")
+                    Text(totalCol2.toFormattedString(maxDecimals: 2))
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
@@ -515,7 +469,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("\(totalCol3)")
+                    Text(totalCol3.toFormattedString(maxDecimals: 2))
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
@@ -523,7 +477,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("\(totalCol4)")
+                    Text(totalCol4.toFormattedString(maxDecimals: 2))
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
@@ -906,7 +860,7 @@ struct HomeView: View {
                             .frame(maxHeight: .infinity)
                             .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                         
-                        Text("\(item.colValue)")
+                        Text(item.colValue.toFormattedString(maxDecimals: 0))
                             .font(.system(size: 13))
                             .foregroundColor(Color(hex: "0F2D59"))
                             .padding(.horizontal, 2)
@@ -914,7 +868,7 @@ struct HomeView: View {
                             .frame(maxHeight: .infinity)
                             .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                         
-                        Text("\(item.colValue0)")
+                        Text(item.colValue0.toFormattedString(maxDecimals: 0))
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundColor(Color(hex: "D32F2F"))
                             .padding(.horizontal, 2)
@@ -922,7 +876,7 @@ struct HomeView: View {
                             .frame(maxHeight: .infinity)
                             .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                         
-                        Text("\(item.colValue1)")
+                        Text(item.colValue1.toFormattedString(maxDecimals: 0))
                             .font(.system(size: 13))
                             .foregroundColor(Color(hex: "0F2D59"))
                             .padding(.horizontal, 2)
@@ -952,7 +906,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("\(totalVal)")
+                    Text(totalVal.toFormattedString(maxDecimals: 0))
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 2)
@@ -960,7 +914,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("\(totalVal0)")
+                    Text(totalVal0.toFormattedString(maxDecimals: 0))
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(Color(hex: "D32F2F"))
                         .padding(.horizontal, 2)
@@ -968,7 +922,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("\(totalVal1)")
+                    Text(totalVal1.toFormattedString(maxDecimals: 0))
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 2)

@@ -10,9 +10,40 @@ import SwiftfulRouting
 
 struct PhieuNhapListView: View {
     @Environment(\.router) private var router
-    @StateObject private var viewModel = PhieuNhapListViewModel()
-    @State private var showSearchBar = false
+    @StateObject private var viewModel: PhieuNhapListViewModel
+    @State private var showSearchBar: Bool
     @State private var hasLoadedData = false
+    @State private var selectedModalItem: TPhieuvc_Nhap_DanhSach? = nil
+    
+    init(fromDate: Date? = nil, toDate: Date? = nil, searchText: String? = nil) {
+        let vm = PhieuNhapListViewModel(fromDate: fromDate, toDate: toDate, searchText: searchText)
+        _viewModel = StateObject(wrappedValue: vm)
+        _showSearchBar = State(initialValue: searchText != nil && !searchText!.isEmpty)
+    }
+    
+    private var permission: TChucNangPhanQuyen? {
+        AuthManager.shared.getPermission(for: "VTSSTAFF_DULIEU_PHIEUNHAP")
+    }
+    
+    private var hasDeletePermission: Bool {
+        permission?.del == true
+    }
+    
+    private func deleteItem(_ item: TPhieuvc_Nhap_DanhSach) {
+        router.showAlert(.alert, title: "Xác nhận xoá", subtitle: "Bạn có chắc chắn muốn xoá phiếu nhập \(item.soPhieu)?") {
+            Button("Xoá", role: .destructive) {
+                Task {
+                    do {
+                        _ = try await PhieuNhapService.shared.xoa(soPhieu: item.soPhieu)
+                        await viewModel.loadData()
+                    } catch {
+                        ErrorManager.shared.showError("Không thể xoá phiếu: \(error.localizedDescription)")
+                    }
+                }
+            }
+            Button("Huỷ", role: .cancel) {}
+        }
+    }
     
     var body: some View {
         VTSPageContainer {
@@ -37,7 +68,7 @@ struct PhieuNhapListView: View {
                     .padding(.top, VTSSpacing.md)
                     .background(Color.vtsPrimary)
                 }
-              
+                
                 VTSAsyncContent(
                     state: viewModel.state,
                     emptyTitle: "Không tìm thấy phiếu nhập",
@@ -65,21 +96,14 @@ struct PhieuNhapListView: View {
                                 ScrollView {
                                     LazyVStack(spacing: 12) {
                                         ForEach(filtered) { item in
-                                            Button {
-                                                router.showScreen(.push) { _ in
-                                                    PhieuNhapDetailView(soPhieu: item.soPhieu, existing: item)
-                                                }
-                                            } label: {
-                                                PhieuNhapCardView(item: item)
-                                            }
-                                            .buttonStyle(PlainButtonStyle())
-                                            .onAppear {
-                                                if item.id == filtered.last?.id {
-                                                    Task {
-                                                        await viewModel.loadDataIfNeeded()
+                                            cardItemView(item: item)
+                                                .onAppear {
+                                                    if item.id == filtered.last?.id {
+                                                        Task {
+                                                            await viewModel.loadDataIfNeeded()
+                                                        }
                                                     }
                                                 }
-                                            }
                                         }
                                     }
                                     .padding(.horizontal, 16)
@@ -119,10 +143,35 @@ struct PhieuNhapListView: View {
                 hasLoadedData = true
             }
         }
+        .sheet(item: $selectedModalItem) { item in
+            VTSActionModalSheet(
+                title: "Phiếu nhập: \(item.soPhieu)",
+                subtitle: "\(item.tenHangHoa) • \(item.ngay.toUIDateString)",
+                actions: {
+                    var acts: [VTSModalAction] = []
+                    acts.append(VTSModalAction(title: "Xem chi tiết", icon: "eye.fill") {
+                        router.showScreen(.push) { _ in
+                            PhieuNhapDetailView(soPhieu: item.soPhieu, existing: item)
+                        }
+                    })
+                    if hasDeletePermission {
+                        acts.append(VTSModalAction(title: "Xoá phiếu", icon: "trash.fill", isDestructive: true) {
+                            deleteItem(item)
+                        })
+                    }
+                    return acts
+                }(),
+                onClose: {
+                    selectedModalItem = nil
+                }
+            )
+            .presentationDetents([.fraction(hasDeletePermission ? 0.38 : 0.3), .medium])
+            .presentationDragIndicator(.visible)
+        }
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Chuyển hàng nhận",
+            subtitle: "Chuyển hàng thu về",
             isWhiteText: !showSearchBar,
             leading: {},
             trailing: {
@@ -158,6 +207,34 @@ struct PhieuNhapListView: View {
         )
         .toolbar(.hidden, for: .tabBar)
     }
+    
+    @ViewBuilder
+    private func cardItemView(item: TPhieuvc_Nhap_DanhSach) -> some View {
+        PhieuNhapCardView(item: item)
+            .contentShape(Rectangle())
+            .onLongPressGesture {
+                let haptic = UIImpactFeedbackGenerator(style: .medium)
+                haptic.impactOccurred()
+                selectedModalItem = item
+            }
+            .contextMenu {
+                Button {
+                    router.showScreen(.push) { _ in
+                        PhieuNhapDetailView(soPhieu: item.soPhieu, existing: item)
+                    }
+                } label: {
+                    Label("Xem chi tiết", systemImage: "eye")
+                }
+                
+                if hasDeletePermission {
+                    Button(role: .destructive) {
+                        deleteItem(item)
+                    } label: {
+                        Label("Xoá phiếu", systemImage: "trash")
+                    }
+                }
+            }
+    }
 }
 
 struct PhieuNhapCardView: View {
@@ -165,7 +242,7 @@ struct PhieuNhapCardView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Row 1: Số, Ngày
+            // Row 1: Số, Trạng thái, Ngày
             HStack {
                 HStack(spacing: 4) {
                     Text("Số:")
@@ -175,101 +252,86 @@ struct PhieuNhapCardView: View {
                         .font(.system(size: 15, weight: .regular, design: .rounded))
                         .foregroundColor(.vtsPrimary)
                 }
+                
                 Spacer()
-                HStack(spacing: 4) {
-                    Text("Ngày:")
-                        .font(.vtsCallout)
-                        .foregroundColor(.vtsTxtSecondary)
-                    Text(item.ngay.toUIDateString)
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
-                        .foregroundColor(.vtsPrimary)
-                }
-            }
-            
-            // Row 2: Xe ngoài, Số xe
-            HStack {
-                HStack(spacing: 6) {
-                    Text("Xe ngoài:")
-                        .font(.vtsCallout)
-                        .foregroundColor(.vtsTxtSecondary)
-                    Image(systemName: item.xeNgoai ? "checkmark.square.fill" : "square")
-                        .font(.system(size: 18))
-                        .foregroundColor(item.xeNgoai ? .vtsPrimary : .vtsBorder)
-                        .symbolEffect(.bounce, options: .nonRepeating)
-                }
-                Spacer()
-                HStack(spacing: 4) {
-                    Text("Số xe:")
-                        .font(.vtsCallout)
-                        .foregroundColor(.vtsTxtSecondary)
-                    Text(item.soXe ?? "")
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
-                        .foregroundColor(.vtsPrimary)
-                }
-            }
-            
-            // Row 3: Tài xế
-            HStack(spacing: 4) {
-                Text("Tài xế:")
-                    .font(.vtsCallout)
+                
+                VTSPhieuStatusChip(trangThai: item.tenTrangThai ?? item.trangThai)
+                
+                Text(item.ngay.toUIDateString)
+                    .font(.system(size: 13))
                     .foregroundColor(.vtsTxtSecondary)
-                Text(item.taiXe ?? "")
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
-                    .foregroundColor(.vtsPrimary)
-                Spacer()
             }
             
-            // Row 4: Hàng nhận, Số/Trọng lượng
+            // Row 2: Khách hàng
+            if let khach = item.tenKhachHang, !khach.isEmpty {
+                HStack(spacing: 6) {
+                    Text("Khách:")
+                        .font(.vtsCallout)
+                        .foregroundColor(.vtsTxtSecondary)
+                    Text(khach)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.vtsTxtPrimary)
+                        .lineLimit(1)
+                }
+            }
+            
+            // Row 3: Hàng hoá & Khối lượng
             HStack {
                 HStack(spacing: 4) {
-                    Text("Hàng nhận:")
+                    Text("Hàng:")
                         .font(.vtsCallout)
                         .foregroundColor(.vtsTxtSecondary)
                     Text(item.tenHangHoa)
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.vtsPrimary)
+                        .lineLimit(1)
                 }
+                
                 Spacer()
+                
                 HStack(spacing: 4) {
-                    Text("Số/Trọng lượng:")
+                    Text("KL:")
                         .font(.vtsCallout)
                         .foregroundColor(.vtsTxtSecondary)
                     Text(Double(item.trongLuongHang).toFormattedString(maxDecimals: 0))
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundColor(.vtsPrimary)
                 }
             }
             
-            // Row 5: Khách hàng
-            HStack(alignment: .top, spacing: 4) {
-                Text("Khách hàng:")
-                    .font(.vtsCallout)
-                    .foregroundColor(.vtsTxtSecondary)
-                Text(item.tenKhachHang ?? "")
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
-                    .foregroundColor(.vtsPrimary)
-                    .multilineTextAlignment(.leading)
-                    .lineLimit(nil)
+            // Row 4: Xe & Tài xế
+            HStack {
+                HStack(spacing: 4) {
+                    Text("Xe:")
+                        .font(.vtsCallout)
+                        .foregroundColor(.vtsTxtSecondary)
+                    Text(item.soXe ?? "---")
+                        .font(.system(size: 13, weight: .regular))
+                        .foregroundColor(.vtsTxtPrimary)
+                }
+                
                 Spacer()
+                
+                HStack(spacing: 4) {
+                    Text("Tài xế:")
+                        .font(.vtsCallout)
+                        .foregroundColor(.vtsTxtSecondary)
+                    Text(item.taiXe ?? "---")
+                        .font(.system(size: 13, weight: .regular))
+                        .foregroundColor(.vtsTxtPrimary)
+                        .lineLimit(1)
+                }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
+        .padding(14)
         .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 14)
                 .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color.vtsBorder.opacity(0.4), lineWidth: 1)
+                .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                )
         )
     }
 }
-
-#Preview {
-    RouterView { _ in
-        PhieuNhapListView()
-    }
-}
-

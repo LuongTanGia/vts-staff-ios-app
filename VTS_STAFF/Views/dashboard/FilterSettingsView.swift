@@ -11,12 +11,10 @@ struct FilterSettingsView: View {
     // Hàng Nhận (Nhập)
     @AppStorage("vts_show_nhap_homnay") private var showNhapHomNay = true
     @AppStorage("vts_show_nhap_tuannay") private var showNhapTuanNay = false
-    @AppStorage("vts_show_nhap_tuantruoc") private var showNhapTuanTruoc = false
     
     // Hàng Giao (Xuất)
     @AppStorage("vts_show_xuat_homnay") private var showXuatHomNay = true
     @AppStorage("vts_show_xuat_tuannay") private var showXuatTuanNay = false
-    @AppStorage("vts_show_xuat_tuantruoc") private var showXuatTuanTruoc = false
     
     var body: some View {
         VTSPageContainer {
@@ -56,20 +54,6 @@ struct FilterSettingsView: View {
                                     }
                                 }
                                 .tint(.vtsPrimary)
-                                
-                                VTSDivider()
-                                
-                                Toggle(isOn: $showNhapTuanTruoc) {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Dữ liệu tuần trước")
-                                            .font(.vtsCallout.bold())
-                                            .foregroundColor(.vtsTxtPrimary)
-                                        Text("Hiển thị hàng nhận tuần trước")
-                                            .font(.vtsCaption)
-                                            .foregroundColor(.vtsTxtSecondary)
-                                    }
-                                }
-                                .tint(.vtsPrimary)
                             }
                         }
                     }
@@ -102,20 +86,6 @@ struct FilterSettingsView: View {
                                             .font(.vtsCallout.bold())
                                             .foregroundColor(.vtsTxtPrimary)
                                         Text("Hiển thị hàng giao tuần này")
-                                            .font(.vtsCaption)
-                                            .foregroundColor(.vtsTxtSecondary)
-                                    }
-                                }
-                                .tint(.vtsPrimary)
-                                
-                                VTSDivider()
-                                
-                                Toggle(isOn: $showXuatTuanTruoc) {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Dữ liệu tuần trước")
-                                            .font(.vtsCallout.bold())
-                                            .foregroundColor(.vtsTxtPrimary)
-                                        Text("Hiển thị hàng giao tuần trước")
                                             .font(.vtsCaption)
                                             .foregroundColor(.vtsTxtSecondary)
                                     }

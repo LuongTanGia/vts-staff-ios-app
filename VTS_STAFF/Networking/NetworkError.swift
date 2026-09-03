@@ -49,6 +49,7 @@ enum NetworkError: LocalizedError {
     // MARK: - Map from HTTP status code
     static func from(statusCode: Int, body: Data?) -> NetworkError {
         let message = body.flatMap { String(data: $0, encoding: .utf8) }
+        
         switch statusCode {
         case 401: return .unauthorized
         case 403: return .forbidden

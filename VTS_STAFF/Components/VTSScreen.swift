@@ -123,9 +123,8 @@ struct VTSPageContainer<Content: View>: View {
             }
             
             content()
-            
         }
-        .preferredColorScheme(.light)
+        .toolbarColorScheme(.dark, for: .navigationBar)
     }
 }
 
@@ -158,6 +157,7 @@ extension View {
         message: String,
         confirmLabel: String = "Xác nhận",
         confirmStyle: VTSButtonStyle = .destructive,
+        
         onConfirm: @escaping () -> Void
     ) -> some View {
         modifier(VTSConfirmDialog(

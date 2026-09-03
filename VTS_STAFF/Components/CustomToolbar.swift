@@ -64,8 +64,9 @@ fileprivate struct CustomToolbarModifier<Leading: View, Trailing: View, PrimaryA
                                     : "VTS-Staff"
                                 )
                                 .font(.vtsScreenTitle)
+                                .fontWeight(.bold)
                                 .foregroundColor(
-                                    isWhiteText ? Color.vtsBg : nil
+                                    isWhiteText ? Color.vtsBg : .vtsTxtPrimary
                                 )
                                 .id(title ?? "")
                                 .transition(.offset(y: 10).combined(with: AnyTransition(.blurReplace)))
@@ -74,7 +75,7 @@ fileprivate struct CustomToolbarModifier<Leading: View, Trailing: View, PrimaryA
                                     Text(subtitle)
                                         .font(.vtsScreenSubtitle)
                                         .foregroundColor(
-                                            isWhiteText ? Color.vtsBg : nil
+                                            isWhiteText ? Color.vtsBg.opacity(0.85) : .vtsTxtSecondary
                                         )
                                         .id(subtitle)
                                         .transition(.blurReplace)
@@ -116,7 +117,10 @@ fileprivate struct CustomToolbarModifier<Leading: View, Trailing: View, PrimaryA
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-        
+            .toolbarBackground(isWhiteText ? Color.vtsPrimary : Color.clear, for: .navigationBar)
+            .toolbarBackground(isWhiteText ? .visible : .automatic, for: .navigationBar)
+            .toolbarColorScheme(isWhiteText ? .dark : .light, for: .navigationBar)
+            .statusBarStyle(isWhiteText ? .lightContent : .darkContent)
             .animation(.bouncy(duration: 0.3, extraBounce: 0), value: isPrimaryActionVisible)
     }
     

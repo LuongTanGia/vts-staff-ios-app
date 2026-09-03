@@ -475,3 +475,34 @@ typealias Params_ThemPhieu_Xuat = Params_ThemPhieu_Nhap
 
 // MARK: Sửa phiếu Xuất (giống Sửa Nhập)
 typealias Params_SuaPhieu_Xuat = Params_SuaPhieu_Nhap
+
+// MARK: - Params_ThongBao
+struct Params_ThongBao: Encodable {
+    var maThongBaos: [Params_Ma]?
+    
+    enum CodingKeys: String, CodingKey {
+        case maThongBaos = "MaThongBaos"
+    }
+}
+
+// MARK: - Params_MSG_TAOPHIEU
+struct Params_MSG_TAOPHIEU: Encodable {
+    var clientToken: String?
+    var msgTaoPhieu: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case clientToken = "ClientToken"
+        case msgTaoPhieu = "MSG_TAOPHIEU"
+    }
+}
+
+// MARK: - Params_MSG_XOAPHIEU
+struct Params_MSG_XOAPHIEU: Encodable {
+    var clientToken: String?
+    var msgXoaPhieu: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case clientToken = "ClientToken"
+        case msgXoaPhieu = "MSG_XOAPHIEU"
+    }
+}

@@ -143,34 +143,6 @@ struct PhieuXuatDetailView: View {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 16) {
                             formFieldsCard(details: details)
-                            
-                            if !viewModel.isNew && isEditMode && hasDeletePermission {
-                                Button(role: .destructive) {
-                                    router.showAlert(.alert, title: "Xác nhận xoá", subtitle: "Bạn có chắc chắn muốn xoá phiếu xuất này?") {
-                                        Button("Xoá", role: .destructive) {
-                                            Task {
-                                                await deleteVoucher()
-                                            }
-                                        }
-                                        Button("Huỷ", role: .cancel) {}
-                                    }
-                                } label: {
-                                    HStack {
-                                        Image(systemName: "trash")
-                                        Text("Xoá phiếu xuất")
-                                    }
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 14)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color.red.opacity(0.8))
-                                    )
-                                }
-                                .padding(.horizontal, 4)
-                                .padding(.top, 8)
-                            }
                         }
                         .padding(.horizontal, VTSSpacing.sm)
                         .padding(.vertical, 16)
@@ -441,6 +413,7 @@ struct PhieuXuatDetailView: View {
                 VTSLiquidTextField(
                     label: "Tài xế ngoài",
                     text: $taiXe,
+                    
                     placeholder: "Nhập tên tài xế...",
                     isReadOnly: !isEditMode,
                     errorMessage: taiXeError
@@ -482,11 +455,11 @@ struct PhieuXuatDetailView: View {
             )
             .disabled(!isEditMode)
             
-            // Row 6: Số/Trọng lượng
+            // Row 6: Số lượng
             VTSLiquidTextField(
-                label: "Số/Trọng lượng",
+                label: "Số lượng",
                 text: $trongLuongHang,
-                keyboardType: .numberPad,
+                keyboardType: .decimalPad,
                 isReadOnly: !isEditMode,
                 errorMessage: trongLuongHangError
             )
@@ -500,18 +473,20 @@ struct PhieuXuatDetailView: View {
             .disabled(!isEditMode)
             
             // Row 8: 2 ô ảnh
-            HStack(spacing: 12) {
-                photoBox(
-                    slotIndex: 1,
-                    iconName: "camera.badge.plus",
-                    image: $hinh01
-                )
-                
-                photoBox(
-                    slotIndex: 2,
-                    iconName: "photo.badge.arrow.up",
-                    image: $hinh02
-                )
+            if isEditMode || hinh01 != nil || hinh02 != nil {
+                HStack(spacing: 12) {
+                    photoBox(
+                        slotIndex: 1,
+                        iconName: "camera.fill",
+                        image: $hinh01
+                    )
+                    
+                    photoBox(
+                        slotIndex: 2,
+                        iconName: "camera.fill",
+                        image: $hinh02
+                    )
+                }
             }
             
             // Row 9: Ghi chú
@@ -541,16 +516,18 @@ struct PhieuXuatDetailView: View {
                             showingFullscreenIndex = slotIndex
                         }
                     
-                    HStack(spacing: 6) {
+                    HStack(spacing: 8) {
                         Button {
                             showingFullscreenIndex = slotIndex
                         } label: {
-                            Image(systemName: "eye.fill")
-                                .font(.system(size: 13, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding(8)
-                                .background(Color.black.opacity(0.6))
-                                .clipShape(Circle())
+                            ZStack {
+                                Circle()
+                                    .fill(Color.black.opacity(0.65))
+                                    .frame(width: 42, height: 42)
+                                Image(systemName: "eye.fill")
+                                    .font(.system(size: 18, weight: .bold))
+                                    .foregroundColor(.white)
+                            }
                         }
                         
                         if isEditMode {
@@ -558,68 +535,77 @@ struct PhieuXuatDetailView: View {
                                 editingSlot = slotIndex
                                 editingImage = IdentifiableImage(image: img)
                             } label: {
-                                Image(systemName: "crop")
-                                    .font(.system(size: 13, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .padding(8)
-                                    .background(Color.blue.opacity(0.8))
-                                    .clipShape(Circle())
+                                ZStack {
+                                    Circle()
+                                        .fill(Color.vtsPrimary)
+                                        .frame(width: 42, height: 42)
+                                    Image(systemName: "crop")
+                                        .font(.system(size: 18, weight: .bold))
+                                        .foregroundColor(.white)
+                                }
                             }
                             
                             Button {
                                 image.wrappedValue = nil
                             } label: {
-                                Image(systemName: "trash.fill")
-                                    .font(.system(size: 13, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .padding(8)
-                                    .background(Color.red.opacity(0.8))
-                                    .clipShape(Circle())
+                                ZStack {
+                                    Circle()
+                                        .fill(Color.vtsDanger)
+                                        .frame(width: 42, height: 42)
+                                    Image(systemName: "trash.fill")
+                                        .font(.system(size: 18, weight: .bold))
+                                        .foregroundColor(.white)
+                                }
                             }
                         }
                     }
-                    .padding(6)
+                    .padding(8)
                 }
             } else {
-                let enabled = isSlotEnabled(slotIndex)
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(uiColor: .systemGray6))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.primary.opacity(0.12), lineWidth: 1)
-                        )
-                    
-                    VStack(spacing: 8) {
-                        ZStack {
-                            Circle()
-                                .fill(enabled ? Color.vtsPrimary.opacity(0.12) : Color.gray.opacity(0.12))
-                                .frame(width: 48, height: 48)
-                            Image(systemName: "photo.fill")
-                                .font(.system(size: 24, weight: .medium))
-                                .foregroundColor(enabled ? .vtsPrimary : .gray)
-                        }
+                if isEditMode {
+                    let enabled = isSlotEnabled(slotIndex)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(uiColor: .systemGray6))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.primary.opacity(0.12), lineWidth: 1)
+                            )
                         
-                        Text(isEditMode ? (enabled ? "Thêm ảnh" : "Thêm ảnh 1 trước") : "Chưa có ảnh")
-                            .font(.vtsCaption)
-                            .foregroundColor(isEditMode ? (enabled ? .vtsTxtSecondary : .vtsTxtTertiary) : .vtsTxtTertiary)
+                        VStack(spacing: 8) {
+                            ZStack {
+                                Circle()
+                                    .fill(enabled ? Color.vtsPrimary.opacity(0.12) : Color.gray.opacity(0.12))
+                                    .frame(width: 60, height: 60)
+                                Image(systemName: iconName)
+                                    .font(.system(size: 28, weight: .bold))
+                                    .foregroundColor(enabled ? .vtsPrimary : .gray)
+                            }
+                            
+                            Text(enabled ? "Thêm ảnh" : "Thêm ảnh 1 trước")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(enabled ? .vtsTxtSecondary : .vtsTxtTertiary)
+                        }
                     }
-                }
-                .opacity(enabled || !isEditMode ? 1.0 : 0.5)
-                .frame(height: 130)
-                .frame(maxWidth: .infinity)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    if isEditMode {
+                    .opacity(enabled ? 1.0 : 0.5)
+                    .frame(height: 130)
+                    .frame(maxWidth: .infinity)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
                         if enabled {
                             showingActionSheetForSlot = slotIndex
                         } else {
                             ErrorManager.shared.showError("Vui lòng thêm ảnh 1 trước.")
                         }
                     }
+                } else {
+                    Color.clear
+                        .frame(height: 130)
+                        .frame(maxWidth: .infinity)
                 }
             }
         }
+        .frame(maxWidth: .infinity)
     }
     
     private func isSlotEnabled(_ slotIndex: Int) -> Bool {

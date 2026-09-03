@@ -32,6 +32,7 @@ struct TruyVanChuyenXeView: View {
                         .padding(.top, VTSSpacing.md)
                         .padding(.bottom, VTSSpacing.md)
                 }
+                
                 SystemDateFilterHeader(
                     fromDate: $viewModel.fromDate,
                     toDate: $viewModel.toDate,
@@ -43,6 +44,7 @@ struct TruyVanChuyenXeView: View {
                 )
                 .padding(.horizontal, VTSSpacing.xl)
                 .background(Color.vtsPrimary)
+                
                 VTSAsyncContent(
                     state: viewModel.state,
                     emptyTitle: "Không tìm thấy chuyến xe",
@@ -92,6 +94,7 @@ struct TruyVanChuyenXeView: View {
                                         render: { item, _ in
                                             AnyView(Text(item.colName ?? ""))
                                         },
+                                        sorter: { ($0.colName ?? "") < ($1.colName ?? "") },
                                         footer: AnyView(Text("Cộng").font(.system(size: 13, weight: .bold)))
                                     ),
                                     ERPColumn(
@@ -102,6 +105,7 @@ struct TruyVanChuyenXeView: View {
                                         render: { item, _ in
                                             AnyView(Text("\(item.colValue1)"))
                                         },
+                                        sorter: { $0.colValue1 < $1.colValue1 },
                                         footer: AnyView(Text("\(totalValue1)").font(.system(size: 13, weight: .bold)))
                                     ),
                                     ERPColumn(
@@ -112,6 +116,7 @@ struct TruyVanChuyenXeView: View {
                                         render: { item, _ in
                                             AnyView(Text(item.colValue2.toFormattedString(maxDecimals: 2)))
                                         },
+                                        sorter: { $0.colValue2 < $1.colValue2 },
                                         footer: AnyView(Text(totalValue2.toFormattedString(maxDecimals: 2)).font(.system(size: 13, weight: .bold)))
                                     ),
                                     ERPColumn(
@@ -122,6 +127,7 @@ struct TruyVanChuyenXeView: View {
                                         render: { item, _ in
                                             AnyView(Text("\(item.colValue3)"))
                                         },
+                                        sorter: { $0.colValue3 < $1.colValue3 },
                                         footer: AnyView(Text("\(totalValue3)").font(.system(size: 13, weight: .bold)))
                                     ),
                                     ERPColumn(
@@ -132,6 +138,7 @@ struct TruyVanChuyenXeView: View {
                                         render: { item, _ in
                                             AnyView(Text(item.colValue4.toFormattedString(maxDecimals: 2)))
                                         },
+                                        sorter: { $0.colValue4 < $1.colValue4 },
                                         footer: AnyView(Text(totalValue4.toFormattedString(maxDecimals: 2)).font(.system(size: 13, weight: .bold)))
                                     )
                                 ],

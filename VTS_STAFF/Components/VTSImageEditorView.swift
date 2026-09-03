@@ -58,6 +58,8 @@ struct VTSImageEditorView: View {
         case topLeft, topRight, bottomLeft, bottomRight
     }
     
+    @State private var showPreviewOnly: Bool = false
+    
     var body: some View {
         VStack(spacing: 0) {
             // Header Bar
@@ -110,7 +112,9 @@ struct VTSImageEditorView: View {
                             )
                         
                         // Interactive Crop Frame & Corner Handles
-                        cropOverlayView(containerSize: containerSize)
+                        if !showPreviewOnly {
+                            cropOverlayView(containerSize: containerSize)
+                        }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .onAppear {
@@ -142,9 +146,26 @@ struct VTSImageEditorView: View {
             
             Spacer()
             
-            Text("Chỉnh sửa ảnh")
-                .font(.system(size: 17, weight: .bold))
-                .foregroundColor(.white)
+            HStack(spacing: 8) {
+                Text("Chỉnh sửa ảnh")
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundColor(.white)
+                
+                Button {
+                    withAnimation(.spring()) {
+                        showPreviewOnly.toggle()
+                    }
+                } label: {
+                    ZStack {
+                        Circle()
+                            .fill(showPreviewOnly ? Color.vtsPrimary : Color.white.opacity(0.2))
+                            .frame(width: 34, height: 34)
+                        Image(systemName: "eye.fill")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                }
+            }
             
             Spacer()
             

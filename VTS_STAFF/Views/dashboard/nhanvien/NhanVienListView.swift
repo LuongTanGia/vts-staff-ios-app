@@ -13,6 +13,7 @@ struct NhanVienListView: View {
     @StateObject private var viewModel = NhanVienListViewModel()
     @State private var showSearchBar = false
     @State private var hasLoadedData = false
+    @State private var selectedModalItem: TNhanVien_DanhSach? = nil
     var body: some View {
         VTSPageContainer {
             VStack(spacing: 0) {
@@ -102,9 +103,7 @@ struct NhanVienListView: View {
                                  ],
                                  defaultSortKey: "emTen",
                                  onRowLongPress: { row in
-                                     router.showScreen(.push) { _ in
-                                         NhanVienDetailView(maNV: row.emid, isEditMode: false)
-                                     }
+                                     selectedModalItem = row
                                  },
 
                                 loadDataIfNeeded: {
@@ -137,6 +136,29 @@ struct NhanVienListView: View {
             .ignoresSafeArea(edges: .bottom)
         }
         
+        .sheet(item: $selectedModalItem) { item in
+            VTSActionModalSheet(
+                title: item.emHo + " " + item.emTen,
+                subtitle: "Mã: \(item.emid)" + (!item.emDienThoai.isEmpty ? " • SĐT: \(item.emDienThoai)" : ""),
+                actions: {
+                    var acts: [VTSModalAction] = []
+                    let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_NHANVIEN")
+                    if perm?.view == true || perm == nil {
+                        acts.append(VTSModalAction(title: "Xem chi tiết", icon: "eye.fill") {
+                            router.showScreen(.push) { _ in
+                                NhanVienDetailView(maNV: item.emid, isEditMode: false)
+                            }
+                        })
+                    }
+                    return acts
+                }(),
+                onClose: {
+                    selectedModalItem = nil
+                }
+            )
+            .presentationDetents([.fraction(0.3), .medium])
+            .presentationDragIndicator(.visible)
+        }
         .task {
             if !hasLoadedData {
                 await viewModel.loadData()

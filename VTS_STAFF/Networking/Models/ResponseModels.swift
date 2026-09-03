@@ -88,7 +88,7 @@ struct TSoLeHeThong: Decodable {
 struct TNhanVienInOutDataResult: Decodable, Sendable, Identifiable {
     let colOrder: Int
     let colCode, colName: String
-    let colValue: Int
+    let colValue: Double
     
     var id: String { "inout-\(colCode)-\(colOrder)" }
     
@@ -104,7 +104,7 @@ struct TNhanVienInOutDataResult: Decodable, Sendable, Identifiable {
 struct TNhanVienPhongBanDataResult: Decodable, Sendable, Identifiable {
     let colOrder: Int
     let colCode, colName: String?
-    let colValue, colValue0, colValue1: Int
+    let colValue, colValue0, colValue1: Double
     
     var id: String { "phongban-\(colCode ?? "")-\(colOrder)" }
     
@@ -123,7 +123,7 @@ struct THangHoa_ChuyenXeDataResult: Decodable, Sendable, Identifiable {
     let colType: String
     let colOrder: Int
     let colCode, colName: String?
-    let colValue1, colValue2, colValue3, colValue4: Int
+    let colValue1, colValue2, colValue3, colValue4: Double
     
     var id: String { "chuyenxe-\(colType)-\(colCode ?? "")-\(colOrder)-\(colName ?? "")" }
     
@@ -147,7 +147,8 @@ struct THangNhapDataResult: Decodable, Sendable, Identifiable {
     let colGroup: String
     let colOrder: Int
     let colCode, colName: String?
-    let colValue, colDataType: Int
+    let colValue: Double
+    let colDataType: Int
     
     var id: String { "nhap-\(colType)-\(colGroup)-\(colCode ?? "")-\(colOrder)-\(colDataType)-\(colName ?? "")" }
     
@@ -170,7 +171,8 @@ struct THangXuatDataResult: Decodable, Sendable, Identifiable {
     let colGroup: String
     let colOrder: Int
     let colCode, colName: String?
-    let colValue, colDataType: Int
+    let colValue: Double
+    let colDataType: Int
     
     var id: String { "xuat-\(colType)-\(colGroup)-\(colCode ?? "")-\(colOrder)-\(colDataType)-\(colName ?? "")" }
     
@@ -781,6 +783,39 @@ extension UIImage {
 
 typealias TPhieuvc_Nhap_DanhSach = TPhieuvc_Giacong_DanhSach
 typealias TPhieuvc_Xuat_DanhSach = TPhieuvc_Giacong_DanhSach
+
+// MARK: - TThongBao_DanhSach
+struct TThongBao_DanhSach: Decodable, Sendable, Identifiable {
+    let notificationID: String
+    let actionDate: String?
+    let actionType: String?
+    let msgTitle: String?
+    let msgContent: String?
+    let msgDataType: String?
+    let msgDataJSON: String?
+    let isRead: Bool?
+    
+    var id: String { notificationID }
+    
+    // Aliases for UI & Logic compatibility
+    var ma: String { notificationID }
+    var ngay: String? { actionDate }
+    var tieuDe: String? { msgTitle }
+    var noiDung: String? { msgContent }
+    var daDoc: Bool? { isRead }
+    var loai: String? { msgDataType }
+    
+    enum CodingKeys: String, CodingKey {
+        case notificationID = "NotificationID"
+        case actionDate = "ActionDate"
+        case actionType = "ActionType"
+        case msgTitle = "MsgTitle"
+        case msgContent = "MsgContent"
+        case msgDataType = "MsgDataType"
+        case msgDataJSON = "MsgDataJSON"
+        case isRead = "IsRead"
+    }
+}
 
 
 

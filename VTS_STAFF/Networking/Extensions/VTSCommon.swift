@@ -403,3 +403,118 @@ public extension Dictionary where Key == String, Value == Any {
         return Array(self.keys)
     }
 }
+
+// MARK: - Force Status Bar Light Content (White text for Time, Wifi, Battery on Dark Blue Headers)
+import SwiftUI
+import UIKit
+
+struct StatusBarStyle: UIViewControllerRepresentable {
+    let style: UIStatusBarStyle
+
+    func makeUIViewController(context: Context) -> ViewController {
+        ViewController(style: style)
+    }
+
+    func updateUIViewController(
+        _ uiViewController: ViewController,
+        context: Context
+    ) {
+        uiViewController.style = style
+        uiViewController.setNeedsStatusBarAppearanceUpdate()
+    }
+
+    final class ViewController: UIViewController {
+        var style: UIStatusBarStyle
+
+        init(style: UIStatusBarStyle) {
+            self.style = style
+            super.init(nibName: nil, bundle: nil)
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        override var preferredStatusBarStyle: UIStatusBarStyle {
+            style
+        }
+
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            view.backgroundColor = .clear
+            view.isUserInteractionEnabled = false
+        }
+    }
+}
+
+extension View {
+    func statusBarStyle(_ style: UIStatusBarStyle = .lightContent) -> some View {
+        self.overlay(
+            StatusBarStyle(style: style)
+                .frame(width: 0, height: 0)
+        )
+    }
+
+}
+
+// MARK: - ============================================================
+//            KEYBOARD ACCESSORY DONE/CHECK BUTTON MANAGER
+// MARK: - ============================================================
+
+public final class KeyboardDoneButtonManager {
+    public static let shared = KeyboardDoneButtonManager()
+    
+    private init() {}
+    
+    public func setup() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(textFieldDidBeginEditing(_:)),
+            name: UITextField.textDidBeginEditingNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(textViewDidBeginEditing(_:)),
+            name: UITextView.textDidBeginEditingNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func textFieldDidBeginEditing(_ notification: Notification) {
+        guard let textField = notification.object as? UITextField else { return }
+        if textField.inputAccessoryView == nil {
+            textField.inputAccessoryView = createDoneToolbar(for: textField)
+        }
+    }
+    
+    @objc private func textViewDidBeginEditing(_ notification: Notification) {
+        guard let textView = notification.object as? UITextView else { return }
+        if textView.inputAccessoryView == nil {
+            textView.inputAccessoryView = createDoneToolbar(for: textView)
+        }
+    }
+    
+    private func createDoneToolbar(for responder: UIResponder) -> UIToolbar {
+        let toolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 44))
+        toolbar.barStyle = .default
+        toolbar.isTranslucent = true
+        
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        
+        let checkImage = UIImage(systemName: "checkmark.circle.fill")?.withRenderingMode(.alwaysTemplate)
+            ?? UIImage(systemName: "checkmark")?.withRenderingMode(.alwaysTemplate)
+            
+        let doneButton = UIBarButtonItem(
+            image: checkImage,
+            style: .done,
+            target: responder,
+            action: #selector(UIResponder.resignFirstResponder)
+        )
+        doneButton.tintColor = UIColor(red: 0.0, green: 0.294, blue: 0.529, alpha: 1.0)
+        
+        toolbar.setItems([flexibleSpace, doneButton], animated: false)
+        toolbar.sizeToFit()
+        return toolbar
+    }
+}

@@ -12,6 +12,7 @@ struct XeListView: View {
     @Environment(\.router) private var router
     @StateObject private var viewModel = XeListViewModel()
     @State private var showSearchBar = false
+    @State private var selectedModalItem: TXe_DanhSach? = nil
     
     var body: some View {
         VTSPageContainer {
@@ -101,6 +102,9 @@ struct XeListView: View {
                                     
                                 ],
                                 defaultSortKey: "ma",
+                                onRowLongPress: { row in
+                                    selectedModalItem = row
+                                },
                                 onRowAction: { action, row in
                                     handleRowAction(action, row: row)
                                 },
@@ -139,6 +143,34 @@ struct XeListView: View {
                 }
             }
             .ignoresSafeArea(edges: .bottom)
+        }
+        .sheet(item: $selectedModalItem) { item in
+            VTSActionModalSheet(
+                title: item.ten,
+                subtitle: "Mã: \(item.ma) • Loại: \(item.loai)",
+                actions: {
+                    var acts: [VTSModalAction] = []
+                    let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_XE")
+                    if perm?.view == true || perm == nil {
+                        acts.append(VTSModalAction(title: "Xem chi tiết", icon: "eye.fill") {
+                            router.showScreen(.push) { _ in
+                                XeDetailView(maXe: item.ma, isEditMode: false)
+                            }
+                        })
+                    }
+                    if perm?.del == true {
+                        acts.append(VTSModalAction(title: "Xoá phương tiện", icon: "trash.fill", isDestructive: true) {
+                            handleRowAction(.xoa, row: item)
+                        })
+                    }
+                    return acts
+                }(),
+                onClose: {
+                    selectedModalItem = nil
+                }
+            )
+            .presentationDetents([.fraction(AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_XE")?.del == true ? 0.38 : 0.3), .medium])
+            .presentationDragIndicator(.visible)
         }
         .task {
             await viewModel.loadData()

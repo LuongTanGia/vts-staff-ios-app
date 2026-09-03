@@ -17,6 +17,18 @@ final class PhieuXuatListViewModel: ObservableObject {
     
     private var allPhieu: [TPhieuvc_Giacong_DanhSach] = []
     
+    init(fromDate: Date? = nil, toDate: Date? = nil, searchText: String? = nil) {
+        if let fromDate = fromDate {
+            self.fromDate = fromDate
+        }
+        if let toDate = toDate {
+            self.toDate = toDate
+        }
+        if let searchText = searchText {
+            self.searchText = searchText
+        }
+    }
+    
     var filteredPhieu: [TPhieuvc_Giacong_DanhSach] {
         if searchText.isEmpty {
             return allPhieu

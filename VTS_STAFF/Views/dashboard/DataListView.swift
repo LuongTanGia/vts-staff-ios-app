@@ -43,7 +43,7 @@ struct DataListView: View {
     }
     
     var body: some View {
-        VTSPageContainer {
+        VTSPageContainer(hasGradient: true) {
             VStack(spacing: 0) {
                 if groupedGroups.isEmpty {
                     VTSEmptyState(
@@ -55,16 +55,17 @@ struct DataListView: View {
                     // Content List
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: VTSSpacing.lg) {
+                            
                             ForEach(groupedGroups, id: \.name) { group in
                                 VStack(alignment: .leading, spacing: VTSSpacing.md) {
-                                    VTSSectionHeader(group.name)
-                                        .padding(.horizontal, VTSSpacing.xs)
+//                                    VTSSectionHeader(group.name)
+//                                        .padding(.horizontal, VTSSpacing.xs)
                                     
                                     VStack(spacing: VTSSpacing.md) {
                                         ForEach(group.items) { item in
                                             VTSListItemRow(
                                                 title: item.tenChucNang,
-                                                subtitle: item.ghiChu ?? "Mã: \(item.maChucNang)",
+                                                subtitle: subtitleForFunction(item),
                                                 leadingIcon: iconForFunction(item.maChucNang),
                                                 accentColor: accentColorForFunction(item.maChucNang),
                                                 onTap: {
@@ -86,7 +87,8 @@ struct DataListView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Dữ liệu"
+            subtitle: "Dữ liệu",
+            isWhiteText: true
         ){
             
         } trailing: {
@@ -135,37 +137,72 @@ struct DataListView: View {
         }
     }
     
+    private func subtitleForFunction(_ item: TChucNangPhanQuyen) -> String {
+        if let ghiChu = item.ghiChu, !ghiChu.isEmpty, !ghiChu.contains("Mã:") {
+            return ghiChu
+        }
+        switch item.maChucNang {
+        case "VTSSTAFF_DANHMUC_HANGHOA":
+            return "Danh sách hàng hóa giao, nhận"
+        case "VTSSTAFF_DANHMUC_KHACHHANG":
+            return "Danh sách khách hàng, nhà cung cấp, đối tác giao, nhận"
+        case "VTSSTAFF_DANHMUC_NHANVIEN":
+            return "Danh sách nhân viên hiện hữu của doanh nghiệp"
+        case "VTSSTAFF_DANHMUC_XE":
+            return "Danh sách phương tiện vận tải thuộc sở hữu của doanh nghiệp"
+        case "VTSSTAFF_DULIEU_PHIEUGIACONG":
+            return "Hàng hóa xuất gia công và nhận về"
+        case "VTSSTAFF_DULIEU_PHIEUNHAP":
+            return "Hàng hóa nhận về từ các nhà cung cấp"
+        case "VTSSTAFF_DULIEU_PHIEUXUAT":
+            return "Hàng hóa giao cho khách hàng"
+        default:
+            return "Mã: \(item.maChucNang)"
+        }
+    }
+    
     private func iconForFunction(_ code: String) -> String {
-        let codeLower = code.lowercased()
-        if codeLower.contains("profile") || codeLower.contains("user") || codeLower.contains("nhanvien") || codeLower.contains("hrm") {
-            return "person.fill"
-        } else if codeLower.contains("setting") || codeLower.contains("config") || codeLower.contains("sys") {
-            return "gearshape.fill"
-        } else if codeLower.contains("weigh") || codeLower.contains("ticket") || codeLower.contains("phieu") {
-            return "scalemass.fill"
-        } else if codeLower.contains("trip") || codeLower.contains("schedule") || codeLower.contains("chuyenxe") {
+        switch code {
+        case "VTSSTAFF_DANHMUC_HANGHOA":
+            return "doc.text.fill"
+        case "VTSSTAFF_DANHMUC_KHACHHANG":
+            return "person.2.fill"
+        case "VTSSTAFF_DANHMUC_NHANVIEN":
+            return "person.3.fill"
+        case "VTSSTAFF_DANHMUC_XE":
             return "truck.box.fill"
-        } else if codeLower.contains("report") || codeLower.contains("excel") || codeLower.contains("chart") {
-            return "chart.bar.fill"
-        } else {
-            return "square.grid.2x2.fill"
+        case "VTSSTAFF_DULIEU_PHIEUGIACONG":
+            return "gearshape.fill"
+        case "VTSSTAFF_DULIEU_PHIEUNHAP":
+            return "building.2.fill"
+        case "VTSSTAFF_DULIEU_PHIEUXUAT":
+            return "shippingbox.fill"
+        default:
+            let codeLower = code.lowercased()
+            if codeLower.contains("profile") || codeLower.contains("user") || codeLower.contains("nhanvien") || codeLower.contains("hrm") {
+                return "person.fill"
+            } else if codeLower.contains("setting") || codeLower.contains("config") || codeLower.contains("sys") {
+                return "gearshape.fill"
+            } else if codeLower.contains("weigh") || codeLower.contains("ticket") || codeLower.contains("phieu") {
+                return "scalemass.fill"
+            } else if codeLower.contains("trip") || codeLower.contains("schedule") || codeLower.contains("chuyenxe") {
+                return "truck.box.fill"
+            } else if codeLower.contains("report") || codeLower.contains("excel") || codeLower.contains("chart") {
+                return "chart.bar.fill"
+            } else {
+                return "square.grid.2x2.fill"
+            }
         }
     }
     
     private func accentColorForFunction(_ code: String) -> Color {
-        let codeLower = code.lowercased()
-        if codeLower.contains("profile") || codeLower.contains("user") || codeLower.contains("nhanvien") || codeLower.contains("hrm") {
-            return .vtsPrimary
-        } else if codeLower.contains("setting") || codeLower.contains("config") || codeLower.contains("sys") {
-            return .vtsSecondary
-        } else if codeLower.contains("weigh") || codeLower.contains("ticket") || codeLower.contains("phieu") {
-            return .vtsInfo
-        } else if codeLower.contains("trip") || codeLower.contains("schedule") || codeLower.contains("chuyenxe") {
-            return .vtsWarning
-        } else if codeLower.contains("report") || codeLower.contains("excel") || codeLower.contains("chart") {
-            return .vtsSuccess
-        } else {
-            return .vtsPrimary
+        switch code {
+        case "VTSSTAFF_DULIEU_PHIEUGIACONG":
+            return Color(hex: "9E6700") // Golden Brown for Gia công
+        case "VTSSTAFF_DULIEU_PHIEUXUAT":
+            return Color(hex: "046823") // Forest Green for Chuyến hàng giao
+        default:
+            return Color(hex: "004C80") // Navy Blue for Hàng hóa, Khách hàng, Nhân viên, Xe nhà, Chuyến hàng nhận
         }
     }
 }
