@@ -471,18 +471,43 @@ struct VTSLiquidDateTimeField: View {
     let label: String
     @Binding var date: Date
     let displayStyle: DisplayStyle
+    let isReadOnly: Bool
     @State private var showPicker = false
+    @Environment(\.isEnabled) private var isEnabled: Bool
     
     enum DisplayStyle {
         case dateOnly       // "16/06/2026"
         case dateTime       // "16/06/2026 08:22:01"
     }
     
+    init(
+        label: String = "",
+        date: Binding<Date>,
+        displayStyle: DisplayStyle = .dateOnly,
+        isReadOnly: Bool = false
+    ) {
+        self.label = label
+        self._date = date
+        self.displayStyle = displayStyle
+        self.isReadOnly = isReadOnly
+    }
+    
+    private var isEffectivelyReadOnly: Bool {
+        isReadOnly || !isEnabled
+    }
+    
     var body: some View {
-        Button { showPicker = true } label: {
+        Button {
+            guard !isEffectivelyReadOnly else { return }
+            showPicker = true
+        } label: {
             ZStack(alignment: .topLeading) {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color.white)
+                    .fill(
+                        isEffectivelyReadOnly
+                        ? Color(hex: "F1F5F9")
+                        : Color.white
+                    )
                     .overlay(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .stroke(Color(hex: "C5D2E0"), lineWidth: 1)
@@ -499,11 +524,10 @@ struct VTSLiquidDateTimeField: View {
                 HStack {
                     Text(formattedDate)
                         .font(.system(size: 15))
-                        .foregroundStyle(Color(hex: "0F2D59"))
+                        .foregroundStyle(isEffectivelyReadOnly ? Color(hex: "64748B") : Color(hex: "0F2D59"))
                     Spacer()
-                    LucideIcon(.calendar, size: 16, color: .vtsPrimary)
+                    LucideIcon(.calendar, size: 16, color: isEffectivelyReadOnly ? Color(hex: "94A3B8") : .vtsPrimary)
                         .font(.system(size: 14))
-                        .foregroundStyle(Color.vtsPrimary)
                 }
                 .padding(.horizontal, 14)
                 .padding(.top, label.isEmpty ? 14 : 24)
@@ -512,6 +536,7 @@ struct VTSLiquidDateTimeField: View {
             .frame(minHeight: label.isEmpty ? 48 : 58)
         }
         .buttonStyle(VTSPressButtonStyle())
+        .disabled(isEffectivelyReadOnly)
         .sheet(isPresented: $showPicker) {
             NavigationStack {
                 DatePicker(

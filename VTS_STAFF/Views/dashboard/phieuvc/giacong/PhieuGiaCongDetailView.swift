@@ -154,8 +154,11 @@ struct PhieuGiaCongDetailView: View {
         }
     }
     
-    init(soPhieu: String?, existing: TPhieuvc_Giacong_DanhSach? = nil, isEditMode: Bool = false) {
+    var onSaveSuccess: (() -> Void)? = nil
+    
+    init(soPhieu: String?, existing: TPhieuvc_Giacong_DanhSach? = nil, isEditMode: Bool = false, onSaveSuccess: (() -> Void)? = nil) {
         self.initialEditMode = isEditMode
+        self.onSaveSuccess = onSaveSuccess
         self._isEditMode = State(initialValue: isEditMode || soPhieu == nil || soPhieu?.isEmpty == true)
         _viewModel = StateObject(wrappedValue: PhieuGiaCongDetailViewModel(soPhieu: soPhieu))
     }
@@ -456,9 +459,9 @@ struct PhieuGiaCongDetailView: View {
                     VTSLiquidDateTimeField(
                         label: "Ngày",
                         date: $ngay,
-                        displayStyle: .dateOnly
+                        displayStyle: .dateOnly,
+                        isReadOnly: !isEditMode
                     )
-                    .disabled(!isEditMode)
                     .frame(maxWidth: .infinity)
                 }
                 
@@ -584,9 +587,9 @@ struct PhieuGiaCongDetailView: View {
                         get: { thoiGian01 ?? Date() },
                         set: { thoiGian01 = $0; thoiGian02 = $0 }
                     ),
-                    displayStyle: .dateTime
+                    displayStyle: .dateTime,
+                    isReadOnly: !isEditMode
                 )
-                .disabled(!isEditMode)
                 
                 // Row 8: Photo 1 & 2 for Hàng giao
                 if isEditMode || hinh01 != nil || hinh02 != nil {
@@ -622,9 +625,9 @@ struct PhieuGiaCongDetailView: View {
                         get: { thoiGian03 ?? Date() },
                         set: { thoiGian03 = $0; thoiGian04 = $0 }
                     ),
-                    displayStyle: .dateTime
+                    displayStyle: .dateTime,
+                    isReadOnly: !isEditMode
                 )
-                .disabled(!isEditMode)
                 
                 // Row 12: Photo 3 & 4 for Hàng bán
                 if isEditMode || hinh03 != nil || hinh04 != nil {
@@ -660,9 +663,9 @@ struct PhieuGiaCongDetailView: View {
                         get: { thoiGian05 ?? Date() },
                         set: { thoiGian05 = $0; thoiGian06 = $0 }
                     ),
-                    displayStyle: .dateTime
+                    displayStyle: .dateTime,
+                    isReadOnly: !isEditMode
                 )
-                .disabled(!isEditMode)
                 
                 // Row 16: Photo 5 & 6 for Hàng thu về
                 if isEditMode || hinh05 != nil || hinh06 != nil {
@@ -867,14 +870,14 @@ struct PhieuGiaCongDetailView: View {
         }
         
         hangHoa = details.hangHoa
-        trongLuongXe = details.trongLuongXe == 0 ? "" : String(details.trongLuongXe)
-        trongLuongHang = details.trongLuongHang == 0 ? "" : String(details.trongLuongHang)
+        trongLuongXe = details.trongLuongXe == 0 ? "" : ((details.trongLuongXe.truncatingRemainder(dividingBy: 1) == 0) ? String(Int(details.trongLuongXe)) : String(details.trongLuongXe))
+        trongLuongHang = details.trongLuongHang == 0 ? "" : ((details.trongLuongHang.truncatingRemainder(dividingBy: 1) == 0) ? String(Int(details.trongLuongHang)) : String(details.trongLuongHang))
         
         hangHoaGC = details.hangHoaGC ?? ""
-        trongLuongHangGC = details.trongLuongHangGC == 0 ? "" : String(details.trongLuongHangGC)
+        trongLuongHangGC = details.trongLuongHangGC == 0 ? "" : ((details.trongLuongHangGC.truncatingRemainder(dividingBy: 1) == 0) ? String(Int(details.trongLuongHangGC)) : String(details.trongLuongHangGC))
         
         hangHoaTV = details.hangHoaTV ?? ""
-        trongLuongHangTV = details.trongLuongHangTV == 0 ? "" : String(details.trongLuongHangTV)
+        trongLuongHangTV = details.trongLuongHangTV == 0 ? "" : ((details.trongLuongHangTV.truncatingRemainder(dividingBy: 1) == 0) ? String(Int(details.trongLuongHangTV)) : String(details.trongLuongHangTV))
         
         trangThai = details.trangThai ?? "Moi"
         ghiChu = details.ghiChu ?? ""
@@ -933,7 +936,7 @@ struct PhieuGiaCongDetailView: View {
         if trongLuongHang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             trongLuongHangError = "Không được để trống."
             isValid = false
-        } else if Double(trongLuongHang) == nil {
+        } else if trongLuongHang.toDouble() == nil {
             trongLuongHangError = "Số không hợp lệ"
             isValid = false
         } else {
@@ -984,22 +987,24 @@ struct PhieuGiaCongDetailView: View {
                     taiXe: finalTaiXe,
                     khachHang: khachHang,
                     hangHoa: hangHoa,
-                    trongLuongXe: Double(trongLuongXe) ?? 0,
-                    trongLuongHang: Double(trongLuongHang) ?? 0,
+                    trongLuongXe: trongLuongXe.toDouble() ?? 0,
+                    trongLuongHang: trongLuongHang.toDouble() ?? 0,
                     thoiGian01: tg1, hinh01NoiDungText: hinh01Text, hinh01NoiDung: hinh01Base64,
                     thoiGian02: tg2, hinh02NoiDungText: hinh02Text, hinh02NoiDung: hinh02Base64,
                     ghiChu: ghiChu.isEmpty ? nil : ghiChu,
                     trangThai: trangThai,
                     hangHoaGC: hangHoaGC.isEmpty ? nil : hangHoaGC,
-                    trongLuongHangGC: Double(trongLuongHangGC) ?? 0,
+                    trongLuongHangGC: trongLuongHangGC.toDouble() ?? 0,
                     thoiGian03: tg3, hinh03NoiDungText: hinh03Text, hinh03NoiDung: hinh03Base64,
                     thoiGian04: tg4, hinh04NoiDungText: hinh04Text, hinh04NoiDung: hinh04Base64,
                     hangHoaTV: hangHoaTV.isEmpty ? nil : hangHoaTV,
-                    trongLuongHangTV: Double(trongLuongHangTV) ?? 0,
+                    trongLuongHangTV: trongLuongHangTV.toDouble() ?? 0,
                     thoiGian05: tg5, hinh05NoiDungText: hinh05Text, hinh05NoiDung: hinh05Base64,
                     thoiGian06: tg6, hinh06NoiDungText: hinh06Text, hinh06NoiDung: hinh06Base64
                 )
                 let _ = try await PhieuGiaCongService.shared.them(data)
+                onSaveSuccess?()
+                NotificationCenter.default.post(name: .vtsPhieuGiaCongChanged, object: nil)
                 router.showAlert(.alert, title: "Thành công", subtitle: "Tạo phiếu gia công mới thành công.") {
                     Button("Xong") {
                         router.dismissScreen()
@@ -1015,24 +1020,26 @@ struct PhieuGiaCongDetailView: View {
                     taiXe: finalTaiXe,
                     khachHang: khachHang,
                     hangHoa: hangHoa,
-                    trongLuongXe: Double(trongLuongXe) ?? 0,
-                    trongLuongHang: Double(trongLuongHang) ?? 0,
+                    trongLuongXe: trongLuongXe.toDouble() ?? 0,
+                    trongLuongHang: trongLuongHang.toDouble() ?? 0,
                     thoiGian01: tg1, hinh01NoiDungText: hinh01Text, hinh01NoiDung: hinh01Base64,
                     thoiGian02: tg2, hinh02NoiDungText: hinh02Text, hinh02NoiDung: hinh02Base64,
                     ghiChu: ghiChu.isEmpty ? nil : ghiChu,
                     trangThai: trangThai,
                     soPhieu: viewModel.soPhieu,
                     hangHoaGC: hangHoaGC.isEmpty ? nil : hangHoaGC,
-                    trongLuongHangGC: Double(trongLuongHangGC) ?? 0,
+                    trongLuongHangGC: trongLuongHangGC.toDouble() ?? 0,
                     thoiGian03: tg3, hinh03NoiDungText: hinh03Text, hinh03NoiDung: hinh03Base64,
                     thoiGian04: tg4, hinh04NoiDungText: hinh04Text, hinh04NoiDung: hinh04Base64,
                     hangHoaTV: hangHoaTV.isEmpty ? nil : hangHoaTV,
-                    trongLuongHangTV: Double(trongLuongHangTV) ?? 0,
+                    trongLuongHangTV: trongLuongHangTV.toDouble() ?? 0,
                     thoiGian05: tg5, hinh05NoiDungText: hinh05Text, hinh05NoiDung: hinh05Base64,
                     thoiGian06: tg6, hinh06NoiDungText: hinh06Text, hinh06NoiDung: hinh06Base64,
                     xoaHinh01: false, xoaHinh02: false, xoaHinh03: false, xoaHinh04: false, xoaHinh05: false, xoaHinh06: false
                 )
                 let _ = try await PhieuGiaCongService.shared.sua(data)
+                onSaveSuccess?()
+                NotificationCenter.default.post(name: .vtsPhieuGiaCongChanged, object: nil)
                 router.showAlert(.alert, title: "Thành công", subtitle: "Cập nhật phiếu gia công thành công.") {
                     Button("OK") {
                         isEditMode = false
@@ -1053,13 +1060,15 @@ struct PhieuGiaCongDetailView: View {
         guard let soPhieu = viewModel.soPhieu else { return }
         do {
             let _ = try await PhieuGiaCongService.shared.xoa(soPhieu: soPhieu)
+            onSaveSuccess?()
+            NotificationCenter.default.post(name: .vtsPhieuGiaCongChanged, object: nil)
             router.showAlert(.alert, title: "Thành công", subtitle: "Đã xoá phiếu gia công.") {
                 Button("OK") {
                     router.dismissScreen()
                 }
             }
         } catch {
-            router.showAlert(.alert, title: "Lỗi", subtitle: error.localizedDescription) {
+            router.showAlert(.alert, title: "Lỗi xoá phiếu", subtitle: error.localizedDescription) {
                 Button("OK") {}
             }
         }

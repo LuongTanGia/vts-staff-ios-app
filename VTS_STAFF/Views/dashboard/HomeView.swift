@@ -219,6 +219,21 @@ struct HomeView: View {
                 hasLoadedData = true
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .vtsPhieuNhapChanged)) { _ in
+            Task {
+                await viewModel.loadDashboardData()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .vtsPhieuXuatChanged)) { _ in
+            Task {
+                await viewModel.loadDashboardData()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .vtsPhieuGiaCongChanged)) { _ in
+            Task {
+                await viewModel.loadDashboardData()
+            }
+        }
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",

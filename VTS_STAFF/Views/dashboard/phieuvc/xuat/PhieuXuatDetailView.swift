@@ -111,8 +111,11 @@ struct PhieuXuatDetailView: View {
         }
     }
     
-    init(soPhieu: String?, existing: TPhieuvc_Xuat_DanhSach? = nil, isEditMode: Bool = false) {
+    var onSaveSuccess: (() -> Void)? = nil
+    
+    init(soPhieu: String?, existing: TPhieuvc_Xuat_DanhSach? = nil, isEditMode: Bool = false, onSaveSuccess: (() -> Void)? = nil) {
         self.initialEditMode = isEditMode
+        self.onSaveSuccess = onSaveSuccess
         self._isEditMode = State(initialValue: isEditMode || soPhieu == nil || soPhieu?.isEmpty == true)
         _viewModel = StateObject(wrappedValue: PhieuXuatDetailViewModel(soPhieu: soPhieu))
     }
@@ -346,7 +349,7 @@ struct PhieuXuatDetailView: View {
             HStack(spacing: 12) {
                 VTSLiquidReadonlyField(viewModel.soPhieu ?? "", caption: "Số phiếu")
                 
-                VTSLiquidDateTimeField(label: "Ngày", date: $ngay, displayStyle: .dateOnly)
+                VTSLiquidDateTimeField(label: "Ngày", date: $ngay, displayStyle: .dateOnly, isReadOnly: !isEditMode)
             }
             
             // Row 2: Số xe ngoài & Số xe nhà
@@ -468,9 +471,9 @@ struct PhieuXuatDetailView: View {
             VTSLiquidDateTimeField(
                 label: "Thời gian cân hàng",
                 date: $thoiGianCanHang,
-                displayStyle: .dateTime
+                displayStyle: .dateTime,
+                isReadOnly: !isEditMode
             )
-            .disabled(!isEditMode)
             
             // Row 8: 2 ô ảnh
             if isEditMode || hinh01 != nil || hinh02 != nil {
@@ -647,7 +650,7 @@ struct PhieuXuatDetailView: View {
         khachHang = details.khachHang ?? ""
         hangHoa = details.hangHoa
         if details.trongLuongHang > 0 {
-            trongLuongHang = String(Int(details.trongLuongHang))
+            trongLuongHang = (details.trongLuongHang.truncatingRemainder(dividingBy: 1) == 0) ? String(Int(details.trongLuongHang)) : String(details.trongLuongHang)
         } else {
             trongLuongHang = ""
         }
@@ -693,7 +696,7 @@ struct PhieuXuatDetailView: View {
         if trongLuongHang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             trongLuongHangError = "Không được để trống."
             isValid = false
-        } else if Double(trongLuongHang) == nil {
+        } else if trongLuongHang.toDouble() == nil {
             trongLuongHangError = "Số không hợp lệ"
             isValid = false
         } else {
@@ -732,7 +735,7 @@ struct PhieuXuatDetailView: View {
                     khachHang: khachHang,
                     hangHoa: hangHoa,
                     trongLuongXe: 0,
-                    trongLuongHang: Double(trongLuongHang) ?? 0,
+                    trongLuongHang: trongLuongHang.toDouble() ?? 0,
                     thoiGian01: thoiGianCanHang,
                     hinh01NoiDungText: hinh01Text,
                     hinh01NoiDung: hinh01Base64,
@@ -743,6 +746,8 @@ struct PhieuXuatDetailView: View {
                     trangThai: trangThai
                 )
                 let _ = try await PhieuXuatService.shared.them(data)
+                onSaveSuccess?()
+                NotificationCenter.default.post(name: .vtsPhieuXuatChanged, object: nil)
                 router.showAlert(.alert, title: "Thành công", subtitle: "Tạo phiếu xuất mới thành công.") {
                     Button("Xong") {
                         router.dismissScreen()
@@ -759,7 +764,7 @@ struct PhieuXuatDetailView: View {
                     khachHang: khachHang,
                     hangHoa: hangHoa,
                     trongLuongXe: 0,
-                    trongLuongHang: Double(trongLuongHang) ?? 0,
+                    trongLuongHang: trongLuongHang.toDouble() ?? 0,
                     thoiGian01: thoiGianCanHang,
                     hinh01NoiDungText: hinh01Text,
                     hinh01NoiDung: hinh01Base64,
@@ -773,6 +778,8 @@ struct PhieuXuatDetailView: View {
                     xoaHinh02: false
                 )
                 let _ = try await PhieuXuatService.shared.sua(data)
+                onSaveSuccess?()
+                NotificationCenter.default.post(name: .vtsPhieuXuatChanged, object: nil)
                 router.showAlert(.alert, title: "Thành công", subtitle: "Cập nhật phiếu xuất thành công.") {
                     Button("OK") {
                         isEditMode = false
@@ -793,6 +800,8 @@ struct PhieuXuatDetailView: View {
         guard let soPhieu = viewModel.soPhieu else { return }
         do {
             let _ = try await PhieuXuatService.shared.xoa(soPhieu: soPhieu)
+            onSaveSuccess?()
+            NotificationCenter.default.post(name: .vtsPhieuXuatChanged, object: nil)
             router.showAlert(.alert, title: "Thành công", subtitle: "Đã xoá phiếu xuất.") {
                 Button("OK") {
                     router.dismissScreen()

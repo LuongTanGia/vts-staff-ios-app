@@ -457,6 +457,12 @@ extension View {
 
 }
 
+extension Notification.Name {
+    public static let vtsPhieuNhapChanged = Notification.Name("vtsPhieuNhapChanged")
+    public static let vtsPhieuXuatChanged = Notification.Name("vtsPhieuXuatChanged")
+    public static let vtsPhieuGiaCongChanged = Notification.Name("vtsPhieuGiaCongChanged")
+}
+
 // MARK: - ============================================================
 //            KEYBOARD ACCESSORY DONE/CHECK BUTTON MANAGER
 // MARK: - ============================================================

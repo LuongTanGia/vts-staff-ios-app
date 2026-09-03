@@ -153,6 +153,11 @@ struct PhieuXuatListView: View {
                 hasLoadedData = true
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .vtsPhieuXuatChanged)) { _ in
+            Task {
+                await viewModel.loadData()
+            }
+        }
         .sheet(item: $selectedModalItem) { item in
             VTSActionModalSheet(
                 title: "Phiếu xuất: \(item.soPhieu)",
@@ -161,7 +166,11 @@ struct PhieuXuatListView: View {
                     var acts: [VTSModalAction] = []
                     acts.append(VTSModalAction(title: "Xem chi tiết", icon: "eye.fill") {
                         router.showScreen(.push) { _ in
-                            PhieuXuatDetailView(soPhieu: item.soPhieu, existing: item)
+                            PhieuXuatDetailView(soPhieu: item.soPhieu, existing: item, onSaveSuccess: {
+                                Task {
+                                    await viewModel.loadData()
+                                }
+                            })
                         }
                     })
                     if hasDeletePermission {
@@ -197,7 +206,11 @@ struct PhieuXuatListView: View {
                     if AuthManager.shared.getPermission(for: "VTSSTAFF_DULIEU_PHIEUXUAT")?.add == true {
                         Button {
                             router.showScreen(.push) { _ in
-                                PhieuXuatDetailView(soPhieu: nil, isEditMode: true)
+                                PhieuXuatDetailView(soPhieu: nil, isEditMode: true, onSaveSuccess: {
+                                    Task {
+                                        await viewModel.loadData()
+                                    }
+                                })
                             }
                         } label: {
                             LucideIcon(.plus, size: 18)
@@ -227,7 +240,11 @@ struct PhieuXuatListView: View {
             .contextMenu {
                 Button {
                     router.showScreen(.push) { _ in
-                        PhieuXuatDetailView(soPhieu: item.soPhieu, existing: item)
+                        PhieuXuatDetailView(soPhieu: item.soPhieu, existing: item, onSaveSuccess: {
+                            Task {
+                                await viewModel.loadData()
+                            }
+                        })
                     }
                 } label: {
                     Label("Xem chi tiết", systemImage: "eye")

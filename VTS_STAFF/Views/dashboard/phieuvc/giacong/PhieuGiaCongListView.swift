@@ -153,6 +153,11 @@ struct PhieuGiaCongListView: View {
                 hasLoadedData = true
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .vtsPhieuGiaCongChanged)) { _ in
+            Task {
+                await viewModel.loadData()
+            }
+        }
         .sheet(item: $selectedModalItem) { item in
             VTSActionModalSheet(
                 title: "Phiếu gia công: \(item.soPhieu)",
@@ -161,7 +166,11 @@ struct PhieuGiaCongListView: View {
                     var acts: [VTSModalAction] = []
                     acts.append(VTSModalAction(title: "Xem chi tiết", icon: "eye.fill") {
                         router.showScreen(.push) { _ in
-                            PhieuGiaCongDetailView(soPhieu: item.soPhieu, existing: item)
+                            PhieuGiaCongDetailView(soPhieu: item.soPhieu, existing: item, onSaveSuccess: {
+                                Task {
+                                    await viewModel.loadData()
+                                }
+                            })
                         }
                     })
                     if hasDeletePermission {
@@ -197,7 +206,11 @@ struct PhieuGiaCongListView: View {
                     if AuthManager.shared.getPermission(for: "VTSSTAFF_DULIEU_PHIEUGIACONG")?.add == true {
                         Button {
                             router.showScreen(.push) { _ in
-                                PhieuGiaCongDetailView(soPhieu: nil, isEditMode: true)
+                                PhieuGiaCongDetailView(soPhieu: nil, isEditMode: true, onSaveSuccess: {
+                                    Task {
+                                        await viewModel.loadData()
+                                    }
+                                })
                             }
                         } label: {
                             LucideIcon(.plus, size: 18)
@@ -227,7 +240,11 @@ struct PhieuGiaCongListView: View {
             .contextMenu {
                 Button {
                     router.showScreen(.push) { _ in
-                        PhieuGiaCongDetailView(soPhieu: item.soPhieu, existing: item)
+                        PhieuGiaCongDetailView(soPhieu: item.soPhieu, existing: item, onSaveSuccess: {
+                            Task {
+                                await viewModel.loadData()
+                            }
+                        })
                     }
                 } label: {
                     Label("Xem chi tiết", systemImage: "eye")
