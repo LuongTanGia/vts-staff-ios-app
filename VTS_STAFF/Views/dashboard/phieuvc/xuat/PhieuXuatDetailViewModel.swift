@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import UIKit
 
 @MainActor
 final class PhieuXuatDetailViewModel: ObservableObject {
@@ -56,25 +57,8 @@ final class PhieuXuatDetailViewModel: ObservableObject {
             self.hangHoaOptions = combinedHH
             
             if let targetSoPhieu = soPhieu ?? existing?.soPhieu, !targetSoPhieu.isEmpty {
-                async let infoTask = PhieuXuatService.shared.thongTin(soPhieu: targetSoPhieu)
-                async let hinhTask = PhieuXuatService.shared.thongTinHinhAnh(
-                    soPhieu: targetSoPhieu,
-                    danhSachHinh: [
-                        Params_MaHinh(maHinh: "Hinh01"),
-                        Params_MaHinh(maHinh: "Hinh02")
-                    ]
-                )
-                
-                let (infoRes, hinhRes) = await (try? infoTask, try? hinhTask)
-                if var found = infoRes?.DataResult {
-                    if let list = hinhRes?.DataResults, !list.isEmpty {
-                        if let item0 = list.first(where: { $0.maHinh == "Hinh01" }) ?? (list.indices.contains(0) ? list[0] : nil), let str = item0.noiDungHinh, !str.isEmpty {
-                            found.hinh01NoiDung = str
-                        }
-                        if let item1 = list.first(where: { $0.maHinh == "Hinh02" }) ?? (list.indices.contains(1) ? list[1] : nil), let str = item1.noiDungHinh, !str.isEmpty {
-                            found.hinh02NoiDung = str
-                        }
-                    }
+                let infoRes = try? await PhieuXuatService.shared.thongTin(soPhieu: targetSoPhieu)
+                if let found = infoRes?.DataResult {
                     state = .success(found)
                 } else if let existing = existing {
                     state = .success(existing)
@@ -93,5 +77,25 @@ final class PhieuXuatDetailViewModel: ObservableObject {
                 state = .failure(error.localizedDescription)
             }
         }
+    }
+    
+    func fetchOriginalImage(slotIndex: Int) async -> UIImage? {
+        guard let targetSoPhieu = soPhieu, !targetSoPhieu.isEmpty else { return nil }
+        let maHinh = "Hinh0\(slotIndex)"
+        do {
+            let res = try await PhieuXuatService.shared.thongTinHinhAnh(
+                soPhieu: targetSoPhieu,
+                danhSachHinh: [Params_MaHinh(maHinh: maHinh)]
+            )
+            if let list = res.DataResults,
+               let item = list.first(where: { $0.maHinh == maHinh }) ?? list.first,
+               let str = item.noiDungHinh, !str.isEmpty,
+               let img = UIImage.fromBase64(str) {
+                return img
+            }
+        } catch {
+            print("Error fetching original image \(maHinh): \(error)")
+        }
+        return nil
     }
 }

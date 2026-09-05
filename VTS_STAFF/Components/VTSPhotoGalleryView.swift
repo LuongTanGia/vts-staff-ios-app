@@ -17,10 +17,44 @@ struct VTSPhotoGalleryItem: Identifiable {
 struct VTSPhotoGalleryView: View {
     let items: [VTSPhotoGalleryItem]
     @Binding var selectedIndex: Int
+    var isEditable: Bool = false
+    var onUpdateImage: ((Int, UIImage) -> Void)? = nil
+    var onFetchFullImage: ((Int) async -> UIImage?)? = nil
     let onClose: () -> Void
     
     @State private var zoomScale: CGFloat = 1.0
     @State private var showOCRText: Bool = true
+    @State private var editingImage: IdentifiableImage? = nil
+    @State private var localUpdatedImages: [Int: UIImage] = [:]
+    @State private var loadedOriginalImages: [Int: UIImage] = [:]
+    @State private var loadingSlotIds: Set<Int> = []
+    
+    private func getImage(for item: VTSPhotoGalleryItem) -> UIImage? {
+        localUpdatedImages[item.id] ?? loadedOriginalImages[item.id] ?? item.image
+    }
+    
+    private func fetchFullImageIfNeeded(for slotId: Int) {
+        guard let onFetchFullImage = onFetchFullImage else { return }
+        guard loadedOriginalImages[slotId] == nil && localUpdatedImages[slotId] == nil else { return }
+        guard !loadingSlotIds.contains(slotId) else { return }
+        
+        // Chỉ fetch nếu slot này đã có ảnh (thumbnail hoặc initial)
+        guard let item = items.first(where: { $0.id == slotId }), item.image != nil else { return }
+        
+        loadingSlotIds.insert(slotId)
+        Task {
+            if let fullImg = await onFetchFullImage(slotId) {
+                await MainActor.run {
+                    loadedOriginalImages[slotId] = fullImg
+                    loadingSlotIds.remove(slotId)
+                }
+            } else {
+                await MainActor.run {
+                    loadingSlotIds.remove(slotId)
+                }
+            }
+        }
+    }
     
     var currentItem: VTSPhotoGalleryItem? {
         items.first(where: { $0.id == selectedIndex }) ?? items.first
@@ -34,7 +68,7 @@ struct VTSPhotoGalleryView: View {
             TabView(selection: $selectedIndex) {
                 ForEach(items) { item in
                     ZStack {
-                        if let img = item.image {
+                        if let img = getImage(for: item) {
                             Image(uiImage: img)
                                 .resizable()
                                 .scaledToFit()
@@ -56,6 +90,31 @@ struct VTSPhotoGalleryView: View {
                                         zoomScale = zoomScale > 1.0 ? 1.0 : 2.0
                                     }
                                 }
+                            
+                            // Loading indicator for full image
+                            if loadingSlotIds.contains(item.id) {
+                                VStack {
+                                    HStack(spacing: 8) {
+                                        ProgressView()
+                                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                            .scaleEffect(0.8)
+                                        Text("Đang tải ảnh gốc...")
+                                            .font(.system(size: 12, weight: .medium))
+                                            .foregroundColor(.white)
+                                    }
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 7)
+                                    .background(Color.black.opacity(0.65))
+                                    .clipShape(Capsule())
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(Color.white.opacity(0.25), lineWidth: 1)
+                                    )
+                                    .padding(.top, 100)
+                                    
+                                    Spacer()
+                                }
+                            }
                         } else {
                             VStack(spacing: 12) {
                                 Image(systemName: "photo.badge.exclamationmark")
@@ -74,8 +133,12 @@ struct VTSPhotoGalleryView: View {
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .onChange(of: selectedIndex) { _, _ in
+            .onChange(of: selectedIndex) { _, newIndex in
                 zoomScale = 1.0
+                fetchFullImageIfNeeded(for: newIndex)
+            }
+            .onAppear {
+                fetchFullImageIfNeeded(for: selectedIndex)
             }
             
             // Overlay controls (Header & Footer)
@@ -95,11 +158,38 @@ struct VTSPhotoGalleryView: View {
                     
                     Spacer()
                     
-                    Button(action: onClose) {
-                        LucideIcon(.xCircle, size: 18, color: .gray)
-                            .font(.system(size: 28))
-                            .foregroundColor(.white.opacity(0.8))
+                    // Nút Sửa ảnh khi isEditable == true và có ảnh hiện tại
+                    if isEditable, let current = currentItem, let img = getImage(for: current) {
+                        Button {
+                            editingImage = IdentifiableImage(image: img)
+                        } label: {
+                            HStack(spacing: 6) {
+                                LucideIcon(.crop, size: 16, color: .white)
+                                Text("Sửa ảnh")
+                                    .font(.system(size: 13, weight: .bold))
+                                    .foregroundColor(.white)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 7)
+                            .background(Color.white.opacity(0.22))
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.white.opacity(0.35), lineWidth: 1)
+                            )
+                        }
+                        .buttonStyle(VTSPressButtonStyle())
                     }
+                    
+                    Button(action: onClose) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.black.opacity(0.5))
+                                .frame(width: 36, height: 36)
+                            LucideIcon(.x, size: 18, color: .white)
+                        }
+                    }
+                    .buttonStyle(VTSPressButtonStyle())
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 50)
@@ -144,7 +234,7 @@ struct VTSPhotoGalleryView: View {
                         HStack(spacing: 6) {
                             ForEach(items) { item in
                                 Circle()
-                                    .fill(item.id == selectedIndex ? Color.white : (item.image != nil ? Color.blue.opacity(0.6) : Color.white.opacity(0.2)))
+                                    .fill(item.id == selectedIndex ? Color.white : (getImage(for: item) != nil ? Color.blue.opacity(0.6) : Color.white.opacity(0.2)))
                                     .frame(width: item.id == selectedIndex ? 8 : 6, height: item.id == selectedIndex ? 8 : 6)
                                     .onTapGesture {
                                         withAnimation {
@@ -187,6 +277,20 @@ struct VTSPhotoGalleryView: View {
                     )
                 )
             }
+        }
+        .fullScreenCover(item: $editingImage) { item in
+            VTSImageEditorView(
+                inputImage: item.image,
+                onSave: { croppedImg in
+                    localUpdatedImages[selectedIndex] = croppedImg
+                    onUpdateImage?(selectedIndex, croppedImg)
+                    editingImage = nil
+                },
+                onCancel: {
+                    editingImage = nil
+                }
+            )
+            .ignoresSafeArea()
         }
         .ignoresSafeArea()
     }

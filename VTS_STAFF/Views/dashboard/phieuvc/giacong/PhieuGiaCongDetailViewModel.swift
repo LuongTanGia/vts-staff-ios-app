@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import UIKit
 
 @MainActor
 final class PhieuGiaCongDetailViewModel: ObservableObject {
@@ -59,29 +60,8 @@ final class PhieuGiaCongDetailViewModel: ObservableObject {
             self.hangHoaOptions = combinedHH
             
             if let targetSoPhieu = soPhieu ?? existing?.soPhieu, !targetSoPhieu.isEmpty {
-                async let infoTask = PhieuGiaCongService.shared.thongTin(soPhieu: targetSoPhieu)
-                async let hinhTask = PhieuGiaCongService.shared.thongTinHinhAnh(
-                    soPhieu: targetSoPhieu,
-                    danhSachHinh: [
-                        Params_MaHinh(maHinh: "Hinh01"),
-                        Params_MaHinh(maHinh: "Hinh02"),
-                        Params_MaHinh(maHinh: "Hinh03"),
-                        Params_MaHinh(maHinh: "Hinh04"),
-                        Params_MaHinh(maHinh: "Hinh05"),
-                        Params_MaHinh(maHinh: "Hinh06")
-                    ]
-                )
-                
-                let (infoRes, hinhRes) = await (try? infoTask, try? hinhTask)
-                if var found = infoRes?.DataResult {
-                    if let list = hinhRes?.DataResults, !list.isEmpty {
-                        if let item = list.first(where: { $0.maHinh == "Hinh01" }) ?? (list.indices.contains(0) ? list[0] : nil), let str = item.noiDungHinh, !str.isEmpty { found.hinh01NoiDung = str }
-                        if let item = list.first(where: { $0.maHinh == "Hinh02" }) ?? (list.indices.contains(1) ? list[1] : nil), let str = item.noiDungHinh, !str.isEmpty { found.hinh02NoiDung = str }
-                        if let item = list.first(where: { $0.maHinh == "Hinh03" }) ?? (list.indices.contains(2) ? list[2] : nil), let str = item.noiDungHinh, !str.isEmpty { found.hinh03NoiDung = str }
-                        if let item = list.first(where: { $0.maHinh == "Hinh04" }) ?? (list.indices.contains(3) ? list[3] : nil), let str = item.noiDungHinh, !str.isEmpty { found.hinh04NoiDung = str }
-                        if let item = list.first(where: { $0.maHinh == "Hinh05" }) ?? (list.indices.contains(4) ? list[4] : nil), let str = item.noiDungHinh, !str.isEmpty { found.hinh05NoiDung = str }
-                        if let item = list.first(where: { $0.maHinh == "Hinh06" }) ?? (list.indices.contains(5) ? list[5] : nil), let str = item.noiDungHinh, !str.isEmpty { found.hinh06NoiDung = str }
-                    }
+                let infoRes = try? await PhieuGiaCongService.shared.thongTin(soPhieu: targetSoPhieu)
+                if let found = infoRes?.DataResult {
                     state = .success(found)
                 } else if let existing = existing {
                     state = .success(existing)
@@ -100,5 +80,25 @@ final class PhieuGiaCongDetailViewModel: ObservableObject {
                 state = .failure(error.localizedDescription)
             }
         }
+    }
+    
+    func fetchOriginalImage(slotIndex: Int) async -> UIImage? {
+        guard let targetSoPhieu = soPhieu, !targetSoPhieu.isEmpty else { return nil }
+        let maHinh = "Hinh0\(slotIndex)"
+        do {
+            let res = try await PhieuGiaCongService.shared.thongTinHinhAnh(
+                soPhieu: targetSoPhieu,
+                danhSachHinh: [Params_MaHinh(maHinh: maHinh)]
+            )
+            if let list = res.DataResults,
+               let item = list.first(where: { $0.maHinh == maHinh }) ?? list.first,
+               let str = item.noiDungHinh, !str.isEmpty,
+               let img = UIImage.fromBase64(str) {
+                return img
+            }
+        } catch {
+            print("Error fetching original image \(maHinh): \(error)")
+        }
+        return nil
     }
 }

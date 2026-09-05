@@ -395,6 +395,34 @@ struct PhieuGiaCongDetailView: View {
                     get: { showingFullscreenIndex ?? 1 },
                     set: { showingFullscreenIndex = $0 }
                 ),
+                isEditable: isEditMode,
+                onUpdateImage: { slot, updatedImage in
+                    switch slot {
+                    case 1:
+                        hinh01 = updatedImage
+                        Task { hinh01Text = await VTSImageOCRHelper.performOCR(on: updatedImage) }
+                    case 2:
+                        hinh02 = updatedImage
+                        Task { hinh02Text = await VTSImageOCRHelper.performOCR(on: updatedImage) }
+                    case 3:
+                        hinh03 = updatedImage
+                        Task { hinh03Text = await VTSImageOCRHelper.performOCR(on: updatedImage) }
+                    case 4:
+                        hinh04 = updatedImage
+                        Task { hinh04Text = await VTSImageOCRHelper.performOCR(on: updatedImage) }
+                    case 5:
+                        hinh05 = updatedImage
+                        Task { hinh05Text = await VTSImageOCRHelper.performOCR(on: updatedImage) }
+                    case 6:
+                        hinh06 = updatedImage
+                        Task { hinh06Text = await VTSImageOCRHelper.performOCR(on: updatedImage) }
+                    default:
+                        break
+                    }
+                },
+                onFetchFullImage: { slot in
+                    await viewModel.fetchOriginalImage(slotIndex: slot)
+                },
                 onClose: {
                     showingFullscreenIndex = nil
                 }
@@ -722,23 +750,6 @@ struct PhieuGiaCongDetailView: View {
                         
                         if isEditMode {
                             Button {
-                                editingSlot = slotIndex
-                                editingImage = IdentifiableImage(image: img)
-                            } label: {
-                                ZStack {
-                                    Circle()
-                                        .fill(Color.black.opacity(0.65))
-                                        .frame(width: 38, height: 38)
-                                        .overlay(
-                                            Circle()
-                                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                                        )
-                                        .shadow(color: Color.black.opacity(0.35), radius: 4, x: 0, y: 2)
-                                    LucideIcon(.crop, size: 18, color: .white)
-                                }
-                            }
-                            
-                            Button {
                                 image.wrappedValue = nil
                             } label: {
                                 ZStack {
@@ -1011,6 +1022,7 @@ struct PhieuGiaCongDetailView: View {
                     }
                 }
             } else {
+                let existingDetails: TPhieuvc_Giacong_DanhSach? = if case .success(let d) = viewModel.state { d } else { nil }
                 let data = Params_SuaPhieu_GiaCong(
                     ngay: ngay,
                     soThamChieu: soThamChieu.isEmpty ? nil : soThamChieu,
@@ -1035,7 +1047,12 @@ struct PhieuGiaCongDetailView: View {
                     trongLuongHangTV: trongLuongHangTV.toDouble() ?? 0,
                     thoiGian05: tg5, hinh05NoiDungText: hinh05Text, hinh05NoiDung: hinh05Base64,
                     thoiGian06: tg6, hinh06NoiDungText: hinh06Text, hinh06NoiDung: hinh06Base64,
-                    xoaHinh01: false, xoaHinh02: false, xoaHinh03: false, xoaHinh04: false, xoaHinh05: false, xoaHinh06: false
+                    xoaHinh01: existingDetails?.hinh01 != nil && hinh01 == nil,
+                    xoaHinh02: existingDetails?.hinh02 != nil && hinh02 == nil,
+                    xoaHinh03: existingDetails?.hinh03 != nil && hinh03 == nil,
+                    xoaHinh04: existingDetails?.hinh04 != nil && hinh04 == nil,
+                    xoaHinh05: existingDetails?.hinh05 != nil && hinh05 == nil,
+                    xoaHinh06: existingDetails?.hinh06 != nil && hinh06 == nil
                 )
                 let _ = try await PhieuGiaCongService.shared.sua(data)
                 onSaveSuccess?()

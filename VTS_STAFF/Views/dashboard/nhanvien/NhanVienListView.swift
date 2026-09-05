@@ -91,6 +91,7 @@ struct NhanVienListView: View {
                                         alignment: .leading,
                                         render: { item, _ in
                                             AnyView(
+                                                
                                                 Text(item.emTen)
                                             )
                                         },
