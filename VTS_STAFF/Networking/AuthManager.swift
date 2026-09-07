@@ -44,6 +44,7 @@ final class AuthManager: ObservableObject {
     @Published private(set) var maNV: String? = nil
     @Published private(set) var avatar: String? = nil
     @Published private(set) var chucNangPhanQuyens: [TChucNangPhanQuyen] = []
+    @Published private(set) var soLEHeThong: TSoLeHeThong? = nil
     
     var isBypassActive: Bool {
         #if DEBUG
@@ -72,6 +73,10 @@ final class AuthManager: ObservableObject {
            let decoded = try? JSONDecoder().decode([TChucNangPhanQuyen].self, from: data) {
             chucNangPhanQuyens = decoded
         }
+        if let data = UserDefaults.standard.data(forKey: "vts_user_sole"),
+           let decoded = try? JSONDecoder().decode(TSoLeHeThong.self, from: data) {
+            soLEHeThong = decoded
+        }
     }
     
     // MARK: - Save after login (tokens only)
@@ -86,13 +91,14 @@ final class AuthManager: ObservableObject {
     }
     
     // MARK: - Save session with profile (after explicit login)
-    func saveSession(access: String, refresh: String?, hoTen: String?, maNV: String?, avatar: String?, chucNangPhanQuyens: [TChucNangPhanQuyen] = []) {
+    func saveSession(access: String, refresh: String?, hoTen: String?, maNV: String?, avatar: String?, chucNangPhanQuyens: [TChucNangPhanQuyen] = [], soLEHeThong: TSoLeHeThong? = nil) {
         self.accessToken  = access
         self.refreshToken = refresh
         self.hoTen        = hoTen
         self.maNV         = maNV
         self.avatar       = avatar
         self.chucNangPhanQuyens = chucNangPhanQuyens
+        self.soLEHeThong  = soLEHeThong
         self.isLoggedIn   = true
         
         KeychainHelper.shared.save(access, forKey: AppConfig.keychainAccessToken)
@@ -105,6 +111,9 @@ final class AuthManager: ObservableObject {
         UserDefaults.standard.set(avatar, forKey: "vts_user_avatar")
         if let encoded = try? JSONEncoder().encode(chucNangPhanQuyens) {
             UserDefaults.standard.set(encoded, forKey: "vts_user_functions")
+        }
+        if let soLE = soLEHeThong, let encoded = try? JSONEncoder().encode(soLE) {
+            UserDefaults.standard.set(encoded, forKey: "vts_user_sole")
         }
     }
     
@@ -122,6 +131,7 @@ final class AuthManager: ObservableObject {
         maNV         = nil
         avatar       = nil
         chucNangPhanQuyens = []
+        soLEHeThong  = nil
         isLoggedIn   = false
         KeychainHelper.shared.clearAll()
         
@@ -135,6 +145,7 @@ final class AuthManager: ObservableObject {
         UserDefaults.standard.removeObject(forKey: "vts_user_manv")
         UserDefaults.standard.removeObject(forKey: "vts_user_avatar")
         UserDefaults.standard.removeObject(forKey: "vts_user_functions")
+        UserDefaults.standard.removeObject(forKey: "vts_user_sole")
     }
     
     // MARK: - Refresh token (async, concurrent-safe)

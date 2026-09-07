@@ -46,6 +46,25 @@ struct VTSImageOCRHelper {
         }
     }
     
+    /// Trích xuất số lượng / khối lượng từ văn bản OCR
+    static func extractQuantity(from text: String) -> Double? {
+        guard !text.isEmpty else { return nil }
+        let pattern = #"(?:TL|KL|Khối lượng|Trọng lượng|SL|Số lượng|Net|Gross|Tare|Weight)?\s*[:=]?\s*([0-9]{1,3}(?:[.,][0-9]{3})*(?:[.,][0-9]+)?|[0-9]+(?:[.,][0-9]+)?)\s*(?:kg|tấn|tan|g)?\b"#
+        if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+            let matches = regex.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
+            for match in matches {
+                if let range = Range(match.range(at: 1), in: text) {
+                    let raw = String(text[range])
+                    let cleanStr = raw.replacingOccurrences(of: ".", with: "").replacingOccurrences(of: ",", with: ".")
+                    if let val = Double(cleanStr), val > 0 {
+                        return val
+                    }
+                }
+            }
+        }
+        return nil
+    }
+    
     private static func fixOrientation(_ img: UIImage) -> UIImage {
         if img.imageOrientation == .up { return img }
         UIGraphicsBeginImageContextWithOptions(img.size, false, img.scale)

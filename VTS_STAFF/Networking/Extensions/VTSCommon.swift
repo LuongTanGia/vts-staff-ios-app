@@ -56,6 +56,27 @@ public extension VTSNumeric {
         formatter.maximumFractionDigits = maxDecimals
         return formatter.string(from: NSNumber(value: self.doubleValue)) ?? "\(self.doubleValue)"
     }
+    
+    /// Định dạng số lượng hàng hóa theo cấu hình ThongSoHeThong (solesoluong)
+    @MainActor
+    func toQuantityString() -> String {
+        let maxDecimals = AuthManager.shared.soLEHeThong?.solesoluong ?? 2
+        return toFormattedString(maxDecimals: maxDecimals)
+    }
+    
+    /// Định dạng đơn giá theo cấu hình ThongSoHeThong (soledongia)
+    @MainActor
+    func toPriceString() -> String {
+        let maxDecimals = AuthManager.shared.soLEHeThong?.soledongia ?? 0
+        return toFormattedString(maxDecimals: maxDecimals)
+    }
+    
+    /// Định dạng số tiền theo cấu hình ThongSoHeThong (solesotien)
+    @MainActor
+    func toAmountString() -> String {
+        let maxDecimals = AuthManager.shared.soLEHeThong?.solesotien ?? 0
+        return toFormattedString(maxDecimals: maxDecimals)
+    }
 }
 
 // MARK: - ============================================================
@@ -134,8 +155,7 @@ public extension String {
         return (try? JSONSerialization.jsonObject(with: data, options: [])) as? [[String: Any]]
     }
     
-    /// Định dạng chuỗi ngày ISO8601 (ví dụ: "1980-10-30T07:00:00+07:00") sang format hiển thị "30/10/1980"
-    func toDisplayDate() -> String {
+    private func parseDateFromVariousFormats() -> Date? {
         let formatters: [DateFormatter] = {
             let f1 = DateFormatter()
             f1.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
@@ -149,27 +169,42 @@ public extension String {
             f3.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
             f3.locale = Locale(identifier: "en_US_POSIX")
             
-            return [f1, f2, f3]
+            let f4 = DateFormatter()
+            f4.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            f4.locale = Locale(identifier: "en_US_POSIX")
+            
+            let f5 = DateFormatter()
+            f5.dateFormat = "yyyy-MM-dd"
+            f5.locale = Locale(identifier: "en_US_POSIX")
+            
+            return [f1, f2, f3, f4, f5]
         }()
         
-        var date: Date? = nil
         for formatter in formatters {
             if let d = formatter.date(from: self) {
-                date = d
-                break
+                return d
             }
         }
         
-        if date == nil {
-            let isoFormatter = ISO8601DateFormatter()
-            isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            date = isoFormatter.date(from: self)
-        }
-        
-        guard let validDate = date else { return self }
-        
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return isoFormatter.date(from: self)
+    }
+    
+    /// Định dạng chuỗi ngày ISO8601 (ví dụ: "1980-10-30T07:00:00+07:00") sang format hiển thị "30/10/1980"
+    func toDisplayDate() -> String {
+        guard let validDate = parseDateFromVariousFormats() else { return self }
         let outputFormatter = DateFormatter()
         outputFormatter.dateFormat = "dd/MM/yyyy"
+        outputFormatter.locale = Locale(identifier: "vi_VN")
+        return outputFormatter.string(from: validDate)
+    }
+    
+    /// Định dạng chuỗi ngày ISO8601 sang format hiển thị "HH:mm - dd/MM/yyyy"
+    func toDisplayDateTime() -> String {
+        guard let validDate = parseDateFromVariousFormats() else { return self }
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "HH:mm - dd/MM/yyyy"
         outputFormatter.locale = Locale(identifier: "vi_VN")
         return outputFormatter.string(from: validDate)
     }

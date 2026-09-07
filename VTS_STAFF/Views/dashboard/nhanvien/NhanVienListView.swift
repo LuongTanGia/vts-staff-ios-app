@@ -138,7 +138,7 @@ struct NhanVienListView: View {
                                 },
                                 backgroundPreferenceValue: Color.vtsPrimary,
                                 customFooterBuilder: { width in
-                                    AnyView(Text("Tổng cộng: \(viewModel.filteredNhanVien.count) nhân viên")
+                                    AnyView(Text("Tổng cộng: \(viewModel.filteredNhanVien.count)")
                                         .font(.system(size: 12, weight: .bold))
                                         .padding(.vertical, 6)
                                         .foregroundColor(Color.vtsBg)

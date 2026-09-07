@@ -134,6 +134,27 @@ struct PhieuGiaCongDetailView: View {
         return hangHoa.isEmpty ? "---" : hangHoa
     }
     
+    private var currentDVTDisplay: String {
+        if case .success(let details) = viewModel.state, let details = details, let d = details.dvt, !d.isEmpty {
+            return d
+        }
+        return ""
+    }
+    
+    private var currentDVTGCDisplay: String {
+        if case .success(let details) = viewModel.state, let details = details, let d = details.dvtgc, !d.isEmpty {
+            return d
+        }
+        return ""
+    }
+    
+    private var currentDVTTVDisplay: String {
+        if case .success(let details) = viewModel.state, let details = details, let d = details.dvttv, !d.isEmpty {
+            return d
+        }
+        return ""
+    }
+    
     private var currentKhachHangDisplay: String {
         if let found = viewModel.khachHangOptions.first(where: { $0.ma == khachHang }) {
             return found.ten
@@ -350,27 +371,75 @@ struct PhieuGiaCongDetailView: View {
                     case 1:
                         hinh01 = croppedImg
                         thoiGian01 = Date()
-                        Task { hinh01Text = await VTSImageOCRHelper.performOCR(on: croppedImg) }
+                        Task {
+                            let text = await VTSImageOCRHelper.performOCR(on: croppedImg)
+                            await MainActor.run {
+                                hinh01Text = text
+                                if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
+                                    trongLuongHang = qty.toQuantityString()
+                                }
+                            }
+                        }
                     case 2:
                         hinh02 = croppedImg
                         thoiGian02 = Date()
-                        Task { hinh02Text = await VTSImageOCRHelper.performOCR(on: croppedImg) }
+                        Task {
+                            let text = await VTSImageOCRHelper.performOCR(on: croppedImg)
+                            await MainActor.run {
+                                hinh02Text = text
+                                if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
+                                    trongLuongHang = qty.toQuantityString()
+                                }
+                            }
+                        }
                     case 3:
                         hinh03 = croppedImg
                         thoiGian03 = Date()
-                        Task { hinh03Text = await VTSImageOCRHelper.performOCR(on: croppedImg) }
+                        Task {
+                            let text = await VTSImageOCRHelper.performOCR(on: croppedImg)
+                            await MainActor.run {
+                                hinh03Text = text
+                                if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangGC.trimmingCharacters(in: .whitespaces).isEmpty {
+                                    trongLuongHangGC = qty.toQuantityString()
+                                }
+                            }
+                        }
                     case 4:
                         hinh04 = croppedImg
                         thoiGian04 = Date()
-                        Task { hinh04Text = await VTSImageOCRHelper.performOCR(on: croppedImg) }
+                        Task {
+                            let text = await VTSImageOCRHelper.performOCR(on: croppedImg)
+                            await MainActor.run {
+                                hinh04Text = text
+                                if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangGC.trimmingCharacters(in: .whitespaces).isEmpty {
+                                    trongLuongHangGC = qty.toQuantityString()
+                                }
+                            }
+                        }
                     case 5:
                         hinh05 = croppedImg
                         thoiGian05 = Date()
-                        Task { hinh05Text = await VTSImageOCRHelper.performOCR(on: croppedImg) }
+                        Task {
+                            let text = await VTSImageOCRHelper.performOCR(on: croppedImg)
+                            await MainActor.run {
+                                hinh05Text = text
+                                if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangTV.trimmingCharacters(in: .whitespaces).isEmpty {
+                                    trongLuongHangTV = qty.toQuantityString()
+                                }
+                            }
+                        }
                     case 6:
                         hinh06 = croppedImg
                         thoiGian06 = Date()
-                        Task { hinh06Text = await VTSImageOCRHelper.performOCR(on: croppedImg) }
+                        Task {
+                            let text = await VTSImageOCRHelper.performOCR(on: croppedImg)
+                            await MainActor.run {
+                                hinh06Text = text
+                                if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangTV.trimmingCharacters(in: .whitespaces).isEmpty {
+                                    trongLuongHangTV = qty.toQuantityString()
+                                }
+                            }
+                        }
                     default: break
                     }
                     editingImage = nil
@@ -400,22 +469,70 @@ struct PhieuGiaCongDetailView: View {
                     switch slot {
                     case 1:
                         hinh01 = updatedImage
-                        Task { hinh01Text = await VTSImageOCRHelper.performOCR(on: updatedImage) }
+                        Task {
+                            let text = await VTSImageOCRHelper.performOCR(on: updatedImage)
+                            await MainActor.run {
+                                hinh01Text = text
+                                if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
+                                    trongLuongHang = qty.toQuantityString()
+                                }
+                            }
+                        }
                     case 2:
                         hinh02 = updatedImage
-                        Task { hinh02Text = await VTSImageOCRHelper.performOCR(on: updatedImage) }
+                        Task {
+                            let text = await VTSImageOCRHelper.performOCR(on: updatedImage)
+                            await MainActor.run {
+                                hinh02Text = text
+                                if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
+                                    trongLuongHang = qty.toQuantityString()
+                                }
+                            }
+                        }
                     case 3:
                         hinh03 = updatedImage
-                        Task { hinh03Text = await VTSImageOCRHelper.performOCR(on: updatedImage) }
+                        Task {
+                            let text = await VTSImageOCRHelper.performOCR(on: updatedImage)
+                            await MainActor.run {
+                                hinh03Text = text
+                                if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangGC.trimmingCharacters(in: .whitespaces).isEmpty {
+                                    trongLuongHangGC = qty.toQuantityString()
+                                }
+                            }
+                        }
                     case 4:
                         hinh04 = updatedImage
-                        Task { hinh04Text = await VTSImageOCRHelper.performOCR(on: updatedImage) }
+                        Task {
+                            let text = await VTSImageOCRHelper.performOCR(on: updatedImage)
+                            await MainActor.run {
+                                hinh04Text = text
+                                if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangGC.trimmingCharacters(in: .whitespaces).isEmpty {
+                                    trongLuongHangGC = qty.toQuantityString()
+                                }
+                            }
+                        }
                     case 5:
                         hinh05 = updatedImage
-                        Task { hinh05Text = await VTSImageOCRHelper.performOCR(on: updatedImage) }
+                        Task {
+                            let text = await VTSImageOCRHelper.performOCR(on: updatedImage)
+                            await MainActor.run {
+                                hinh05Text = text
+                                if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangTV.trimmingCharacters(in: .whitespaces).isEmpty {
+                                    trongLuongHangTV = qty.toQuantityString()
+                                }
+                            }
+                        }
                     case 6:
                         hinh06 = updatedImage
-                        Task { hinh06Text = await VTSImageOCRHelper.performOCR(on: updatedImage) }
+                        Task {
+                            let text = await VTSImageOCRHelper.performOCR(on: updatedImage)
+                            await MainActor.run {
+                                hinh06Text = text
+                                if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangTV.trimmingCharacters(in: .whitespaces).isEmpty {
+                                    trongLuongHangTV = qty.toQuantityString()
+                                }
+                            }
+                        }
                     default:
                         break
                     }
@@ -493,64 +610,79 @@ struct PhieuGiaCongDetailView: View {
                     .frame(maxWidth: .infinity)
                 }
                 
-                // Row 2: Số xe ngoài (Left) & Số xe nhà (Right)
-                HStack(spacing: 12) {
-                    VTSLiquidTextField(
-                        label: "Số xe ngoài",
-                        text: $soXeNgoai,
-                        placeholder: "",
-                        isReadOnly: !isEditMode
-                    )
-                    .onChange(of: soXeNgoai) { _, newValue in
-                        let upper = newValue.uppercased()
-                        if soXeNgoai != upper {
-                            soXeNgoai = upper
+                // Checkbox Xe ngoài
+                HStack {
+                    Button {
+                        guard isEditMode else { return }
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            xeNgoai.toggle()
+                            if xeNgoai {
+                                soXeNha = ""
+                            } else {
+                                soXeNgoai = ""
+                            }
                         }
-                        let normalizedInput = normalizePlate(upper)
-                        if !normalizedInput.isEmpty,
-                           let matchedXe = viewModel.xeOptions.first(where: {
-                               normalizePlate($0.ma) == normalizedInput || normalizePlate($0.ten) == normalizedInput
-                           }) {
-                            xeNgoai = false
-                            soXeNha = matchedXe.ma
-                            soXeNgoai = ""
-                            soXeError = nil
-                            if !matchedXe.maTaiXe.isEmpty {
-                                taiXe = matchedXe.maTaiXe
-                            }
-                        } else if !upper.isEmpty {
-                            xeNgoai = true
-                            soXeNha = ""
-                            soXeError = nil
-                        }
-                    }
-                    
-                    VTSLiquidPickerField(
-                        label: "Số xe nhà",
-                        selection: $soXeNha,
-                        options: viewModel.xeOptions.map { $0.ma },
-                        displayName: { code in
-                            viewModel.xeOptions.first(where: { $0.ma == code })?.ten ?? code
-                        },
-                        displaySubtitle: { code in
-                            if let xe = viewModel.xeOptions.first(where: { $0.ma == code }) {
-                                return "Tài xế: \(xe.tenTaiXe)"
-                            }
-                            return ""
-                        },
-                        errorMessage: soXeError
-                    )
-                    .onChange(of: soXeNha) { _, newSoXe in
-                        if !newSoXe.isEmpty {
-                            xeNgoai = false
-                            soXeNgoai = ""
-                            soXeError = nil
-                            if let foundXe = viewModel.xeOptions.first(where: { $0.ma == newSoXe }) {
-                                taiXe = foundXe.maTaiXe
-                            }
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: xeNgoai ? "checkmark.square.fill" : "square")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(xeNgoai ? .vtsPrimary : .gray)
+                            Text("Xe ngoài")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(Color(hex: "0F2D59"))
                         }
                     }
                     .disabled(!isEditMode)
+                    .buttonStyle(.plain)
+                    .padding(.vertical, 2)
+                    
+                    Spacer()
+                }
+                
+                // Row 2: Số xe ngoài & Số xe nhà
+                HStack(spacing: 12) {
+                    if xeNgoai {
+                        VTSLiquidTextField(
+                            label: "Số xe ngoài",
+                            text: $soXeNgoai,
+                            isReadOnly: !isEditMode,
+                            errorMessage: soXeError
+                        )
+                        .onChange(of: soXeNgoai) { _, newValue in
+                            let upper = newValue.uppercased()
+                            if soXeNgoai != upper {
+                                soXeNgoai = upper
+                            }
+                            if !upper.isEmpty {
+                                soXeError = nil
+                            }
+                        }
+                    } else {
+                        VTSLiquidPickerField(
+                            label: "Số xe nhà",
+                            selection: $soXeNha,
+                            options: viewModel.xeOptions.map { $0.ma },
+                            displayName: { code in
+                                viewModel.xeOptions.first(where: { $0.ma == code })?.ten ?? code
+                            },
+                            displaySubtitle: { code in
+                                if let xe = viewModel.xeOptions.first(where: { $0.ma == code }) {
+                                    return "Tài xế: \(xe.tenTaiXe)"
+                                }
+                                return ""
+                            },
+                            errorMessage: soXeError
+                        )
+                        .onChange(of: soXeNha) { _, newSoXe in
+                            if !newSoXe.isEmpty {
+                                soXeError = nil
+                                if let foundXe = viewModel.xeOptions.first(where: { $0.ma == newSoXe }) {
+                                    taiXe = foundXe.maTaiXe
+                                }
+                            }
+                        }
+                        .disabled(!isEditMode)
+                    }
                 }
                 
                 // Row 3: Tài xế / Nhân viên (Picker nếu xe nhà, Text Input nếu xe ngoài)
@@ -599,14 +731,21 @@ struct PhieuGiaCongDetailView: View {
                 )
                 .disabled(!isEditMode)
                 
-                // Row 6: Số lượng (Hàng giao)
-                VTSLiquidTextField(
-                    label: "Số lượng",
-                    text: $trongLuongHang,
-                    keyboardType: .decimalPad,
-                    isReadOnly: !isEditMode,
-                    errorMessage: trongLuongHangError
-                )
+                // Row 6: Số lượng (Hàng giao) & ĐVT
+                HStack(spacing: 12) {
+                    VTSLiquidTextField(
+                        label: "Số lượng",
+                        text: $trongLuongHang,
+                        keyboardType: .decimalPad,
+                        isReadOnly: !isEditMode,
+                        errorMessage: trongLuongHangError
+                    )
+                    
+                    if !currentDVTDisplay.isEmpty {
+                        VTSLiquidReadonlyField(currentDVTDisplay, caption: "ĐVT")
+                            .frame(width: 90)
+                    }
+                }
                 
                 // Row 7: Thời điểm giao hàng
                 VTSLiquidDateTimeField(
@@ -638,13 +777,20 @@ struct PhieuGiaCongDetailView: View {
                 )
                 .disabled(!isEditMode)
                 
-                // Row 10: Số lượng (Hàng bán)
-                VTSLiquidTextField(
-                    label: "Số lượng",
-                    text: $trongLuongHangGC,
-                    keyboardType: .decimalPad,
-                    isReadOnly: !isEditMode
-                )
+                // Row 10: Số lượng (Hàng bán) & ĐVT
+                HStack(spacing: 12) {
+                    VTSLiquidTextField(
+                        label: "Số lượng",
+                        text: $trongLuongHangGC,
+                        keyboardType: .decimalPad,
+                        isReadOnly: !isEditMode
+                    )
+                    
+                    if !currentDVTGCDisplay.isEmpty {
+                        VTSLiquidReadonlyField(currentDVTGCDisplay, caption: "ĐVT")
+                            .frame(width: 90)
+                    }
+                }
                 
                 // Row 11: Thời điểm cân hàng bán
                 VTSLiquidDateTimeField(
@@ -676,13 +822,20 @@ struct PhieuGiaCongDetailView: View {
                 )
                 .disabled(!isEditMode)
                 
-                // Row 14: Số lượng (Hàng thu về)
-                VTSLiquidTextField(
-                    label: "Số lượng",
-                    text: $trongLuongHangTV,
-                    keyboardType: .decimalPad,
-                    isReadOnly: !isEditMode
-                )
+                // Row 14: Số lượng (Hàng thu về) & ĐVT
+                HStack(spacing: 12) {
+                    VTSLiquidTextField(
+                        label: "Số lượng",
+                        text: $trongLuongHangTV,
+                        keyboardType: .decimalPad,
+                        isReadOnly: !isEditMode
+                    )
+                    
+                    if !currentDVTTVDisplay.isEmpty {
+                        VTSLiquidReadonlyField(currentDVTTVDisplay, caption: "ĐVT")
+                            .frame(width: 90)
+                    }
+                }
                 
                 // Row 15: Thời điểm cân hàng thu về
                 VTSLiquidDateTimeField(
@@ -722,7 +875,7 @@ struct PhieuGiaCongDetailView: View {
                     Image(uiImage: img)
                         .resizable()
                         .scaledToFill()
-                        .frame(height: 120)
+                        .frame(height: 130)
                         .frame(maxWidth: .infinity)
                         .clipped()
                         .cornerRadius(12)
@@ -737,14 +890,14 @@ struct PhieuGiaCongDetailView: View {
                         } label: {
                             ZStack {
                                 Circle()
-                                    .fill(Color.black.opacity(0.65))
-                                    .frame(width: 38, height: 38)
+                                    .fill(Color.black.opacity(0.7))
+                                    .frame(width: 42, height: 42)
                                     .overlay(
                                         Circle()
-                                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                            .stroke(Color.white.opacity(0.4), lineWidth: 1)
                                     )
                                     .shadow(color: Color.black.opacity(0.35), radius: 4, x: 0, y: 2)
-                                LucideIcon(.eye, size: 18, color: .white)
+                                LucideIcon(.eye, size: 20, color: .white)
                             }
                         }
                         

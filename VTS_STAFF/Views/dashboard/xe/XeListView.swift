@@ -112,7 +112,14 @@ struct XeListView: View {
                                 ],
                                 defaultSortKey: "ma",
                                 onRowLongPress: { row in
-                                    selectedModalItem = row
+                                    let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_XE")
+                                    if perm?.del != true && (perm?.view == true || perm == nil) {
+                                        router.showScreen(.push) { _ in
+                                            XeDetailView(maXe: row.ma, isEditMode: false)
+                                        }
+                                    } else {
+                                        selectedModalItem = row
+                                    }
                                 },
                                 onRowAction: { action, row in
                                     handleRowAction(action, row: row)
@@ -136,7 +143,7 @@ struct XeListView: View {
                                 },
                                 backgroundPreferenceValue: Color.vtsPrimary,
                                 customFooterBuilder: { width in
-                                    AnyView(Text("Tổng cộng: \(viewModel.filteredXe.count) phương tiện")
+                                    AnyView(Text("Tổng cộng: \(viewModel.filteredXe.count)")
                                         .font(.system(size: 12, weight: .bold))
                                         .padding(.vertical, 6)
                                         .foregroundColor(Color.vtsBg)

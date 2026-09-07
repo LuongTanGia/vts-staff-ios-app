@@ -71,7 +71,7 @@ struct TChucNangPhanQuyen: Codable, Hashable, Identifiable {
 }
 
 // MARK: - TSoLeHeThong
-struct TSoLeHeThong: Decodable {
+struct TSoLeHeThong: Codable, Sendable {
     let solesoluong, soledongia, solesotien, soletyle: Int
     
     enum CodingKeys: String, CodingKey {
@@ -791,16 +791,27 @@ extension UIImage {
     static func fromBase64(_ base64String: String?) -> UIImage? {
         guard let base64String = base64String, !base64String.isEmpty else { return nil }
         
-        var cleanedString = base64String
+        // 1. Thử decode trực tiếp với .ignoreUnknownCharacters (Cực nhanh, 0 tốn thêm RAM)
+        if let data = Data(base64Encoded: base64String, options: [.ignoreUnknownCharacters]),
+           let image = UIImage(data: data) {
+            return image
+        }
+        
+        // 2. Nếu có data URI prefix hoặc ký tự thừa, làm sạch nhẹ nhàng
+        var cleanedString = base64String.trimmingCharacters(in: .whitespacesAndNewlines)
         if let range = cleanedString.range(of: "base64,") {
             cleanedString = String(cleanedString[range.upperBound...])
         }
-        cleanedString = cleanedString.components(separatedBy: .whitespacesAndNewlines).joined()
-        cleanedString = cleanedString.replacingOccurrences(of: "\"", with: "")
+        if cleanedString.hasPrefix("\"") && cleanedString.hasSuffix("\"") && cleanedString.count >= 2 {
+            cleanedString = String(cleanedString.dropFirst().dropLast())
+        }
+        
+        // Lọc bỏ ký tự whitespace/newline/quote không tạo mảng trung gian
+        cleanedString = cleanedString.filter { !$0.isWhitespace && !$0.isNewline && $0 != "\"" }
         
         let remainder = cleanedString.count % 4
         if remainder > 0 {
-            cleanedString += String(repeating: "=", count: 4 - remainder)
+            cleanedString.append(String(repeating: "=", count: 4 - remainder))
         }
         
         guard let data = Data(base64Encoded: cleanedString, options: [.ignoreUnknownCharacters]),

@@ -375,14 +375,6 @@ struct CameraView: UIViewControllerRepresentable {
     }
 }
 
-// MARK: - UIImage extension base64
-extension UIImage {
-    static func fromBase64(_ string: String) -> UIImage? {
-        guard let data = Data(base64Encoded: string) else { return nil }
-        return UIImage(data: data)
-    }
-}
-
 // MARK: - Preview
 #Preview("ImagePicker") {
     @State var img1: UIImage? = nil

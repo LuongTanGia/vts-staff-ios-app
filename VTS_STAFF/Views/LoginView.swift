@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import SwiftfulRouting
 
 struct LoginView: View {
     @StateObject private var viewModel = LoginViewModel()
+    @State private var showPolicySheet: Bool = false
     
     // Focus state for dismiss keyboard
     @FocusState private var isFocused: Bool
@@ -124,16 +126,36 @@ struct LoginView: View {
                     
                     Spacer(minLength: 40)
                     
-                    // MARK: Footer Version
-                    Text("Phiên bản 1.0.0 (VTS Tech)")
-                        .font(.vtsCaption)
-                        .foregroundColor(.vtsTxtTertiary)
-                        .padding(.bottom, 20)
+                    // MARK: Footer Policy & Version
+                    VStack(spacing: 8) {
+                        Button {
+                            showPolicySheet = true
+                        } label: {
+                            HStack(spacing: 6) {
+                                LucideIcon(.info, size: 15, color: .vtsTxtSecondary)
+                                Text("Chính sách & Điều khoản")
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(.vtsTxtSecondary)
+                                    .underline()
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        
+                        Text("Phiên bản 1.0.0 (VTS Tech)")
+                            .font(.vtsCaption)
+                            .foregroundColor(.vtsTxtTertiary)
+                    }
+                    .padding(.bottom, 20)
                 }
                 .padding(VTSSpacing.xl)
             }
         }
         .environment(\.colorScheme, .light)
+        .sheet(isPresented: $showPolicySheet) {
+            RouterView { _ in
+                PolicyDocumentView()
+            }
+        }
         .onTapGesture {
             isFocused = false
         }

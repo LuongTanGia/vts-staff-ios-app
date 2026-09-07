@@ -99,7 +99,14 @@ struct KhachHangListView: View {
                                 ],
                                 defaultSortKey: "ten",
                                 onRowLongPress: { row in
-                                    selectedModalItem = row
+                                    let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_KHACHHANG")
+                                    if perm?.del != true && (perm?.view == true || perm == nil) {
+                                        router.showScreen(.push) { _ in
+                                            KhachHangDetailView(maKH: row.ma, isEditMode: false)
+                                        }
+                                    } else {
+                                        selectedModalItem = row
+                                    }
                                 },
                                 onRowAction: { action, row in
                                     handleRowAction(action, row: row)
@@ -123,7 +130,7 @@ struct KhachHangListView: View {
                                 },
                                 backgroundPreferenceValue: Color.vtsPrimary,
                                 customFooterBuilder: { width in
-                                    AnyView(Text("Tổng cộng: \(viewModel.filteredKhachHang.count) khách hàng")
+                                    AnyView(Text("Tổng cộng: \(viewModel.filteredKhachHang.count)")
                                         .font(.system(size: 12, weight: .bold))
                                         .padding(.vertical, 6)
                                         .foregroundColor(Color.vtsBg)

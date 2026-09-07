@@ -8,33 +8,58 @@
 import SwiftUI
 import SwiftfulRouting
 
+enum PolicyTab: String, CaseIterable, Identifiable {
+    case terms = "terms"
+    case privacy = "privacy"
+    
+    var id: String { self.rawValue }
+    
+    var title: String {
+        switch self {
+        case .terms: return "Điều khoản sử dụng"
+        case .privacy: return "Chính sách bảo mật"
+        }
+    }
+}
+
 struct PolicyDocumentView: View {
     @Environment(\.router) private var router
-    let documentName: String
-    let title: String
+    @State private var selectedTab: PolicyTab
+    
+    init(documentName: String = "terms", title: String = "Chính sách & Điều khoản") {
+        _selectedTab = State(initialValue: documentName == "privacy" ? .privacy : .terms)
+    }
     
     var body: some View {
         VTSPageContainer {
-            VTSHTMLViewer(fileName: documentName)
-//                .ignoresSafeArea(edges: .bottom)
+            VStack(spacing: 0) {
+                // Segmented picker
+                Picker("Chính sách & Điều khoản", selection: $selectedTab) {
+                    ForEach(PolicyTab.allCases) { tab in
+                        Text(tab.title).tag(tab)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal, VTSSpacing.xl)
+                .padding(.vertical, 8)
+                .background(Color.vtsPrimary)
+                
+                VTSHTMLViewer(fileName: selectedTab.rawValue)
+                    .id(selectedTab.rawValue)
+            }
         }
-        //        .navigationBarBackButtonHidden(true)
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
             subtitle: "Chính sách & Điều khoản",
             showLogout: false
-        )
-        {
-            
-        }
-        trailing: {
+        ) {
+            EmptyView()
+        } trailing: {
+            EmptyView()
+        } primaryAction: {
             EmptyView()
         }
-        primaryAction: {
-            EmptyView()
-        }
-//        .toolbar(.hidden, for: .tabBar)
     }
 }
 

@@ -91,6 +91,13 @@ struct PhieuXuatDetailView: View {
         return hangHoa.isEmpty ? "---" : hangHoa
     }
     
+    private var currentDVTDisplay: String {
+        if case .success(let details) = viewModel.state, let details = details, let d = details.dvt, !d.isEmpty {
+            return d
+        }
+        return ""
+    }
+    
     private var currentKhachHangDisplay: String {
         if let found = viewModel.khachHangOptions.first(where: { $0.ma == khachHang }) {
             return found.ten
@@ -279,12 +286,20 @@ struct PhieuXuatDetailView: View {
                     if target == 1 {
                         hinh01 = croppedImg
                         Task {
-                            hinh01Text = await VTSImageOCRHelper.performOCR(on: croppedImg)
+                            let text = await VTSImageOCRHelper.performOCR(on: croppedImg)
+                            hinh01Text = text
+                            if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
+                                trongLuongHang = String(qty)
+                            }
                         }
                     } else if target == 2 {
                         hinh02 = croppedImg
                         Task {
-                            hinh02Text = await VTSImageOCRHelper.performOCR(on: croppedImg)
+                            let text = await VTSImageOCRHelper.performOCR(on: croppedImg)
+                            hinh02Text = text
+                            if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
+                                trongLuongHang = String(qty)
+                            }
                         }
                     }
                     editingImage = nil
@@ -314,12 +329,20 @@ struct PhieuXuatDetailView: View {
                     if slot == 1 {
                         hinh01 = updatedImage
                         Task {
-                            hinh01Text = await VTSImageOCRHelper.performOCR(on: updatedImage)
+                            let text = await VTSImageOCRHelper.performOCR(on: updatedImage)
+                            hinh01Text = text
+                            if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
+                                trongLuongHang = String(qty)
+                            }
                         }
                     } else if slot == 2 {
                         hinh02 = updatedImage
                         Task {
-                            hinh02Text = await VTSImageOCRHelper.performOCR(on: updatedImage)
+                            let text = await VTSImageOCRHelper.performOCR(on: updatedImage)
+                            hinh02Text = text
+                            if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
+                                trongLuongHang = String(qty)
+                            }
                         }
                     }
                 },
@@ -369,63 +392,79 @@ struct PhieuXuatDetailView: View {
                 VTSLiquidDateTimeField(label: "Ngày", date: $ngay, displayStyle: .dateOnly, isReadOnly: !isEditMode)
             }
             
-            // Row 2: Số xe ngoài & Số xe nhà
-            HStack(spacing: 12) {
-                VTSLiquidTextField(
-                    label: "Số xe ngoài",
-                    text: $soXeNgoai,
-                    isReadOnly: !isEditMode
-                )
-                .onChange(of: soXeNgoai) { _, newValue in
-                    let upper = newValue.uppercased()
-                    if soXeNgoai != upper {
-                        soXeNgoai = upper
+            // Checkbox Xe ngoài
+            HStack {
+                Button {
+                    guard isEditMode else { return }
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        xeNgoai.toggle()
+                        if xeNgoai {
+                            soXeNha = ""
+                        } else {
+                            soXeNgoai = ""
+                        }
                     }
-                    let normalizedInput = normalizePlate(upper)
-                    if !normalizedInput.isEmpty,
-                       let matchedXe = viewModel.xeOptions.first(where: {
-                           normalizePlate($0.ma) == normalizedInput || normalizePlate($0.ten) == normalizedInput
-                       }) {
-                        xeNgoai = false
-                        soXeNha = matchedXe.ma
-                        soXeNgoai = ""
-                        soXeError = nil
-                        if !matchedXe.maTaiXe.isEmpty {
-                            taiXe = matchedXe.maTaiXe
-                        }
-                    } else if !upper.isEmpty {
-                        xeNgoai = true
-                        soXeNha = ""
-                        soXeError = nil
-                    }
-                }
-                
-                VTSLiquidPickerField(
-                    label: "Số xe nhà",
-                    selection: $soXeNha,
-                    options: viewModel.xeOptions.map { $0.ma },
-                    displayName: { code in
-                        viewModel.xeOptions.first(where: { $0.ma == code })?.ten ?? code
-                    },
-                    displaySubtitle: { code in
-                        if let xe = viewModel.xeOptions.first(where: { $0.ma == code }) {
-                            return "Tài xế: \(xe.tenTaiXe)"
-                        }
-                        return ""
-                    },
-                    errorMessage: soXeError
-                )
-                .onChange(of: soXeNha) { _, newSoXe in
-                    if !newSoXe.isEmpty {
-                        xeNgoai = false
-                        soXeNgoai = ""
-                        soXeError = nil
-                        if let foundXe = viewModel.xeOptions.first(where: { $0.ma == newSoXe }) {
-                            taiXe = foundXe.maTaiXe
-                        }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: xeNgoai ? "checkmark.square.fill" : "square")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(xeNgoai ? .vtsPrimary : .gray)
+                        Text("Xe ngoài")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(Color(hex: "0F2D59"))
                     }
                 }
                 .disabled(!isEditMode)
+                .buttonStyle(.plain)
+                .padding(.vertical, 2)
+                
+                Spacer()
+            }
+            
+            // Row 2: Số xe ngoài & Số xe nhà
+            HStack(spacing: 12) {
+                if xeNgoai {
+                    VTSLiquidTextField(
+                        label: "Số xe ngoài",
+                        text: $soXeNgoai,
+                        isReadOnly: !isEditMode,
+                        errorMessage: soXeError
+                    )
+                    .onChange(of: soXeNgoai) { _, newValue in
+                        let upper = newValue.uppercased()
+                        if soXeNgoai != upper {
+                            soXeNgoai = upper
+                        }
+                        if !upper.isEmpty {
+                            soXeError = nil
+                        }
+                    }
+                } else {
+                    VTSLiquidPickerField(
+                        label: "Số xe nhà",
+                        selection: $soXeNha,
+                        options: viewModel.xeOptions.map { $0.ma },
+                        displayName: { code in
+                            viewModel.xeOptions.first(where: { $0.ma == code })?.ten ?? code
+                        },
+                        displaySubtitle: { code in
+                            if let xe = viewModel.xeOptions.first(where: { $0.ma == code }) {
+                                return "Tài xế: \(xe.tenTaiXe)"
+                            }
+                            return ""
+                        },
+                        errorMessage: soXeError
+                    )
+                    .onChange(of: soXeNha) { _, newSoXe in
+                        if !newSoXe.isEmpty {
+                            soXeError = nil
+                            if let foundXe = viewModel.xeOptions.first(where: { $0.ma == newSoXe }) {
+                                taiXe = foundXe.maTaiXe
+                            }
+                        }
+                    }
+                    .disabled(!isEditMode)
+                }
             }
             
             // Row 3: Tài xế (Picker nếu xe nhà, Text Input nếu xe ngoài)
@@ -433,7 +472,6 @@ struct PhieuXuatDetailView: View {
                 VTSLiquidTextField(
                     label: "Tài xế ngoài",
                     text: $taiXe,
-                    
                     placeholder: "Nhập tên tài xế...",
                     isReadOnly: !isEditMode,
                     errorMessage: taiXeError
@@ -475,14 +513,21 @@ struct PhieuXuatDetailView: View {
             )
             .disabled(!isEditMode)
             
-            // Row 6: Số lượng
-            VTSLiquidTextField(
-                label: "Số lượng",
-                text: $trongLuongHang,
-                keyboardType: .decimalPad,
-                isReadOnly: !isEditMode,
-                errorMessage: trongLuongHangError
-            )
+            // Row 6: Số lượng & ĐVT
+            HStack(spacing: 12) {
+                VTSLiquidTextField(
+                    label: "Số lượng",
+                    text: $trongLuongHang,
+                    keyboardType: .decimalPad,
+                    isReadOnly: !isEditMode,
+                    errorMessage: trongLuongHangError
+                )
+                
+                if !currentDVTDisplay.isEmpty {
+                    VTSLiquidReadonlyField(currentDVTDisplay, caption: "ĐVT")
+                        .frame(width: 90)
+                }
+            }
             
             // Row 7: Thời gian cân hàng
             VTSLiquidDateTimeField(
@@ -542,14 +587,14 @@ struct PhieuXuatDetailView: View {
                         } label: {
                             ZStack {
                                 Circle()
-                                    .fill(Color.black.opacity(0.65))
-                                    .frame(width: 38, height: 38)
+                                    .fill(Color.black.opacity(0.7))
+                                    .frame(width: 42, height: 42)
                                     .overlay(
                                         Circle()
-                                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                            .stroke(Color.white.opacity(0.4), lineWidth: 1)
                                     )
                                     .shadow(color: Color.black.opacity(0.35), radius: 4, x: 0, y: 2)
-                                LucideIcon(.eye, size: 18, color: .white)
+                                LucideIcon(.eye, size: 20, color: .white)
                             }
                         }
                         
@@ -560,13 +605,13 @@ struct PhieuXuatDetailView: View {
                                 ZStack {
                                     Circle()
                                         .fill(Color(hex: "BA1A1A").opacity(0.85))
-                                        .frame(width: 38, height: 38)
+                                        .frame(width: 42, height: 42)
                                         .overlay(
                                             Circle()
                                                 .stroke(Color.white.opacity(0.3), lineWidth: 1)
                                         )
                                         .shadow(color: Color.black.opacity(0.35), radius: 4, x: 0, y: 2)
-                                    LucideIcon(.trash2, size: 18, color: .white)
+                                    LucideIcon(.trash2, size: 20, color: .white)
                                 }
                             }
                         }

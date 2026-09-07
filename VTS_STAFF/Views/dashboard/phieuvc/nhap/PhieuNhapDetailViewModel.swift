@@ -89,9 +89,10 @@ final class PhieuNhapDetailViewModel: ObservableObject {
             )
             if let list = res.DataResults,
                let item = list.first(where: { $0.maHinh == maHinh }) ?? list.first,
-               let str = item.noiDungHinh, !str.isEmpty,
-               let img = UIImage.fromBase64(str) {
-                return img
+               let str = item.noiDungHinh, !str.isEmpty {
+                return await Task.detached(priority: .userInitiated) {
+                    UIImage.fromBase64(str)
+                }.value
             }
         } catch {
             print("Error fetching original image \(maHinh): \(error)")

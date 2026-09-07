@@ -229,23 +229,16 @@ struct SettingsView: View {
                     // Button Đăng xuất khỏi tài khoản
                     Button(action: { showLogoutConfirm = true }) {
                         HStack(spacing: 8) {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                                .font(.system(size: 15, weight: .bold))
+                            LucideIcon(.logOut, size: 18, color: .white)
                             Text("Đăng xuất khỏi tài khoản")
                                 .font(.system(size: 15, weight: .bold))
                         }
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(
-                            LinearGradient(
-                                colors: [Color.vtsDanger, Color.red.opacity(0.85)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
+                        .background(LinearGradient.vtsPrimary)
                         .cornerRadius(20)
-                        .shadow(color: Color.vtsDanger.opacity(0.25), radius: 8, x: 0, y: 4)
+                        .shadow(color: Color.vtsPrimary.opacity(0.25), radius: 8, x: 0, y: 4)
                     }
                     .padding(.top, 4)
                     

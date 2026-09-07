@@ -138,6 +138,7 @@ struct VTSPhotoGalleryView: View {
                 fetchFullImageIfNeeded(for: newIndex)
             }
             .onAppear {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 fetchFullImageIfNeeded(for: selectedIndex)
             }
             

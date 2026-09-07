@@ -92,18 +92,17 @@ public struct VTSActionModalSheet: View {
                         dismiss()
                         item.action()
                     } label: {
-                        HStack(spacing: 12) {
+                        HStack(spacing: 14) {
                             ZStack {
                                 Circle()
-                                    .fill(item.isDestructive ? Color.vtsDanger.opacity(0.12) : Color.vtsPrimary.opacity(0.12))
-                                    .frame(width: 38, height: 38)
-                                LucideIcon(item.icon, size: 20, color: item.isDestructive ? .vtsDanger : .vtsPrimary)
-                                    .font(.system(size: 16, weight: .semibold))
+                                    .fill(item.isDestructive ? Color.vtsDanger.opacity(0.16) : Color.vtsPrimary.opacity(0.16))
+                                    .frame(width: 42, height: 42)
+                                LucideIcon(item.icon, size: 22, color: item.isDestructive ? .vtsDanger : .vtsPrimary)
                                     .foregroundColor(item.isDestructive ? .vtsDanger : .vtsPrimary)
                             }
                             
                             Text(item.title)
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(.system(size: 16, weight: .bold))
                                 .foregroundColor(item.isDestructive ? .vtsDanger : .vtsTxtPrimary)
                             
                             Spacer()

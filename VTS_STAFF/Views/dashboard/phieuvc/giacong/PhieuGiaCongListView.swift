@@ -133,7 +133,7 @@ struct PhieuGiaCongListView: View {
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity, alignment: .center)
                             
-                            Text(totalWeight.toFormattedString(maxDecimals: 0))
+                            Text(totalWeight.toQuantityString())
                                 .font(.system(size: 13, weight: .bold))
                                 .foregroundColor(.white)
                                 .frame(width: 110, alignment: .center)
@@ -235,7 +235,17 @@ struct PhieuGiaCongListView: View {
             .onLongPressGesture {
                 let haptic = UIImpactFeedbackGenerator(style: .medium)
                 haptic.impactOccurred()
-                selectedModalItem = item
+                if !hasDeletePermission && (permission?.view == true || permission == nil) {
+                    router.showScreen(.push) { _ in
+                        PhieuGiaCongDetailView(soPhieu: item.soPhieu, existing: item, onSaveSuccess: {
+                            Task {
+                                await viewModel.loadData()
+                            }
+                        })
+                    }
+                } else {
+                    selectedModalItem = item
+                }
             }
             .contextMenu {
                 Button {
@@ -315,7 +325,8 @@ struct PhieuGiaCongCardView: View {
                     Text("KL:")
                         .font(.vtsCallout)
                         .foregroundColor(.vtsTxtSecondary)
-                    Text(Double(item.trongLuongHang).toFormattedString(maxDecimals: 0))
+                    let dvtSuffix = (item.dvt != nil && !item.dvt!.isEmpty) ? " \(item.dvt!)" : ""
+                    Text("\(Double(item.trongLuongHang).toQuantityString())\(dvtSuffix)")
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundColor(.vtsPrimary)
                 }

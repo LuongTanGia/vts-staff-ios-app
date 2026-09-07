@@ -44,7 +44,8 @@ final class AuthService {
                 hoTen:   user,
                 maNV:    "",
                 avatar:  "",
-                chucNangPhanQuyens: response.chucNangPhanQuyens
+                chucNangPhanQuyens: response.chucNangPhanQuyens,
+                soLEHeThong: response.soLEHeThong
             )
         } else {
             throw AuthError.invalidCredentials

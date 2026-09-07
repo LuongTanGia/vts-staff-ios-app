@@ -157,7 +157,7 @@ struct ThongBaoCard: View {
         Button(action: onTap) {
             HStack(alignment: .top, spacing: 14) {
                 // Icon Header Box
-                LucideIcon(iconName, size: 20, color: .vtsPrimary)
+                LucideIcon(iconName, size: 20, color: accentColor)
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(accentColor)
                     .frame(width: 36, height: 36)
@@ -186,7 +186,7 @@ struct ThongBaoCard: View {
                     if let ngay = item.ngay, !ngay.isEmpty {
                         HStack {
                             Spacer()
-                            Text(ngay.toDisplayDate())
+                            Text(ngay.toDisplayDateTime())
                                 .font(.system(size: 11))
                                 .foregroundColor(Color(hex: "64748B"))
                         }

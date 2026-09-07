@@ -75,7 +75,7 @@ struct HangHoaListView: View {
                                     ERPColumn(
                                         title: AnyView(Text("Tên")),
                                         key: "ten",
-                                        width: 0.4,
+                                        width: 0.45,
                                         alignment: .leading,
                                         render: { item, _ in
                                             AnyView(
@@ -83,18 +83,6 @@ struct HangHoaListView: View {
                                             )
                                         },
                                         sorter: { $0.ten.localizedCompare($1.ten) == .orderedAscending }
-                                    ),
-                                    ERPColumn(
-                                        title: AnyView(Text("Loại")),
-                                        key: "loai",
-                                        width: 0.15,
-                                        alignment: .leading,
-                                        render: { item, _ in
-                                            AnyView(
-                                                Text(item.loai ?? "")
-                                            )
-                                        },
-                                        sorter: { ($0.loai ?? "").localizedCompare($1.loai ?? "") == .orderedAscending }
                                     ),
                                     ERPColumn(
                                         title: AnyView(Text("ĐVT")),
@@ -108,11 +96,29 @@ struct HangHoaListView: View {
                                         },
                                         sorter: { ($0.dvt ?? "").localizedCompare($1.dvt ?? "") == .orderedAscending }
                                     ),
-                                    
+                                    ERPColumn(
+                                        title: AnyView(Text("Loại")),
+                                        key: "loai",
+                                        width: 0.15,
+                                        alignment: .leading,
+                                        render: { item, _ in
+                                            AnyView(
+                                                Text(item.loai ?? "")
+                                            )
+                                        },
+                                        sorter: { ($0.loai ?? "").localizedCompare($1.loai ?? "") == .orderedAscending }
+                                    ),
                                 ],
                                 defaultSortKey: "ten",
                                 onRowLongPress: { row in
-                                    selectedModalItem = row
+                                    let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_HANGHOA")
+                                    if perm?.del != true && (perm?.view == true || perm == nil) {
+                                        router.showScreen(.push) { _ in
+                                            HangHoaDetailView(maHH: row.ma, isEditMode: false)
+                                        }
+                                    } else {
+                                        selectedModalItem = row
+                                    }
                                 },
                                 onRowAction: { action, row in
                                     handleRowAction(action, row: row)
@@ -136,7 +142,7 @@ struct HangHoaListView: View {
                                 },
                                 backgroundPreferenceValue: Color.vtsPrimary,
                                 customFooterBuilder: { width in
-                                    AnyView(Text("Tổng cộng: \(viewModel.filteredHangHoa.count) hàng hoá")
+                                    AnyView(Text("Tổng cộng: \(viewModel.filteredHangHoa.count)")
                                         .font(.system(size: 12, weight: .bold))
                                         .padding(.vertical, 6)
                                         .foregroundColor(Color.vtsBg)
