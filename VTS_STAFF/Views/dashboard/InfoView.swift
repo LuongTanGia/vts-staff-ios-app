@@ -9,6 +9,33 @@ import SwiftUI
 import SwiftfulRouting
 
 struct InfoView: View {
+    // MARK: - Strings
+    private enum Strings {
+        static let toolbarTitle = "Thông tin"
+        static let companyFullName = "Công Ty Cổ Phần Giải Pháp Thương Mại\nViệt Nam Sài Gòn"
+        static let sectionCompanyDetails = "Thông tin doanh nghiệp"
+        static let labelDiaChi = "Địa chỉ"
+        static let valueDiaChi = "351/9 Nơ Trang Long, Phường Bình Lợi Trung, Tp.Hồ Chí Minh"
+        static let labelMaSoThue = "Mã số thuế"
+        static let valueMaSoThue = "0312055823"
+        static let labelDienThoai = "Điện thoại"
+        static let valueDienThoai1 = "02822412141"
+        static let valueDienThoai2 = "02822412142"
+        static let labelWebsite = "Website"
+        static let valueWebsite = "https://www.viettassaigon.vn"
+        static let labelEmail = "Email"
+        static let valueEmail = "hotro@viettassaigon.vn"
+        static let appName = "VTS-Staff"
+        static let appVersion = "1.26.06.1603"
+        static let labelPhienBan = "Phiên bản:"
+        static let appDescription = "Công cụ Kiểm soát nội bộ dành riêng cho công nhân viên đang làm việc tại doanh nghiệp, bản quyền thuộc về Công Ty Cổ Phần Giải Pháp Thương Mại Việt Nam Sài Gòn"
+        static let appCopyright = "Công Ty Cổ Phần Giải Pháp Thương Mại Việt Nam Sài Gòn bảo lưu mọi quyền."
+        static let rowDieuKhoan = "Điều khoản sử dụng:"
+        static let rowChinhSach = "Chính sách bảo mật:"
+        static let rowThanhPhan = "Thành phần & Thử nghiệm OCR:"
+        static let btnXemNoiDung = "Xem nội dung"
+    }
+
     @Environment(\.router) private var router
     
     var body: some View {
@@ -34,7 +61,7 @@ struct InfoView: View {
                             )
                             
                             VStack(spacing: 0) {
-                                Text("Công Ty Cổ Phần Giải Pháp Thương Mại\nViệt Nam Sài Gòn")
+                                Text(Strings.companyFullName)
                                     .font(.system(size: 20, weight: .bold, design: .rounded))
                                     .foregroundColor(.white)
                                     .multilineTextAlignment(.center)
@@ -58,29 +85,29 @@ struct InfoView: View {
                                 Image(systemName: "info.circle.fill")
                                     .foregroundColor(.vtsPrimary)
                                     .font(.title3)
-                                Text("Thông tin doanh nghiệp")
+                                Text(Strings.sectionCompanyDetails)
                                     .font(.vtsHeadline.bold())
                                     .foregroundColor(.vtsTxtPrimary)
                             }
                             .padding(.bottom, 4)
                             
-                            infoItem(icon: "mappin.and.ellipse", iconColor: .blue, label: "Địa chỉ", value: "351/9 Nơ Trang Long, Phường Bình Lợi Trung, Tp.Hồ Chí Minh")
+                            infoItem(icon: "mappin.and.ellipse", iconColor: .blue, label: Strings.labelDiaChi, value: Strings.valueDiaChi)
                             
                             VTSDivider()
                             
-                            infoItem(icon: "doc.text.fill", iconColor: .teal, label: "Mã số thuế", value: "0312055823", isBoldValue: true)
+                            infoItem(icon: "doc.text.fill", iconColor: .teal, label: Strings.labelMaSoThue, value: Strings.valueMaSoThue, isBoldValue: true)
                             
                             VTSDivider()
                             
-                            infoItemWithLinks(icon: "phone.fill", iconColor: .green, label: "Điện thoại", values: ["02822412141", "02822412142"], isPhone: true)
+                            infoItemWithLinks(icon: "phone.fill", iconColor: .green, label: Strings.labelDienThoai, values: [Strings.valueDienThoai1, Strings.valueDienThoai2], isPhone: true)
                             
                             VTSDivider()
                             
-                            infoItemWithLinks(icon: "globe", iconColor: .indigo, label: "Website", values: ["https://www.viettassaigon.vn"], isWeb: true)
+                            infoItemWithLinks(icon: "globe", iconColor: .indigo, label: Strings.labelWebsite, values: [Strings.valueWebsite], isWeb: true)
                             
                             VTSDivider()
                             
-                            infoItemWithLinks(icon: "envelope.fill", iconColor: .purple, label: "Email", values: ["hotro@viettassaigon.vn"], isEmail: true)
+                            infoItemWithLinks(icon: "envelope.fill", iconColor: .purple, label: Strings.labelEmail, values: [Strings.valueEmail], isEmail: true)
                         }
                         .padding(20)
                         .background(
@@ -100,15 +127,15 @@ struct InfoView: View {
                                     .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
                                 
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("VTS-Staff")
+                                    Text(Strings.appName)
                                         .font(.vtsTitle.bold())
                                         .foregroundColor(.vtsPrimary)
                                     
                                     HStack(spacing: 4) {
-                                        Text("Phiên bản:")
+                                        Text(Strings.labelPhienBan)
                                             .font(.vtsCaption)
                                             .foregroundColor(.vtsTxtSecondary)
-                                        Text("1.26.06.1603")
+                                        Text(Strings.appVersion)
                                             .font(.vtsCaption.bold())
                                             .foregroundColor(.vtsTxtPrimary)
                                     }
@@ -118,7 +145,7 @@ struct InfoView: View {
                             
                             VTSDivider()
                             
-                            Text("Công cụ Kiểm soát nội bộ dành riêng cho công nhân viên đang làm việc tại doanh nghiệp, bản quyền thuộc về Công Ty Cổ Phần Giải Pháp Thương Mại Việt Nam Sài Gòn")
+                            Text(Strings.appDescription)
                                 .font(.vtsCallout)
                                 .foregroundColor(.vtsTxtSecondary)
                                 .lineSpacing(5)
@@ -126,7 +153,7 @@ struct InfoView: View {
                             
                             VTSDivider()
                             
-                            Text("Công Ty Cổ Phần Giải Pháp Thương Mại Việt Nam Sài Gòn bảo lưu mọi quyền.")
+                            Text(Strings.appCopyright)
                                 .font(.vtsCaption.bold().italic())
                                 .foregroundColor(.vtsPrimary)
                                 .multilineTextAlignment(.center)
@@ -141,7 +168,7 @@ struct InfoView: View {
                         
                         // MARK: Policies & Actions Card
                         VStack(spacing: 0) {
-                            policyRow(title: "Điều khoản sử dụng:", action: {
+                            policyRow(title: Strings.rowDieuKhoan, action: {
                                 router.showScreen(.push) { _ in
                                     PolicyDocumentView(documentName: "terms", title: "Điều khoản sử dụng")
                                 }
@@ -149,7 +176,7 @@ struct InfoView: View {
                             
                             VTSDivider()
                             
-                            policyRow(title: "Chính sách bảo mật:", action: {
+                            policyRow(title: Strings.rowChinhSach, action: {
                                 router.showScreen(.push) { _ in
                                     PolicyDocumentView(documentName: "privacy", title: "Chính sách bảo mật")
                                 }
@@ -157,7 +184,7 @@ struct InfoView: View {
                             
                             VTSDivider()
                             
-                            policyRow(title: "Thành phần & Thử nghiệm OCR:", action: {
+                            policyRow(title: Strings.rowThanhPhan, action: {
                                 router.showScreen(.push) { _ in
                                     ComponentShowcaseView()
                                 }
@@ -180,7 +207,7 @@ struct InfoView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Thông tin",
+            subtitle: Strings.toolbarTitle,
             
             leading: {},
             trailing: {},
@@ -259,7 +286,7 @@ struct InfoView: View {
                     .font(.vtsCallout)
                     .foregroundColor(.vtsTxtPrimary)
                 Spacer()
-                Text("Xem nội dung")
+                Text(Strings.btnXemNoiDung)
                     .font(.vtsCallout.bold())
                     .foregroundColor(.vtsPrimary)
                 LucideIcon(.chevronRight, size: 14, color: .gray.opacity(0.6))

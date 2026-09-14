@@ -9,6 +9,15 @@ import SwiftUI
 import SwiftfulRouting
 
 struct ThongBaoView: View {
+    // MARK: - Strings
+    private enum Strings {
+        static let toolbarTitle = "Thông báo"
+        static let searchPlaceholder = "Nhập nội dung để tìm"
+        static let emptyTitle = "Không có thông báo nào"
+        static let emptySubtitle = "Bạn chưa nhận được thông báo trong khoảng thời gian này."
+        static let emptyIcon = "bell.slash"
+    }
+
     @Environment(\.router) private var router
     @StateObject private var viewModel = ThongBaoViewModel()
     
@@ -22,7 +31,7 @@ struct ThongBaoView: View {
                     if isSearchVisible {
                         VTSSearchBar(
                             text: $viewModel.searchText,
-                            placeholder: "Nhập nội dung để tìm",
+                            placeholder: Strings.searchPlaceholder,
                             onClose: {
                                 withAnimation(.easeInOut(duration: 0.2)) {
                                     isSearchVisible = false
@@ -53,9 +62,9 @@ struct ThongBaoView: View {
                 // MARK: - Notification List Content
                 VTSAsyncContent(
                     state: viewModel.state,
-                    emptyTitle: "Không có thông báo nào",
-                    emptySubtitle: "Bạn chưa nhận được thông báo trong khoảng thời gian này.",
-                    emptyIcon: "bell.slash",
+                    emptyTitle: Strings.emptyTitle,
+                    emptySubtitle: Strings.emptySubtitle,
+                    emptyIcon: Strings.emptyIcon,
                     retry: {
                         Task {
                             await viewModel.loadNotifications()
@@ -85,7 +94,7 @@ struct ThongBaoView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Thông báo",
+            subtitle: Strings.toolbarTitle,
             isWhiteText: true,
             leading: {},
             trailing: {

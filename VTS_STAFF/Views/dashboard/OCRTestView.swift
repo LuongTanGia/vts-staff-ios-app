@@ -11,6 +11,25 @@ import PhotosUI
 import SwiftfulRouting
 
 struct OCRTestView: View {
+    // MARK: - Strings
+    private enum Strings {
+        static let toolbarTitle = "Thử nghiệm quét chữ (OCR)"
+        static let sectionImageTitle = "Hình ảnh cần quét"
+        static let btnChonAnh = "Chọn hình ảnh hoặc chụp ảnh mới"
+        static let descImageHint = "Hỗ trợ JPG, PNG. Chụp rõ nét để nhận diện tốt nhất."
+        static let btnStartOCR = "Bắt đầu nhận diện văn bản (OCR)"
+        static let labelProcessing = "Đang xử lý quét chữ..."
+        static let sectionResult = "Kết quả nhận diện"
+        static let btnCopyResult = "Sao chép"
+        static let labelWaiting = "Vui lòng chờ giây lát..."
+        static let emptyResult = "Chưa có kết quả. Chọn ảnh và bấm bắt đầu quét."
+        static let dialogTitle = "Chọn nguồn ảnh"
+        static let btnCamera = "Chụp ảnh"
+        static let btnLibrary = "Chọn từ thư viện"
+        static let btnCancel = "Huỷ"
+        static let successCopied = "Đã sao chép văn bản vào bộ nhớ tạm"
+    }
+
     @Environment(\.router) private var router
     @State private var selectedImage: UIImage? = nil
     @State private var recognizedText: String = ""
@@ -29,7 +48,7 @@ struct OCRTestView: View {
                     
                     // MARK: Image Selection Area
                     VStack(spacing: 12) {
-                        Text("Hình ảnh cần quét")
+                        Text(Strings.sectionImageTitle)
                             .font(.vtsHeadline.bold())
                             .foregroundColor(.vtsTxtPrimary)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -69,11 +88,11 @@ struct OCRTestView: View {
                                         .font(.system(size: 40))
                                         .foregroundColor(.vtsPrimary)
                                     
-                                    Text("Chọn hình ảnh hoặc chụp ảnh mới")
+                                    Text(Strings.btnChonAnh)
                                         .font(.vtsBody.bold())
                                         .foregroundColor(.vtsPrimary)
                                     
-                                    Text("Hỗ trợ JPG, PNG. Chụp rõ nét để nhận diện tốt nhất.")
+                                    Text(Strings.descImageHint)
                                         .font(.vtsCaption)
                                         .foregroundColor(.vtsTxtSecondary)
                                 }
@@ -107,10 +126,10 @@ struct OCRTestView: View {
                                     ProgressView()
                                         .tint(.white)
                                         .padding(.trailing, 8)
-                                    Text("Đang xử lý quét chữ...")
+                                    Text(Strings.labelProcessing)
                                 } else {
                                     Image(systemName: "doc.text.viewfinder")
-                                    Text("Bắt đầu nhận diện văn bản (OCR)")
+                                    Text(Strings.btnStartOCR)
                                 }
                             }
                             .font(.vtsHeadline.bold())
@@ -126,7 +145,7 @@ struct OCRTestView: View {
                     // MARK: OCR Results Area
                     VStack(spacing: 12) {
                         HStack {
-                            Text("Kết quả nhận diện")
+                            Text(Strings.sectionResult)
                                 .font(.vtsHeadline.bold())
                                 .foregroundColor(.vtsTxtPrimary)
                             
@@ -135,11 +154,11 @@ struct OCRTestView: View {
                             if !recognizedText.isEmpty {
                                 Button {
                                     UIPasteboard.general.string = recognizedText
-                                    ErrorManager.shared.showSuccess("Đã sao chép văn bản vào bộ nhớ tạm")
+                                    ErrorManager.shared.showSuccess(Strings.successCopied)
                                 } label: {
                                     HStack(spacing: 4) {
                                         LucideIcon(.copy, size: 14, color: .vtsTxtTertiary)
-                                        Text("Sao chép")
+                                        Text(Strings.btnCopyResult)
                                     }
                                     .font(.vtsCaption.bold())
                                     .foregroundColor(.vtsPrimary)
@@ -151,7 +170,7 @@ struct OCRTestView: View {
                             VStack(spacing: 12) {
                                 ProgressView()
                                     .scaleEffect(1.2)
-                                Text("Vui lòng chờ giây lát...")
+                                Text(Strings.labelWaiting)
                                     .font(.vtsCaption)
                                     .foregroundColor(.vtsTxtSecondary)
                             }
@@ -176,7 +195,7 @@ struct OCRTestView: View {
                                     .stroke(Color.primary.opacity(0.1), lineWidth: 1)
                             )
                         } else {
-                            Text("Chưa có kết quả. Chọn ảnh và bấm bắt đầu quét.")
+                            Text(Strings.emptyResult)
                                 .font(.vtsCallout)
                                 .foregroundColor(.vtsTxtTertiary)
                                 .frame(maxWidth: .infinity)
@@ -199,16 +218,16 @@ struct OCRTestView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Thử nghiệm quét chữ (OCR)",
+            subtitle: Strings.toolbarTitle,
             isWhiteText: true,
             leading: {},
             trailing: {},
             primaryAction: { EmptyView() }
         )
-        .confirmationDialog("Chọn nguồn ảnh", isPresented: $showActionSheet, titleVisibility: .visible) {
-            Button("Chụp ảnh") { showCamera = true }
-            Button("Chọn từ thư viện") { showPicker = true }
-            Button("Huỷ", role: .cancel) {}
+        .confirmationDialog(Strings.dialogTitle, isPresented: $showActionSheet, titleVisibility: .visible) {
+            Button(Strings.btnCamera) { showCamera = true }
+            Button(Strings.btnLibrary) { showPicker = true }
+            Button(Strings.btnCancel, role: .cancel) {}
         }
         .photosPicker(isPresented: $showPicker, selection: $selectedItem, matching: .images)
         .onChange(of: selectedItem) { item in

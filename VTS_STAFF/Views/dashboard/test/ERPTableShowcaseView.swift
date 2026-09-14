@@ -18,6 +18,28 @@ struct TransportManifest: Identifiable {
 }
 
 struct ERPTableShowcaseView: View {
+    // MARK: - Strings
+    private enum Strings {
+        static let toolbarTitle = "Tính năng nâng cấp biểu mẫu"
+        static let searchPlaceholder = "Tìm kiếm mã phiếu, số xe, khách hàng..."
+        static let pickerLabel = "Chế độ hiển thị"
+        static let layoutCuonDoc = "Cuộn dọc"
+        static let layoutKhongCuon = "Không cuộn"
+        static let layoutTuyBien = "Tùy biến"
+        static let emptyTitle = "Không tìm thấy kết quả"
+        static let emptySubtitle = "Vui lòng nhập từ khóa khác"
+        static let colMaPhieu = "Mã Phiếu"
+        static let colSoXe = "Số Xe"
+        static let colKhachHang = "Khách Hàng"
+        static let colTaiXe = "Tài Xế"
+        static let colTaiTrong = "Tải Trọng"
+        static let colTrangThai = "Trạng Thái"
+        static let footerTong = "Tổng"
+        static let labelTrongLuong = "Trọng lượng:"
+        static let labelUocTinhPhi = "Ưc tính phí:"
+        static let headerTuyBien = "Bố cục thẻ tùy biến & tự động ước tính phí (VND)"
+    }
+
     @Environment(\.router) private var router
     
     @State private var searchText = ""
@@ -60,12 +82,12 @@ struct ERPTableShowcaseView: View {
             VStack(spacing: 0) {
                 // Thanh tìm kiếm & bộ lọc layout
                 VStack(spacing: 12) {
-                    VTSSearchBar(text: $searchText, placeholder: "Tìm kiếm mã phiếu, số xe, khách hàng...")
+                    VTSSearchBar(text: $searchText, placeholder: Strings.searchPlaceholder)
                     
-                    Picker("Chế độ hiển thị", selection: $selectedLayout) {
-                        Text("Cuộn dọc").tag(0)
-                        Text("Không cuộn").tag(1)
-                        Text("Tùy biến").tag(2)
+                    Picker(Strings.pickerLabel, selection: $selectedLayout) {
+                        Text(Strings.layoutCuonDoc).tag(0)
+                        Text(Strings.layoutKhongCuon).tag(1)
+                        Text(Strings.layoutTuyBien).tag(2)
                     }
                     .pickerStyle(.segmented)
                 }
@@ -81,8 +103,8 @@ struct ERPTableShowcaseView: View {
                     VSpacer()
                     VTSEmptyState(
                         icon: "doc.text.magnifyingglass",
-                        title: "Không tìm thấy kết quả",
-                        subtitle: "Vui lòng nhập từ khóa khác"
+                        title: Strings.emptyTitle,
+                        subtitle: Strings.emptySubtitle
                     )
                     VSpacer()
                 } else {
@@ -129,9 +151,7 @@ struct ERPTableShowcaseView: View {
                                         }
                                         
                                         HStack {
-                                            Text("Trọng lượng:")
-                                                .font(.vtsCaption)
-                                                .foregroundColor(.vtsTxtTertiary)
+                                            Text(Strings.labelTrongLuong)
                                             Text(String(format: "%.1f tấn", item.weight))
                                                 .font(.vtsCaption)
                                                 .fontWeight(.bold)
@@ -139,7 +159,7 @@ struct ERPTableShowcaseView: View {
                                             
                                             Spacer()
                                             
-                                            Text("Ước tính phí:")
+                                            Text(Strings.labelUocTinhPhi)
                                                 .font(.vtsCaption)
                                                 .foregroundColor(.vtsTxtTertiary)
                                             // Sử dụng hàm format VND mới tạo
@@ -159,7 +179,7 @@ struct ERPTableShowcaseView: View {
                                     HStack {
                                         Image(systemName: "info.circle.fill")
                                             .foregroundColor(.vtsPrimary)
-                                        Text("Bố cục thẻ tùy biến & tự động ước tính phí (VND)")
+                                        Text(Strings.headerTuyBien)
                                             .font(.vtsCaption)
                                             .foregroundColor(.vtsTxtSecondary)
                                         Spacer()
@@ -195,7 +215,7 @@ struct ERPTableShowcaseView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Tính năng nâng cấp biểu mẫu",
+            subtitle: Strings.toolbarTitle,
             showLogout: false,
             leading: {
                 Button {
@@ -222,7 +242,7 @@ struct ERPTableShowcaseView: View {
         
         return [
             ERPColumn(
-                title: AnyView(Text("Mã Phiếu")),
+                title: AnyView(Text(Strings.colMaPhieu)),
                 key: "id",
                 width: isScroll ? 100 : 0.16,
                 alignment: .center,
@@ -234,12 +254,12 @@ struct ERPTableShowcaseView: View {
                 },
                 sorter: { $0.id < $1.id },
                 footer: AnyView(
-                    Text("Tổng")
+                    Text(Strings.footerTong)
                         .frame(maxWidth: .infinity, alignment: .center)
                 )
             ),
             ERPColumn(
-                title: AnyView(Text("Số Xe")),
+                title: AnyView(Text(Strings.colSoXe)),
                 key: "plate",
                 width: isScroll ? 110 : 0.16,
                 alignment: .leading,
@@ -256,7 +276,7 @@ struct ERPTableShowcaseView: View {
                 )
             ),
             ERPColumn(
-                title: AnyView(Text("Khách Hàng")),
+                title: AnyView(Text(Strings.colKhachHang)),
                 key: "customer",
                 width: isScroll ? 200 : 0.22,
                 alignment: .leading,
@@ -268,7 +288,7 @@ struct ERPTableShowcaseView: View {
                 }
             ),
             ERPColumn(
-                title: AnyView(Text("Tài Xế")),
+                title: AnyView(Text(Strings.colTaiXe)),
                 key: "driver",
                 width: isScroll ? 140 : 0.18,
                 alignment: .leading,
@@ -280,7 +300,7 @@ struct ERPTableShowcaseView: View {
                 }
             ),
             ERPColumn(
-                title: AnyView(Text("Tải Trọng")),
+                title: AnyView(Text(Strings.colTaiTrong)),
                 key: "weight",
                 width: isScroll ? 90 : 0.14,
                 alignment: .trailing,
@@ -297,7 +317,7 @@ struct ERPTableShowcaseView: View {
                 )
             ),
             ERPColumn(
-                title: AnyView(Text("Trạng Thái")),
+                title: AnyView(Text(Strings.colTrangThai)),
                 key: "status",
                 width: isScroll ? 110 : 0.14,
                 alignment: .center,

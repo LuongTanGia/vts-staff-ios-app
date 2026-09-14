@@ -23,6 +23,12 @@ enum PolicyTab: String, CaseIterable, Identifiable {
 }
 
 struct PolicyDocumentView: View {
+    // MARK: - Strings
+    private enum Strings {
+        static let toolbarTitle = "Chính sách & Điều khoản"
+        static let pickerLabel = "Chính sách & Điều khoản"
+    }
+
     @Environment(\.router) private var router
     @State private var selectedTab: PolicyTab
     
@@ -34,7 +40,7 @@ struct PolicyDocumentView: View {
         VTSPageContainer {
             VStack(spacing: 0) {
                 // Segmented picker
-                Picker("Chính sách & Điều khoản", selection: $selectedTab) {
+                Picker(Strings.pickerLabel, selection: $selectedTab) {
                     ForEach(PolicyTab.allCases) { tab in
                         Text(tab.title).tag(tab)
                     }
@@ -51,7 +57,7 @@ struct PolicyDocumentView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Chính sách & Điều khoản",
+            subtitle: Strings.toolbarTitle,
             showLogout: false
         ) {
             EmptyView()

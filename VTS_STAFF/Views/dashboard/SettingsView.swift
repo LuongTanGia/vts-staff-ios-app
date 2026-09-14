@@ -11,6 +11,24 @@ import LocalAuthentication
 import UserNotifications
 
 struct SettingsView: View {
+    // MARK: - Strings
+    private enum Strings {
+        static let toolbarTitle = "Cài đặt"
+        static let btnDangXuat = "Đăng xuất khỏi tài khoản"
+        static let confirmLogoutTitle = "Đăng xuất"
+        static let confirmLogoutMessage = "Bạn có chắc muốn đăng xuất khỏi ứng dụng?"
+        static let sectionBaoMat = "BẢO MẬT & XÁC THỰC"
+        static let rowFaceID = "Sử dụng Face ID thay cho mã bảo vệ"
+        static let sectionThongBao = "THÔNG BÁO"
+        static let rowThongBaoTao = "Nhận thông báo khi phiếu được Tạo"
+        static let rowThongBaoXoa = "Nhận thông báo khi phiếu được Xóa"
+        static let sectionDashboard = "HIỂN THỊ DASHBOARD"
+        static let labelHienThongKeNhan = "Hiện thống kê hàng nhận"
+        static let labelHienThongKeGiao = "Hiện thống kê hàng giao"
+        static let labelHomNay = "Hôm nay"
+        static let labelTuanNay = "Tuần này"
+    }
+
     @Environment(\.router) private var router
     @ObservedObject private var authManager = AuthManager.shared
     
@@ -91,12 +109,12 @@ struct SettingsView: View {
                     }
                     
                     // MARK: - 2. Bảo mật & Xác thực
-                    settingsSection(title: "BẢO MẬT & XÁC THỰC", icon: "shield.lock.fill") {
+                    settingsSection(title: Strings.sectionBaoMat, icon: "shield.lock.fill") {
                         VStack(spacing: 0) {
                             settingRow(
                                 icon: "faceid",
                                 iconBg: Color.purple,
-                                title: "Sử dụng Face ID thay cho mã bảo vệ"
+                                title: Strings.rowFaceID
                             ) {
                                 Toggle("", isOn: $enableBiometrics)
                                     .labelsHidden()
@@ -107,12 +125,12 @@ struct SettingsView: View {
                     }
                     
                     // MARK: - 3. Thông báo
-                    settingsSection(title: "THÔNG BÁO", icon: "bell.badge.fill") {
+                    settingsSection(title: Strings.sectionThongBao, icon: "bell.badge.fill") {
                         VStack(spacing: 0) {
                             settingRow(
                                 icon: "doc.badge.plus",
                                 iconBg: Color.indigo,
-                                title: "Nhận thông báo khi phiếu được Tạo"
+                                title: Strings.rowThongBaoTao
                             ) {
                                 Toggle("", isOn: $notifyTicketCreated)
                                     .labelsHidden()
@@ -125,7 +143,7 @@ struct SettingsView: View {
                             settingRow(
                                 icon: "doc.badge.gearshape",
                                 iconBg: Color.pink,
-                                title: "Nhận thông báo khi phiếu được Xóa"
+                                title: Strings.rowThongBaoXoa
                             ) {
                                 Toggle("", isOn: $notifyTicketDeleted)
                                     .labelsHidden()
@@ -135,7 +153,7 @@ struct SettingsView: View {
                     }
                     
                     // MARK: - 4. Hiển thị Dashboard
-                    settingsSection(title: "HIỂN THỊ DASHBOARD", icon: "chart.bar.fill") {
+                    settingsSection(title: Strings.sectionDashboard, icon: "chart.bar.fill") {
                         VStack(spacing: 0) {
                             // Thống kê hàng nhận (Nhập) - Xếp trên/dưới
                             VStack(alignment: .leading, spacing: 8) {
@@ -149,14 +167,14 @@ struct SettingsView: View {
                                             .foregroundColor(.blue)
                                     }
                                     
-                                    Text("Hiện thống kê hàng nhận")
+                                    Text(Strings.labelHienThongKeNhan)
                                         .font(.system(size: 14, weight: .medium))
                                         .foregroundColor(Color(hex: "0F2D59"))
                                 }
                                 
                                 VStack(spacing: 8) {
                                     HStack {
-                                        Text("Hôm nay")
+                                        Text(Strings.labelHomNay)
                                             .font(.system(size: 13, weight: .regular))
                                             .foregroundColor(Color(hex: "0F2D59"))
                                         Spacer()
@@ -166,7 +184,7 @@ struct SettingsView: View {
                                     }
                                     
                                     HStack {
-                                        Text("Tuần này")
+                                        Text(Strings.labelTuanNay)
                                             .font(.system(size: 13, weight: .regular))
                                             .foregroundColor(Color(hex: "0F2D59"))
                                         Spacer()
@@ -194,14 +212,14 @@ struct SettingsView: View {
                                             .foregroundColor(.green)
                                     }
                                     
-                                    Text("Hiện thống kê hàng giao")
+                                    Text(Strings.labelHienThongKeGiao)
                                         .font(.system(size: 14, weight: .medium))
                                         .foregroundColor(Color(hex: "0F2D59"))
                                 }
                                 
                                 VStack(spacing: 8) {
                                     HStack {
-                                        Text("Hôm nay")
+                                        Text(Strings.labelHomNay)
                                             .font(.system(size: 13, weight: .regular))
                                             .foregroundColor(Color(hex: "0F2D59"))
                                         Spacer()
@@ -211,7 +229,7 @@ struct SettingsView: View {
                                     }
                                     
                                     HStack {
-                                        Text("Tuần này")
+                                        Text(Strings.labelTuanNay)
                                             .font(.system(size: 13, weight: .regular))
                                             .foregroundColor(Color(hex: "0F2D59"))
                                         Spacer()
@@ -230,7 +248,7 @@ struct SettingsView: View {
                     Button(action: { showLogoutConfirm = true }) {
                         HStack(spacing: 8) {
                             LucideIcon(.logOut, size: 18, color: .white)
-                            Text("Đăng xuất khỏi tài khoản")
+                            Text(Strings.btnDangXuat)
                                 .font(.system(size: 15, weight: .bold))
                         }
                         .foregroundColor(.white)
@@ -255,9 +273,9 @@ struct SettingsView: View {
         }
         .vtsConfirm(
             isPresented: $showLogoutConfirm,
-            title: "Đăng xuất",
-            message: "Bạn có chắc muốn đăng xuất khỏi ứng dụng?",
-            confirmLabel: "Đăng xuất"
+            title: Strings.confirmLogoutTitle,
+            message: Strings.confirmLogoutMessage,
+            confirmLabel: Strings.btnDangXuat
         ) {
             Task {
                 await AuthService.shared.dangXuat()
@@ -266,7 +284,7 @@ struct SettingsView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Cài đặt",
+            subtitle: Strings.toolbarTitle,
             isWhiteText: true
         ) {
             EmptyView()
