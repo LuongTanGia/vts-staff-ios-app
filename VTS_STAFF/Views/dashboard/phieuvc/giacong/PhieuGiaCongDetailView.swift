@@ -10,6 +10,65 @@ import SwiftfulRouting
 import PhotosUI
 
 struct PhieuGiaCongDetailView: View {
+    private enum Strings {
+        static let navTitle = "VTS-Staff"
+        static let titleNew = "Chuyến hàng gia công mới"
+        static let titleEdit = "Cập nhật chuyến hàng gia công"
+        static let titleInfo = "Thông tin chuyến hàng gia công"
+        static let emptyTitle = "Không tìm thấy thông tin phiếu gia công"
+        static let emptySubtitle = "Số phiếu có thể không tồn tại hoặc đã bị xóa."
+        static let btnCancel = "Huỷ"
+        static let btnSave = "Lưu"
+        static let btnEdit = "Sửa"
+        static let btnOK = "OK"
+        static let btnDone = "Xong"
+        static let fieldSoPhieu = "Số phiếu"
+        static let fieldNgay = "Ngày"
+        static let chkXeNgoai = "Xe ngoài"
+        static let fieldSoXeNgoai = "Số xe ngoài"
+        static let fieldSoXeNha = "Số xe nhà"
+        static let fieldTaiXeNgoai = "Tài xế ngoài"
+        static let fieldTaiXe = "Tài xế"
+        static let placeholderTaiXe = "Nhập tên tài xế..."
+        static let fieldKhachHang = "Khách hàng"
+        static let fieldHangGiao = "Hàng giao"
+        static let fieldSoLuong = "Số lượng"
+        static let fieldDVT = "ĐVT"
+        static let fieldThoiDiemGiaoHang = "Thời điểm giao hàng"
+        static let fieldHangBan = "Hàng bán"
+        static let fieldThoiDiemCanHangBan = "Thời điểm cân hàng bán"
+        static let fieldHangThuVe = "Hàng thu về"
+        static let fieldThoiDiemCanHangThuVe = "Thời điểm cân hàng thu về"
+        static let fieldGhiChu = "Ghi chú"
+        static let btnAddPhoto = "Thêm ảnh"
+        static func btnAddPhotoBefore(_ index: Int) -> String { "Thêm ảnh \(index) trước" }
+        static func errAddPhotoBefore(_ index: Int) -> String { "Vui lòng thêm ảnh \(index) trước." }
+        static let errEmptyField = "Không được để trống."
+        static let errInvalidNumber = "Số không hợp lệ"
+        static let alertInputErrorTitle = "Lỗi nhập liệu"
+        static let alertInputErrorSub = "Vui lòng kiểm tra lại các trường thông tin."
+        static let alertSuccessTitle = "Thành công"
+        static let alertCreateSuccessSub = "Tạo phiếu gia công mới thành công."
+        static let alertUpdateSuccessSub = "Cập nhật phiếu gia công thành công."
+        static let alertDeleteSuccessSub = "Đã xoá phiếu gia công."
+        static let alertErrorTitle = "Lỗi"
+        static let alertDeleteErrorTitle = "Lỗi xoá phiếu"
+        static let galleryItem1 = "Ảnh 1 - Hàng hoá chính 1"
+        static let galleryItem2 = "Ảnh 2 - Hàng hoá chính 2"
+        static let galleryItem3 = "Ảnh 3 - Hàng gia công 1"
+        static let galleryItem4 = "Ảnh 4 - Hàng gia công 2"
+        static let galleryItem5 = "Ảnh 5 - Hàng thu hồi 1"
+        static let galleryItem6 = "Ảnh 6 - Hàng thu hồi 2"
+        static let defaultDash = "---"
+        static let placeholderHyphen = "—"
+        static let statusCreating = "Đang tạo"
+        static let statusNew = "Mới"
+        static let unselectedKH = "Chưa chọn KH"
+        static let newVoucherHeader = "Phiếu gia công mới"
+        static func copiedMessage(_ label: String) -> String { "Đã sao chép \(label.lowercased())" }
+        static func driverSubtitle(_ name: String) -> String { "Tài xế: \(name)" }
+    }
+    
     @Environment(\.router) private var router
     @StateObject private var viewModel: PhieuGiaCongDetailViewModel
     
@@ -71,12 +130,12 @@ struct PhieuGiaCongDetailView: View {
     
     private var galleryItems: [VTSPhotoGalleryItem] {
         [
-            VTSPhotoGalleryItem(id: 1, title: "Ảnh 1 - Hàng hoá chính 1", image: hinh01, ocrText: hinh01Text),
-            VTSPhotoGalleryItem(id: 2, title: "Ảnh 2 - Hàng hoá chính 2", image: hinh02, ocrText: hinh02Text),
-            VTSPhotoGalleryItem(id: 3, title: "Ảnh 3 - Hàng gia công 1", image: hinh03, ocrText: hinh03Text),
-            VTSPhotoGalleryItem(id: 4, title: "Ảnh 4 - Hàng gia công 2", image: hinh04, ocrText: hinh04Text),
-            VTSPhotoGalleryItem(id: 5, title: "Ảnh 5 - Hàng thu hồi 1", image: hinh05, ocrText: hinh05Text),
-            VTSPhotoGalleryItem(id: 6, title: "Ảnh 6 - Hàng thu hồi 2", image: hinh06, ocrText: hinh06Text)
+            VTSPhotoGalleryItem(id: 1, title: Strings.galleryItem1, image: hinh01, ocrText: hinh01Text),
+            VTSPhotoGalleryItem(id: 2, title: Strings.galleryItem2, image: hinh02, ocrText: hinh02Text),
+            VTSPhotoGalleryItem(id: 3, title: Strings.galleryItem3, image: hinh03, ocrText: hinh03Text),
+            VTSPhotoGalleryItem(id: 4, title: Strings.galleryItem4, image: hinh04, ocrText: hinh04Text),
+            VTSPhotoGalleryItem(id: 5, title: Strings.galleryItem5, image: hinh05, ocrText: hinh05Text),
+            VTSPhotoGalleryItem(id: 6, title: Strings.galleryItem6, image: hinh06, ocrText: hinh06Text)
         ]
     }
     
@@ -121,7 +180,7 @@ struct PhieuGiaCongDetailView: View {
                 return name
             }
         }
-        return taiXe.isEmpty ? "---" : taiXe
+        return taiXe.isEmpty ? Strings.defaultDash : taiXe
     }
     
     private var currentHangHoaDisplay: String {
@@ -131,7 +190,7 @@ struct PhieuGiaCongDetailView: View {
         if case .success(let details) = viewModel.state, let details = details, !details.tenHangHoa.isEmpty {
             return details.tenHangHoa
         }
-        return hangHoa.isEmpty ? "---" : hangHoa
+        return hangHoa.isEmpty ? Strings.defaultDash : hangHoa
     }
     
     private var currentDVTDisplay: String {
@@ -162,16 +221,16 @@ struct PhieuGiaCongDetailView: View {
         if case .success(let details) = viewModel.state, let details = details, let name = details.tenKhachHang, !name.isEmpty {
             return name
         }
-        return khachHang.isEmpty ? "---" : khachHang
+        return khachHang.isEmpty ? Strings.defaultDash : khachHang
     }
     
     private var headerTitleDisplay: String {
         if viewModel.isNew {
-            return "Chuyến hàng gia công mới"
+            return Strings.titleNew
         } else if isEditMode {
-            return "Cập nhật chuyến hàng gia công"
+            return Strings.titleEdit
         } else {
-            return "Thông tin chuyến hàng gia công"
+            return Strings.titleInfo
         }
     }
     
@@ -188,8 +247,8 @@ struct PhieuGiaCongDetailView: View {
         VTSPageContainer(hasGradient: true) {
             VTSAsyncContent(
                 state: viewModel.state,
-                emptyTitle: "Không tìm thấy thông tin phiếu gia công",
-                emptySubtitle: "Số phiếu có thể không tồn tại hoặc đã bị xóa.",
+                emptyTitle: Strings.emptyTitle,
+                emptySubtitle: Strings.emptySubtitle,
                 emptyIcon: "doc.text.fill",
                 retry: {
                     Task {
@@ -200,7 +259,7 @@ struct PhieuGiaCongDetailView: View {
                 VStack(spacing: 0) {
                     VTSVoucherHeaderProfileCard(
                         iconName: "building.2.fill",
-                        soXe: (xeNgoai ? soXeNgoai : soXeNha).isEmpty ? "---" : (xeNgoai ? soXeNgoai : soXeNha),
+                        soXe: (xeNgoai ? soXeNgoai : soXeNha).isEmpty ? Strings.defaultDash : (xeNgoai ? soXeNgoai : soXeNha),
                         tenNhanVien: currentTaiXeDisplay,
                         tenHangHoa: currentHangHoaDisplay,
                         trongLuongHang: trongLuongHang,
@@ -236,7 +295,7 @@ struct PhieuGiaCongDetailView: View {
         }
         .customToolbar(
             isPrimaryActionVisible: false,
-            title: "VTS-Staff",
+            title: Strings.navTitle,
             subtitle: headerTitleDisplay,
             isWhiteText: true,
             leading: { EmptyView() },
@@ -257,7 +316,7 @@ struct PhieuGiaCongDetailView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 LucideIcon(.x, size: 18)
-                                Text("Huỷ")
+                                Text(Strings.btnCancel)
                                     .font(.vtsHeadline)
                             }
                             .foregroundColor(.red)
@@ -275,7 +334,7 @@ struct PhieuGiaCongDetailView: View {
                                         .tint(.white)
                                 } else {
                                     LucideIcon(.check, size: 18)
-                                    Text("Lưu")
+                                    Text(Strings.btnSave)
                                         .font(.vtsHeadline)
                                 }
                             }
@@ -292,7 +351,7 @@ struct PhieuGiaCongDetailView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 LucideIcon(.pencil, size: 18)
-                                Text("Sửa")
+                                Text(Strings.btnEdit)
                                     .font(.vtsHeadline)
                             }
                             .foregroundColor(.white)
@@ -565,12 +624,12 @@ struct PhieuGiaCongDetailView: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(details?.soPhieu.isEmpty == false ? details!.soPhieu : "Phiếu gia công mới")
+                    Text(details?.soPhieu.isEmpty == false ? details!.soPhieu : Strings.newVoucherHeader)
                         .font(.vtsTitle)
                         .foregroundColor(.white)
                     
                     if let d = details {
-                        Text("\(d.tenKhachHang ?? "Chưa chọn KH") • \(d.tenHangHoa)")
+                        Text("\(d.tenKhachHang ?? Strings.unselectedKH) • \(d.tenHangHoa)")
                             .font(.vtsCaption)
                             .foregroundColor(.white.opacity(0.8))
                     }
@@ -579,7 +638,7 @@ struct PhieuGiaCongDetailView: View {
                 Spacer()
                 
                 VTSBadge(
-                    details?.tenTrangThai ?? (isEditMode ? "Đang tạo" : "Mới"),
+                    details?.tenTrangThai ?? (isEditMode ? Strings.statusCreating : Strings.statusNew),
                     color: .white
                 )
             }
@@ -595,14 +654,14 @@ struct PhieuGiaCongDetailView: View {
                 // Row 1: Left Số phiếu (Readonly) & Right Date field "Ngày"
                 HStack(spacing: 12) {
                     VTSLiquidTextField(
-                        label: "Số phiếu",
-                        text: .constant((details?.soPhieu ?? viewModel.soPhieu) ?? "—"),
+                        label: Strings.fieldSoPhieu,
+                        text: .constant((details?.soPhieu ?? viewModel.soPhieu) ?? Strings.placeholderHyphen),
                         isReadOnly: true
                     )
                     .frame(maxWidth: .infinity)
                     
                     VTSLiquidDateTimeField(
-                        label: "Ngày",
+                        label: Strings.fieldNgay,
                         date: $ngay,
                         displayStyle: .dateOnly,
                         isReadOnly: !isEditMode
@@ -627,7 +686,7 @@ struct PhieuGiaCongDetailView: View {
                             Image(systemName: xeNgoai ? "checkmark.square.fill" : "square")
                                 .font(.system(size: 18, weight: .semibold))
                                 .foregroundColor(xeNgoai ? .vtsPrimary : .gray)
-                            Text("Xe ngoài")
+                            Text(Strings.chkXeNgoai)
                                 .font(.system(size: 14, weight: .semibold))
                                 .foregroundColor(Color(hex: "0F2D59"))
                         }
@@ -643,7 +702,7 @@ struct PhieuGiaCongDetailView: View {
                 HStack(spacing: 12) {
                     if xeNgoai {
                         VTSLiquidTextField(
-                            label: "Số xe ngoài",
+                            label: Strings.fieldSoXeNgoai,
                             text: $soXeNgoai,
                             isReadOnly: !isEditMode,
                             errorMessage: soXeError
@@ -659,7 +718,7 @@ struct PhieuGiaCongDetailView: View {
                         }
                     } else {
                         VTSLiquidPickerField(
-                            label: "Số xe nhà",
+                            label: Strings.fieldSoXeNha,
                             selection: $soXeNha,
                             options: viewModel.xeOptions.map { $0.ma },
                             displayName: { code in
@@ -667,7 +726,7 @@ struct PhieuGiaCongDetailView: View {
                             },
                             displaySubtitle: { code in
                                 if let xe = viewModel.xeOptions.first(where: { $0.ma == code }) {
-                                    return "Tài xế: \(xe.tenTaiXe)"
+                                    return Strings.driverSubtitle(xe.tenTaiXe)
                                 }
                                 return ""
                             },
@@ -688,15 +747,15 @@ struct PhieuGiaCongDetailView: View {
                 // Row 3: Tài xế / Nhân viên (Picker nếu xe nhà, Text Input nếu xe ngoài)
                 if xeNgoai {
                     VTSLiquidTextField(
-                        label: "Tài xế ngoài",
+                        label: Strings.fieldTaiXeNgoai,
                         text: $taiXe,
-                        placeholder: "Nhập tên tài xế...",
+                        placeholder: Strings.placeholderTaiXe,
                         isReadOnly: !isEditMode,
                         errorMessage: taiXeError
                     )
                 } else {
                     VTSLiquidPickerField(
-                        label: "Tài xế",
+                        label: Strings.fieldTaiXe,
                         selection: $taiXe,
                         options: viewModel.taiXeOptions.map { $0.ma },
                         displayName: { code in
@@ -709,7 +768,7 @@ struct PhieuGiaCongDetailView: View {
                 
                 // Row 4: Khách hàng
                 VTSLiquidPickerField(
-                    label: "Khách hàng",
+                    label: Strings.fieldKhachHang,
                     selection: $khachHang,
                     options: viewModel.khachHangOptions.map { $0.ma },
                     displayName: { code in
@@ -721,7 +780,7 @@ struct PhieuGiaCongDetailView: View {
                 
                 // Row 5: Hàng giao
                 VTSLiquidPickerField(
-                    label: "Hàng giao",
+                    label: Strings.fieldHangGiao,
                     selection: $hangHoa,
                     options: viewModel.hangHoaOptions.map { $0.ma },
                     displayName: { code in
@@ -734,7 +793,7 @@ struct PhieuGiaCongDetailView: View {
                 // Row 6: Số lượng (Hàng giao) & ĐVT
                 HStack(spacing: 12) {
                     VTSLiquidTextField(
-                        label: "Số lượng",
+                        label: Strings.fieldSoLuong,
                         text: $trongLuongHang,
                         keyboardType: .decimalPad,
                         isReadOnly: !isEditMode,
@@ -742,14 +801,14 @@ struct PhieuGiaCongDetailView: View {
                     )
                     
                     if !currentDVTDisplay.isEmpty {
-                        VTSLiquidReadonlyField(currentDVTDisplay, caption: "ĐVT")
+                        VTSLiquidReadonlyField(currentDVTDisplay, caption: Strings.fieldDVT)
                             .frame(width: 90)
                     }
                 }
                 
                 // Row 7: Thời điểm giao hàng
                 VTSLiquidDateTimeField(
-                    label: "Thời điểm giao hàng",
+                    label: Strings.fieldThoiDiemGiaoHang,
                     date: Binding(
                         get: { thoiGian01 ?? Date() },
                         set: { thoiGian01 = $0; thoiGian02 = $0 }
@@ -768,11 +827,11 @@ struct PhieuGiaCongDetailView: View {
                 
                 // Row 9: Hàng bán
                 VTSLiquidPickerField(
-                    label: "Hàng bán",
+                    label: Strings.fieldHangBan,
                     selection: $hangHoaGC,
                     options: [""] + viewModel.hangHoaOptions.map { $0.ma },
                     displayName: { code in
-                        code.isEmpty ? "Hàng bán" : (viewModel.hangHoaOptions.first(where: { $0.ma == code })?.ten ?? code)
+                        code.isEmpty ? Strings.fieldHangBan : (viewModel.hangHoaOptions.first(where: { $0.ma == code })?.ten ?? code)
                     }
                 )
                 .disabled(!isEditMode)
@@ -780,21 +839,21 @@ struct PhieuGiaCongDetailView: View {
                 // Row 10: Số lượng (Hàng bán) & ĐVT
                 HStack(spacing: 12) {
                     VTSLiquidTextField(
-                        label: "Số lượng",
+                        label: Strings.fieldSoLuong,
                         text: $trongLuongHangGC,
                         keyboardType: .decimalPad,
                         isReadOnly: !isEditMode
                     )
                     
                     if !currentDVTGCDisplay.isEmpty {
-                        VTSLiquidReadonlyField(currentDVTGCDisplay, caption: "ĐVT")
+                        VTSLiquidReadonlyField(currentDVTGCDisplay, caption: Strings.fieldDVT)
                             .frame(width: 90)
                     }
                 }
                 
                 // Row 11: Thời điểm cân hàng bán
                 VTSLiquidDateTimeField(
-                    label: "Thời điểm cân hàng bán",
+                    label: Strings.fieldThoiDiemCanHangBan,
                     date: Binding(
                         get: { thoiGian03 ?? Date() },
                         set: { thoiGian03 = $0; thoiGian04 = $0 }
@@ -813,11 +872,11 @@ struct PhieuGiaCongDetailView: View {
                 
                 // Row 13: Hàng thu về
                 VTSLiquidPickerField(
-                    label: "Hàng thu về",
+                    label: Strings.fieldHangThuVe,
                     selection: $hangHoaTV,
                     options: [""] + viewModel.hangHoaOptions.map { $0.ma },
                     displayName: { code in
-                        code.isEmpty ? "Hàng thu về" : (viewModel.hangHoaOptions.first(where: { $0.ma == code })?.ten ?? code)
+                        code.isEmpty ? Strings.fieldHangThuVe : (viewModel.hangHoaOptions.first(where: { $0.ma == code })?.ten ?? code)
                     }
                 )
                 .disabled(!isEditMode)
@@ -825,21 +884,21 @@ struct PhieuGiaCongDetailView: View {
                 // Row 14: Số lượng (Hàng thu về) & ĐVT
                 HStack(spacing: 12) {
                     VTSLiquidTextField(
-                        label: "Số lượng",
+                        label: Strings.fieldSoLuong,
                         text: $trongLuongHangTV,
                         keyboardType: .decimalPad,
                         isReadOnly: !isEditMode
                     )
                     
                     if !currentDVTTVDisplay.isEmpty {
-                        VTSLiquidReadonlyField(currentDVTTVDisplay, caption: "ĐVT")
+                        VTSLiquidReadonlyField(currentDVTTVDisplay, caption: Strings.fieldDVT)
                             .frame(width: 90)
                     }
                 }
                 
                 // Row 15: Thời điểm cân hàng thu về
                 VTSLiquidDateTimeField(
-                    label: "Thời điểm cân hàng thu về",
+                    label: Strings.fieldThoiDiemCanHangThuVe,
                     date: Binding(
                         get: { thoiGian05 ?? Date() },
                         set: { thoiGian05 = $0; thoiGian06 = $0 }
@@ -858,7 +917,7 @@ struct PhieuGiaCongDetailView: View {
                 
                 // Row 17: Ghi chú
                 VTSLiquidTextField(
-                    label: "Ghi chú",
+                    label: Strings.fieldGhiChu,
                     text: $ghiChu,
                     placeholder: "",
                     isReadOnly: !isEditMode
@@ -942,7 +1001,7 @@ struct PhieuGiaCongDetailView: View {
                                     .foregroundColor(enabled ? Color(hex: "004B87") : Color.gray)
                             }
                             
-                            Text(enabled ? "Thêm ảnh" : "Thêm ảnh \(slotIndex - 1) trước")
+                            Text(enabled ? Strings.btnAddPhoto : Strings.btnAddPhotoBefore(slotIndex - 1))
                                 .font(.system(size: 13, weight: .bold))
                                 .foregroundColor(enabled ? Color(hex: "374151") : Color.gray)
                         }
@@ -955,7 +1014,7 @@ struct PhieuGiaCongDetailView: View {
                         if enabled {
                             showingActionSheetForSlot = slotIndex
                         } else {
-                            ErrorManager.shared.showError("Vui lòng thêm ảnh \(slotIndex - 1) trước.")
+                            ErrorManager.shared.showError(Strings.errAddPhotoBefore(slotIndex - 1))
                         }
                     }
                 } else {
@@ -985,7 +1044,7 @@ struct PhieuGiaCongDetailView: View {
         Button {
             if !value.isEmpty {
                 UIPasteboard.general.string = value
-                ErrorManager.shared.showSuccess("Đã sao chép \(label.lowercased())")
+                ErrorManager.shared.showSuccess(Strings.copiedMessage(label))
             }
         } label: {
             HStack(spacing: 12) {
@@ -999,7 +1058,7 @@ struct PhieuGiaCongDetailView: View {
                     Text(label)
                         .font(.vtsCaption)
                         .foregroundColor(.vtsTxtSecondary)
-                    Text(value.isEmpty ? "—" : value)
+                    Text(value.isEmpty ? Strings.placeholderHyphen : value)
                         .font(.vtsBody.bold())
                         .foregroundColor(value.isEmpty ? .vtsTxtTertiary : .vtsTxtPrimary)
                         .multilineTextAlignment(.leading)
@@ -1077,31 +1136,31 @@ struct PhieuGiaCongDetailView: View {
         
         let currentSoXe = xeNgoai ? soXeNgoai : soXeNha
         if currentSoXe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            soXeError = "Không được để trống."
+            soXeError = Strings.errEmptyField
             isValid = false
         } else {
             soXeError = nil
         }
         
         if khachHang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            khachHangError = "Không được để trống."
+            khachHangError = Strings.errEmptyField
             isValid = false
         } else {
             khachHangError = nil
         }
         
         if hangHoa.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            hangHoaError = "Không được để trống."
+            hangHoaError = Strings.errEmptyField
             isValid = false
         } else {
             hangHoaError = nil
         }
         
         if trongLuongHang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            trongLuongHangError = "Không được để trống."
+            trongLuongHangError = Strings.errEmptyField
             isValid = false
         } else if trongLuongHang.toDouble() == nil {
-            trongLuongHangError = "Số không hợp lệ"
+            trongLuongHangError = Strings.errInvalidNumber
             isValid = false
         } else {
             trongLuongHangError = nil
@@ -1112,8 +1171,8 @@ struct PhieuGiaCongDetailView: View {
     
     private func saveVoucher() async {
         guard validateForm() else {
-            router.showAlert(.alert, title: "Lỗi nhập liệu", subtitle: "Vui lòng kiểm tra lại các trường thông tin.") {
-                Button("OK") {}
+            router.showAlert(.alert, title: Strings.alertInputErrorTitle, subtitle: Strings.alertInputErrorSub) {
+                Button(Strings.btnOK) {}
             }
             return
         }
@@ -1169,8 +1228,8 @@ struct PhieuGiaCongDetailView: View {
                 let _ = try await PhieuGiaCongService.shared.them(data)
                 onSaveSuccess?()
                 NotificationCenter.default.post(name: .vtsPhieuGiaCongChanged, object: nil)
-                router.showAlert(.alert, title: "Thành công", subtitle: "Tạo phiếu gia công mới thành công.") {
-                    Button("Xong") {
+                router.showAlert(.alert, title: Strings.alertSuccessTitle, subtitle: Strings.alertCreateSuccessSub) {
+                    Button(Strings.btnDone) {
                         router.dismissScreen()
                     }
                 }
@@ -1210,8 +1269,8 @@ struct PhieuGiaCongDetailView: View {
                 let _ = try await PhieuGiaCongService.shared.sua(data)
                 onSaveSuccess?()
                 NotificationCenter.default.post(name: .vtsPhieuGiaCongChanged, object: nil)
-                router.showAlert(.alert, title: "Thành công", subtitle: "Cập nhật phiếu gia công thành công.") {
-                    Button("OK") {
+                router.showAlert(.alert, title: Strings.alertSuccessTitle, subtitle: Strings.alertUpdateSuccessSub) {
+                    Button(Strings.btnOK) {
                         isEditMode = false
                         Task {
                             await viewModel.loadDetails()
@@ -1220,8 +1279,8 @@ struct PhieuGiaCongDetailView: View {
                 }
             }
         } catch {
-            router.showAlert(.alert, title: "Lỗi", subtitle: error.localizedDescription) {
-                Button("OK") {}
+            router.showAlert(.alert, title: Strings.alertErrorTitle, subtitle: error.localizedDescription) {
+                Button(Strings.btnOK) {}
             }
         }
     }
@@ -1232,14 +1291,14 @@ struct PhieuGiaCongDetailView: View {
             let _ = try await PhieuGiaCongService.shared.xoa(soPhieu: soPhieu)
             onSaveSuccess?()
             NotificationCenter.default.post(name: .vtsPhieuGiaCongChanged, object: nil)
-            router.showAlert(.alert, title: "Thành công", subtitle: "Đã xoá phiếu gia công.") {
-                Button("OK") {
+            router.showAlert(.alert, title: Strings.alertSuccessTitle, subtitle: Strings.alertDeleteSuccessSub) {
+                Button(Strings.btnOK) {
                     router.dismissScreen()
                 }
             }
         } catch {
-            router.showAlert(.alert, title: "Lỗi xoá phiếu", subtitle: error.localizedDescription) {
-                Button("OK") {}
+            router.showAlert(.alert, title: Strings.alertDeleteErrorTitle, subtitle: error.localizedDescription) {
+                Button(Strings.btnOK) {}
             }
         }
     }

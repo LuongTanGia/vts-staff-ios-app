@@ -9,6 +9,30 @@ import SwiftUI
 import SwiftfulRouting
 
 struct XeListView: View {
+    // MARK: - UI Text Strings
+    private enum Strings {
+        static let searchPlaceholder = "Nhập nội dung để tìm"
+        static let emptyTitle = "Không tìm thấy phương tiện"
+        static let emptySubtitle = "Vui lòng kiểm tra lại kết nối hoặc thử lại."
+        static let noResultTitle = "Không tìm thấy kết quả"
+        static let noResultSubtitle = "Vui lòng nhập từ khóa khác"
+        static let colIndex = "#"
+        static let colMa = "Biển số"
+        static let colTen = "Tên gọi"
+        static let colLoai = "Loại"
+        static let subtitle = "Xe nhà"
+        static func totalCount(_ count: Int) -> String { "Tổng cộng: \(count)" }
+        static let viewDetail = "Xem chi tiết"
+        static let deleteVehicle = "Xoá phương tiện"
+        static let deleteConfirmTitle = "Xác nhận xóa"
+        static func deleteConfirmSubtitle(_ ten: String, _ ma: String) -> String { "Bạn có chắc chắn muốn xóa phương tiện \(ten) (\(ma))?" }
+        static let deleteBtn = "Xoá"
+        static let cancelBtn = "Huỷ"
+        static let errorTitle = "Lỗi"
+        static let okBtn = "OK"
+        static func subtitleModal(_ ma: String, _ loai: String) -> String { "Mã: \(ma) • Loại: \(loai)" }
+    }
+
     @Environment(\.router) private var router
     @StateObject private var viewModel = XeListViewModel()
     @State private var showSearchBar = false
@@ -17,10 +41,10 @@ struct XeListView: View {
     var body: some View {
         VTSPageContainer {
             VStack(spacing: 0) {
-                                if showSearchBar {
+                if showSearchBar {
                     VTSSearchBar(
                         text: $viewModel.searchText,
-                        placeholder: "Nhập nội dung để tìm",
+                        placeholder: Strings.searchPlaceholder,
                         onClose: {
                             withAnimation(.easeInOut(duration: 0.2)) {
                                 showSearchBar = false
@@ -35,8 +59,8 @@ struct XeListView: View {
                 
                 VTSAsyncContent(
                     state: viewModel.state,
-                    emptyTitle: "Không tìm thấy phương tiện",
-                    emptySubtitle: "Vui lòng kiểm tra lại kết nối hoặc thử lại.",
+                    emptyTitle: Strings.emptyTitle,
+                    emptySubtitle: Strings.emptySubtitle,
                     emptyIcon: "car.2.fill",
                     retry: {
                         Task {
@@ -51,17 +75,16 @@ struct XeListView: View {
                             Spacer()
                             VTSEmptyState(
                                 icon: "doc.text.magnifyingglass",
-                                title: "Không tìm thấy kết quả",
-                                subtitle: "Vui lòng nhập từ khóa khác"
+                                title: Strings.noResultTitle,
+                                subtitle: Strings.noResultSubtitle
                             )
                             Spacer()
                         } else {
-                            
                             ERPTable(
                                 dataSource: filtered,
                                 columns: [
                                     ERPColumn(
-                                        title: AnyView(Text("#")),
+                                        title: AnyView(Text(Strings.colIndex)),
                                         key: "index",
                                         width: 0.1,
                                         alignment: .center,
@@ -72,7 +95,7 @@ struct XeListView: View {
                                         }
                                     ),
                                     ERPColumn(
-                                        title: AnyView(Text("Biển số")),
+                                        title: AnyView(Text(Strings.colMa)),
                                         key: "ma",
                                         width: 0.25,
                                         alignment: .leading,
@@ -85,7 +108,7 @@ struct XeListView: View {
                                         sorter: { $0.ma.localizedCompare($1.ma) == .orderedAscending }
                                     ),
                                     ERPColumn(
-                                        title: AnyView(Text("Tên gọi")),
+                                        title: AnyView(Text(Strings.colTen)),
                                         key: "ten",
                                         width: 0.45,
                                         alignment: .leading,
@@ -97,7 +120,7 @@ struct XeListView: View {
                                         sorter: { $0.ten.localizedCompare($1.ten) == .orderedAscending }
                                     ),
                                     ERPColumn(
-                                        title: AnyView(Text("Loại")),
+                                        title: AnyView(Text(Strings.colLoai)),
                                         key: "loai",
                                         width: 0.2,
                                         alignment: .leading,
@@ -108,7 +131,6 @@ struct XeListView: View {
                                         },
                                         sorter: { $0.loai.localizedCompare($1.loai) == .orderedAscending }
                                     ),
-                                    
                                 ],
                                 defaultSortKey: "ma",
                                 onRowLongPress: { row in
@@ -143,7 +165,7 @@ struct XeListView: View {
                                 },
                                 backgroundPreferenceValue: Color.vtsPrimary,
                                 customFooterBuilder: { width in
-                                    AnyView(Text("Tổng cộng: \(viewModel.filteredXe.count)")
+                                    AnyView(Text(Strings.totalCount(viewModel.filteredXe.count))
                                         .font(.system(size: 12, weight: .bold))
                                         .padding(.vertical, 6)
                                         .foregroundColor(Color.vtsBg)
@@ -164,19 +186,19 @@ struct XeListView: View {
         .sheet(item: $selectedModalItem) { item in
             VTSActionModalSheet(
                 title: item.ten,
-                subtitle: "Mã: \(item.ma) • Loại: \(item.loai)",
+                subtitle: Strings.subtitleModal(item.ma, item.loai),
                 actions: {
                     var acts: [VTSModalAction] = []
                     let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_XE")
                     if perm?.view == true || perm == nil {
-                        acts.append(VTSModalAction(title: "Xem chi tiết", icon: "eye.fill") {
+                        acts.append(VTSModalAction(title: Strings.viewDetail, icon: "eye.fill") {
                             router.showScreen(.push) { _ in
                                 XeDetailView(maXe: item.ma, isEditMode: false)
                             }
                         })
                     }
                     if perm?.del == true {
-                        acts.append(VTSModalAction(title: "Xoá phương tiện", icon: "trash.fill", isDestructive: true) {
+                        acts.append(VTSModalAction(title: Strings.deleteVehicle, icon: "trash.fill", isDestructive: true) {
                             handleRowAction(.xoa, row: item)
                         })
                     }
@@ -195,11 +217,9 @@ struct XeListView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Xe nhà",
+            subtitle: Strings.subtitle,
             isWhiteText: true,
-            leading: {
-                
-            },
+            leading: {},
             trailing: {
                 HStack(spacing: 16) {
                     Button {
@@ -242,16 +262,16 @@ struct XeListView: View {
                 XeDetailView(maXe: row.ma, isEditMode: true)
             }
         case .xoa:
-            router.showAlert(.alert, title: "Xác nhận xóa", subtitle: "Bạn có chắc chắn muốn xóa phương tiện \(row.ten) (\(row.ma))?") {
-                Button("Huỷ", role: .cancel) {}
-                Button("Xoá", role: .destructive) {
+            router.showAlert(.alert, title: Strings.deleteConfirmTitle, subtitle: Strings.deleteConfirmSubtitle(row.ten, row.ma)) {
+                Button(Strings.cancelBtn, role: .cancel) {}
+                Button(Strings.deleteBtn, role: .destructive) {
                     Task {
                         do {
                             let _ = try await XeService.shared.xoa(ma: row.ma)
                             await viewModel.loadData()
                         } catch {
-                            router.showAlert(.alert, title: "Lỗi", subtitle: error.localizedDescription) {
-                                Button("OK") {}
+                            router.showAlert(.alert, title: Strings.errorTitle, subtitle: error.localizedDescription) {
+                                Button(Strings.okBtn) {}
                             }
                         }
                     }

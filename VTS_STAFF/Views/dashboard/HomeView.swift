@@ -9,6 +9,32 @@ import SwiftUI
 import SwiftfulRouting
 
 struct HomeView: View {
+    // MARK: - Strings
+    private enum Strings {
+        static let emptyTitle = "Không có dữ liệu thống kê"
+        static let emptySubtitle = "Vui lòng thử lại sau hoặc liên hệ quản trị viên."
+        static let toolbarTitle = "Trang chủ"
+        
+        static let sectionPhanBoNhanSu = "Phân bố nhân sự"
+        static let sectionChuyenHangHomNay = "Các chuyến hàng hôm nay"
+        static let sectionHangNhanHomNay = "Hàng nhận hôm nay"
+        static let sectionHangNhanTuanNay = "Hàng nhận tuần này"
+        static let sectionHangGiaoHomNay = "Hàng giao hôm nay"
+        static let sectionHangGiaoTuanNay = "Hàng giao tuần này"
+        
+        static let colNumber = "#"
+        static let colHangHoa = "Hàng hóa"
+        static let groupNhan = "Nhận"
+        static let groupGiao = "Giao"
+        static let colXe = "Xe"
+        static let colSoLuong = "Số lượng"
+        static let colCong = "Cộng"
+        static let colKhachHangHangHoa = "Khách hàng / Hàng hóa"
+        static let colPhongBan = "Phòng ban"
+        static let colTong = "Tổng"
+        static let colVang = "Vắng"
+        static let colDiLam = "Đi làm"
+    }
     
     @Environment(\.router) private var router
     @ObservedObject private var authManager = AuthManager.shared
@@ -50,8 +76,8 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 14) {
                         VTSAsyncContent(
                             state: viewModel.dashboardState,
-                            emptyTitle: "Không có dữ liệu thống kê",
-                            emptySubtitle: "Vui lòng thử lại sau hoặc liên hệ quản trị viên.",
+                            emptyTitle: Strings.emptyTitle,
+                            emptySubtitle: Strings.emptySubtitle,
                             emptyIcon: "chart.pie.fill",
                             retry: {
                                 Task {
@@ -71,7 +97,7 @@ struct HomeView: View {
                                 // Bảng Phân bố nhân sự
                                 if showNhanVienStats && hasNHANVIENPermission {
                                     if !data.nhanVienPhongBan.isEmpty || !data.nhanVienInOut.isEmpty {
-                                        homeCardContainer(title: "Phân bố nhân sự") {
+                                        homeCardContainer(title: Strings.sectionPhanBoNhanSu) {
                                             VStack(spacing: 12) {
                                                 kpiGrid(data: data)
                                                 hrCustomTable(data: data)
@@ -90,7 +116,7 @@ struct HomeView: View {
                                 if hasXEPermission {
                                     let filteredChuyenXe = data.hangHoaChuyenXe.filter({ $0.colType.localizedCaseInsensitiveContains("HOMNAY") })
                                     if !filteredChuyenXe.isEmpty {
-                                        homeCardContainer(title: "Các chuyến hàng hôm nay") {
+                                        homeCardContainer(title: Strings.sectionChuyenHangHomNay) {
                                             transportCustomTable(filteredList: filteredChuyenXe)
                                         }
                                         .contentShape(Rectangle())
@@ -101,7 +127,7 @@ struct HomeView: View {
                                             }
                                         }
                                     } else {
-                                        emptySectionPill(title: "Các chuyến hàng hôm nay") {
+                                        emptySectionPill(title: Strings.sectionChuyenHangHomNay) {
                                             let range = Date.todayRange
                                             router.showScreen(.push) { _ in
                                                 TruyVanChuyenXeView(fromDate: range.from, toDate: range.to)
@@ -114,7 +140,7 @@ struct HomeView: View {
                                 if hasNHAPPermission {
                                     if showNhapHomNay {
                                         if !nhapHomNay.isEmpty {
-                                            homeCardContainer(title: "Hàng nhận hôm nay") {
+                                            homeCardContainer(title: Strings.sectionHangNhanHomNay) {
                                                 importCustomTable(list: nhapHomNay)
                                             }
                                             .contentShape(Rectangle())
@@ -125,7 +151,7 @@ struct HomeView: View {
                                                 }
                                             }
                                         } else {
-                                            emptySectionPill(title: "Hàng nhận hôm nay") {
+                                            emptySectionPill(title: Strings.sectionHangNhanHomNay) {
                                                 let range = Date.todayRange
                                                 router.showScreen(.push) { _ in
                                                     TruyVanNhapView(fromDate: range.from, toDate: range.to)
@@ -136,7 +162,7 @@ struct HomeView: View {
                                     
                                     if showNhapTuanNay {
                                         if !nhapTuanNay.isEmpty {
-                                            homeCardContainer(title: "Hàng nhận tuần này") {
+                                            homeCardContainer(title: Strings.sectionHangNhanTuanNay) {
                                                 importCustomTable(list: nhapTuanNay)
                                             }
                                             .contentShape(Rectangle())
@@ -147,7 +173,7 @@ struct HomeView: View {
                                                 }
                                             }
                                         } else {
-                                            emptySectionPill(title: "Hàng nhận tuần này") {
+                                            emptySectionPill(title: Strings.sectionHangNhanTuanNay) {
                                                 let range = Date.getWeekRange(offsetWeeks: 0)
                                                 router.showScreen(.push) { _ in
                                                     TruyVanNhapView(fromDate: range.from, toDate: range.to)
@@ -161,7 +187,7 @@ struct HomeView: View {
                                 if hasXUATPermission {
                                     if showXuatHomNay {
                                         if !xuatHomNay.isEmpty {
-                                            homeCardContainer(title: "Hàng giao hôm nay") {
+                                            homeCardContainer(title: Strings.sectionHangGiaoHomNay) {
                                                 exportCustomTable(list: xuatHomNay)
                                             }
                                             .contentShape(Rectangle())
@@ -172,7 +198,7 @@ struct HomeView: View {
                                                 }
                                             }
                                         } else {
-                                            emptySectionPill(title: "Hàng giao hôm nay") {
+                                            emptySectionPill(title: Strings.sectionHangGiaoHomNay) {
                                                 let range = Date.todayRange
                                                 router.showScreen(.push) { _ in
                                                     TruyVanXuatView(fromDate: range.from, toDate: range.to)
@@ -183,7 +209,7 @@ struct HomeView: View {
                                     
                                     if showXuatTuanNay {
                                         if !xuatTuanNay.isEmpty {
-                                            homeCardContainer(title: "Hàng giao tuần này") {
+                                            homeCardContainer(title: Strings.sectionHangGiaoTuanNay) {
                                                 exportCustomTable(list: xuatTuanNay)
                                             }
                                             .contentShape(Rectangle())
@@ -194,7 +220,7 @@ struct HomeView: View {
                                                 }
                                             }
                                         } else {
-                                            emptySectionPill(title: "Hàng giao tuần này") {
+                                            emptySectionPill(title: Strings.sectionHangGiaoTuanNay) {
                                                 let range = Date.getWeekRange(offsetWeeks: 0)
                                                 router.showScreen(.push) { _ in
                                                     TruyVanXuatView(fromDate: range.from, toDate: range.to)
@@ -237,7 +263,7 @@ struct HomeView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Trang chủ",
+            subtitle: Strings.toolbarTitle,
             isWhiteText: true
         ) {
             EmptyView()
@@ -321,14 +347,14 @@ struct HomeView: View {
             VStack(spacing: 0) {
                 // Multi-level Header
                 HStack(spacing: 0) {
-                    Text("#")
+                    Text(Strings.colNumber)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .frame(width: col1Width, alignment: .center)
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Hàng hóa")
+                    Text(Strings.colHangHoa)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
@@ -338,7 +364,7 @@ struct HomeView: View {
                     
                     // Group "Nhận"
                     VStack(spacing: 0) {
-                        Text("Nhận")
+                        Text(Strings.groupNhan)
                             .font(.system(size: 13, weight: .bold))
                             .foregroundColor(headerTextColor)
                             .padding(.vertical, 4)
@@ -346,7 +372,7 @@ struct HomeView: View {
                             .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
                         
                         HStack(spacing: 0) {
-                            Text("Xe")
+                            Text(Strings.colXe)
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(headerTextColor)
                                 .padding(.vertical, 4)
@@ -354,7 +380,7 @@ struct HomeView: View {
                                 .frame(maxHeight: .infinity)
                                 .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                             
-                            Text("Số lượng")
+                            Text(Strings.colSoLuong)
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(headerTextColor)
                                 .padding(.vertical, 4)
@@ -366,7 +392,7 @@ struct HomeView: View {
                     
                     // Group "Giao"
                     VStack(spacing: 0) {
-                        Text("Giao")
+                        Text(Strings.groupGiao)
                             .font(.system(size: 13, weight: .bold))
                             .foregroundColor(headerTextColor)
                             .padding(.vertical, 4)
@@ -374,7 +400,7 @@ struct HomeView: View {
                             .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
                         
                         HStack(spacing: 0) {
-                            Text("Xe")
+                            Text(Strings.colXe)
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(headerTextColor)
                                 .padding(.vertical, 4)
@@ -382,7 +408,7 @@ struct HomeView: View {
                                 .frame(maxHeight: .infinity)
                                 .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                             
-                            Text("Số lượng")
+                            Text(Strings.colSoLuong)
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(headerTextColor)
                                 .padding(.vertical, 4)
@@ -459,7 +485,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Cộng")
+                    Text(Strings.colCong)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 6)
@@ -525,7 +551,7 @@ struct HomeView: View {
             VStack(spacing: 0) {
                 // Header Row
                 HStack(spacing: 0) {
-                    Text("#")
+                    Text(Strings.colNumber)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .frame(width: col1Width, alignment: .center)
@@ -533,7 +559,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Khách hàng / Hàng hóa")
+                    Text(Strings.colKhachHangHangHoa)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
@@ -542,7 +568,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Số lượng")
+                    Text(Strings.colSoLuong)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
@@ -624,7 +650,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Cộng")
+                    Text(Strings.colCong)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 6)
@@ -666,7 +692,7 @@ struct HomeView: View {
             VStack(spacing: 0) {
                 // Header Row
                 HStack(spacing: 0) {
-                    Text("#")
+                    Text(Strings.colNumber)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .frame(width: col1Width, alignment: .center)
@@ -674,7 +700,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Khách hàng / Hàng hóa")
+                    Text(Strings.colKhachHangHangHoa)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
@@ -683,7 +709,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Số lượng")
+                    Text(Strings.colSoLuong)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
@@ -765,7 +791,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Cộng")
+                    Text(Strings.colCong)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 6)
@@ -809,7 +835,7 @@ struct HomeView: View {
             VStack(spacing: 0) {
                 // Header Row
                 HStack(spacing: 0) {
-                    Text("#")
+                    Text(Strings.colNumber)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .frame(width: col1Width, alignment: .center)
@@ -817,7 +843,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Phòng ban")
+                    Text(Strings.colPhongBan)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.leading, 6)
@@ -826,7 +852,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Tổng")
+                    Text(Strings.colTong)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 2)
@@ -835,7 +861,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Vắng")
+                    Text(Strings.colVang)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(Color(hex: "D32F2F"))
                         .padding(.horizontal, 2)
@@ -844,7 +870,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Đi làm")
+                    Text(Strings.colDiLam)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 2)
@@ -912,7 +938,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text("Cộng")
+                    Text(Strings.colCong)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 6)

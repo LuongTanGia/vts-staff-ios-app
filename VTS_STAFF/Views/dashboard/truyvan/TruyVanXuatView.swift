@@ -9,6 +9,22 @@ import SwiftUI
 import SwiftfulRouting
 
 struct TruyVanXuatView: View {
+    // MARK: - UI Text Strings
+    private enum Strings {
+        static let searchPlaceholder = "Nhập nội dung để tìm"
+        static let queryTypePicker = "Loại truy vấn"
+        static let subtitle = "Thống kê hàng giao"
+        static let emptyTitle = "Không tìm thấy dữ liệu xuất"
+        static let emptySubtitle = "Vui lòng chọn khoảng ngày khác hoặc thử lại."
+        static let noResultTitle = "Không tìm thấy kết quả"
+        static let noResultSubtitle = "Không có dữ liệu trong khoảng thời gian này"
+        static let colIndex = "#"
+        static let colHangHoa = "Hàng hoá"
+        static let colKhachHang = "Khách hàng"
+        static let colSoLuong = "Số lượng"
+        static let footerSum = "Cộng"
+    }
+
     @Environment(\.router) private var router
     @StateObject private var viewModel: TruyVanXuatViewModel
     @State private var showSearchBar = false
@@ -24,7 +40,7 @@ struct TruyVanXuatView: View {
                 if showSearchBar {
                     VTSSearchBar(
                         text: $viewModel.searchText,
-                        placeholder: "Nhập nội dung để tìm",
+                        placeholder: Strings.searchPlaceholder,
                         onClose: {
                             withAnimation(.easeInOut(duration: 0.2)) {
                                 showSearchBar = false
@@ -37,7 +53,7 @@ struct TruyVanXuatView: View {
                     .background(Color.vtsPrimary)
                 }
                 
-                Picker("Loại truy vấn", selection: $viewModel.queryType) {
+                Picker(Strings.queryTypePicker, selection: $viewModel.queryType) {
                     ForEach(QueryType.allCases) { type in
                         Text(type.rawValue).tag(type)
                     }
@@ -81,7 +97,7 @@ struct TruyVanXuatView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Thống kê hàng giao",
+            subtitle: Strings.subtitle,
             isWhiteText: true,
             leading: {},
             trailing: {
@@ -107,8 +123,8 @@ struct TruyVanXuatView: View {
         
         VTSAsyncContent(
             state: state,
-            emptyTitle: "Không tìm thấy dữ liệu xuất",
-            emptySubtitle: "Vui lòng chọn khoảng ngày khác hoặc thử lại.",
+            emptyTitle: Strings.emptyTitle,
+            emptySubtitle: Strings.emptySubtitle,
             emptyIcon: "tray.and.arrow.up.fill",
             retry: {
                 Task {
@@ -121,8 +137,8 @@ struct TruyVanXuatView: View {
                     Spacer()
                     VTSEmptyState(
                         icon: "magnifyingglass",
-                        title: "Không tìm thấy kết quả",
-                        subtitle: "Không có dữ liệu trong khoảng thời gian này"
+                        title: Strings.noResultTitle,
+                        subtitle: Strings.noResultSubtitle
                     )
                     Spacer()
                 } else {
@@ -132,7 +148,7 @@ struct TruyVanXuatView: View {
                         dataSource: filtered,
                         columns: [
                             ERPColumn(
-                                title: AnyView(Text("#")),
+                                title: AnyView(Text(Strings.colIndex)),
                                 key: "colOrder",
                                 width: 0.12,
                                 alignment: .center,
@@ -148,7 +164,7 @@ struct TruyVanXuatView: View {
                                 sorter: { $0.colOrder < $1.colOrder }
                             ),
                             ERPColumn(
-                                title: AnyView(Text(type == .byItem ? "Hàng hoá" : "Khách hàng")),
+                                title: AnyView(Text(type == .byItem ? Strings.colHangHoa : Strings.colKhachHang)),
                                 key: "colName",
                                 width: 0.58,
                                 alignment: .leading,
@@ -163,7 +179,7 @@ struct TruyVanXuatView: View {
                                 sorter: { ($0.colName ?? "").localizedCompare($1.colName ?? "") == .orderedAscending }
                             ),
                             ERPColumn(
-                                title: AnyView(Text("Số lượng")),
+                                title: AnyView(Text(Strings.colSoLuong)),
                                 key: "colValue",
                                 width: 0.30,
                                 alignment: .trailing,
@@ -227,7 +243,7 @@ struct TruyVanXuatView: View {
                         customFooterBuilder: { width in
                             AnyView(
                                 HStack(spacing: 0) {
-                                    Text("Cộng")
+                                    Text(Strings.footerSum)
                                         .font(.system(size: 12, weight: .bold))
                                         .foregroundColor(.white)
                                         .frame(width: width * 0.70, alignment: .center)

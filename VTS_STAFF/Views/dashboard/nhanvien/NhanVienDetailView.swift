@@ -9,6 +9,45 @@ import SwiftUI
 import SwiftfulRouting
 
 struct NhanVienDetailView: View {
+    private enum Strings {
+        static let titleEdit = "Chỉnh sửa nhân viên"
+        static let titleInfo = "Thông tin nhân viên"
+        static let emptyTitle = "Không tìm thấy thông tin nhân viên"
+        static let emptySubtitle = "Hồ sơ có thể đã bị xóa hoặc không hợp lệ."
+        static let btnCancel = "Huỷ"
+        static let btnSave = "Lưu"
+        static let btnEdit = "Sửa"
+        static let btnOK = "OK"
+        static let defaultEmployee = "Nhân viên"
+        static let placeholderHyphen = "—"
+        static let fieldHoVaTenDem = "Họ và tên đệm"
+        static let fieldTen = "Tên"
+        static let fieldNgaySinh = "Ngày sinh"
+        static let fieldGioiTinh = "Giới tính"
+        static let genderMale = "Nam"
+        static let genderFemale = "Nữ"
+        static let fieldSoCCCD = "Số căn cước"
+        static let fieldDienThoai = "Điện thoại liên hệ"
+        static let fieldEmail = "Email"
+        static let fieldSoDuong = "Số, đường"
+        static let fieldPhuongXa = "Phường, Xã"
+        static let fieldTinhThanh = "Tỉnh, Thành"
+        static let fieldGhiChu = "Ghi chú"
+        static let unconfigured = "Chưa thiết lập"
+        static let errHo = "Vui lòng nhập họ và tên đệm"
+        static let errTen = "Vui lòng nhập tên"
+        static let errNgaySinh = "Vui lòng nhập ngày sinh"
+        static let errCCCD = "Vui lòng nhập số căn cước"
+        static let errDiaChi = "Vui lòng nhập số nhà, tên đường"
+        static let errPhuongXa = "Vui lòng chọn phường xã"
+        static let alertInputErrorTitle = "Lỗi nhập liệu"
+        static let alertInputErrorSub = "Vui lòng hoàn thiện các trường thông tin bắt buộc."
+        static let alertSuccessTitle = "Thành công"
+        static let alertUpdateSuccessSub = "Thông tin nhân viên đã được cập nhật."
+        static let alertErrorTitle = "Lỗi"
+        static func copiedMessage(_ label: String) -> String { "Đã sao chép \(label.lowercased())" }
+    }
+    
     @Environment(\.router) private var router
     @StateObject private var viewModel: NhanVienDetailViewModel
     
@@ -51,8 +90,8 @@ struct NhanVienDetailView: View {
         VTSPageContainer(hasGradient: true) {
             VTSAsyncContent(
                 state: viewModel.state,
-                emptyTitle: "Không tìm thấy thông tin nhân viên",
-                emptySubtitle: "Hồ sơ có thể đã bị xóa hoặc không hợp lệ.",
+                emptyTitle: Strings.emptyTitle,
+                emptySubtitle: Strings.emptySubtitle,
                 emptyIcon: "person.crop.circle.badge.exclamationmark",
                 retry: {
                     Task {
@@ -99,7 +138,7 @@ struct NhanVienDetailView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: isEditMode ? "Chỉnh sửa nhân viên" : "Thông tin nhân viên",
+            subtitle: isEditMode ? Strings.titleEdit : Strings.titleInfo,
             isWhiteText: true,
             leading: {},
             trailing: {
@@ -115,7 +154,7 @@ struct NhanVienDetailView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 LucideIcon(.x, size: 18)
-                                Text("Huỷ")
+                                Text(Strings.btnCancel)
                                     .font(.vtsHeadline)
                             }
                             .foregroundColor(.red)
@@ -133,7 +172,7 @@ struct NhanVienDetailView: View {
                                         .tint(.primary)
                                 } else {
                                     LucideIcon(.check, size: 18)
-                                    Text("Lưu")
+                                    Text(Strings.btnSave)
                                         .font(.vtsHeadline)
                                 }
                             }
@@ -150,7 +189,7 @@ struct NhanVienDetailView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 LucideIcon(.pencil, size: 18)
-                                Text("Sửa")
+                                Text(Strings.btnEdit)
                                     .font(.vtsHeadline)
                             }
                             .foregroundColor(.primary)
@@ -217,17 +256,17 @@ struct NhanVienDetailView: View {
             
             VStack(alignment: .leading, spacing: 2) {
                 let fullName = getFullName(ho: emHo, ten: emTen)
-                Text(fullName.isEmpty ? "Nhân viên" : fullName)
+                Text(fullName.isEmpty ? Strings.defaultEmployee : fullName)
                     .font(.system(size: 17, weight: .bold))
                     .foregroundColor(.white)
                     .lineLimit(1)
                 
-                Text(details.emid ?? "—")
+                Text(details.emid ?? Strings.placeholderHyphen)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.white)
                     .lineLimit(1)
                 
-                let sub = details.emTenPhongBanHH ?? (details.emDienThoai ?? "—")
+                let sub = details.emTenPhongBanHH ?? (details.emDienThoai ?? Strings.placeholderHyphen)
                 Text(sub)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.white)
@@ -246,14 +285,14 @@ struct NhanVienDetailView: View {
             VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 12) {
                     VTSLiquidTextField(
-                        label: "Họ và tên đệm",
+                        label: Strings.fieldHoVaTenDem,
                         text: $emHo,
                         isReadOnly: !isEditMode,
                         errorMessage: hoError
                     )
                     
                     VTSLiquidTextField(
-                        label: "Tên",
+                        label: Strings.fieldTen,
                         text: $emTen,
                         isReadOnly: !isEditMode,
                         errorMessage: tenError
@@ -263,20 +302,20 @@ struct NhanVienDetailView: View {
                 
                 HStack(spacing: 12) {
                     VTSLiquidTextField(
-                        label: "Ngày sinh",
+                        label: Strings.fieldNgaySinh,
                         text: $emNgaySinhStr,
                         isReadOnly: !isEditMode,
                         errorMessage: ngaySinhError
                     )
                     
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Giới tính")
+                        Text(Strings.fieldGioiTinh)
                             .font(.system(size: 11, weight: .medium))
                             .foregroundStyle(Color(hex: "475569"))
                             .padding(.leading, 4)
-                        Picker("Giới tính", selection: $isFemale) {
-                            Text("Nam").tag(false)
-                            Text("Nữ").tag(true)
+                        Picker(Strings.fieldGioiTinh, selection: $isFemale) {
+                            Text(Strings.genderMale).tag(false)
+                            Text(Strings.genderFemale).tag(true)
                         }
                         .pickerStyle(.segmented)
                         .disabled(!isEditMode)
@@ -284,7 +323,7 @@ struct NhanVienDetailView: View {
                 }
                 
                 VTSLiquidTextField(
-                    label: "Số căn cước",
+                    label: Strings.fieldSoCCCD,
                     text: $emcccdppSo,
                     keyboardType: .numberPad,
                     isReadOnly: !isEditMode,
@@ -292,28 +331,28 @@ struct NhanVienDetailView: View {
                 )
                 
                 VTSLiquidTextField(
-                    label: "Điện thoại liên hệ",
+                    label: Strings.fieldDienThoai,
                     text: $emDienThoai,
                     keyboardType: .phonePad,
                     isReadOnly: !isEditMode
                 )
                 
                 VTSLiquidTextField(
-                    label: "Email",
+                    label: Strings.fieldEmail,
                     text: $emEmail,
                     keyboardType: .emailAddress,
                     isReadOnly: !isEditMode
                 )
                 
                 VTSLiquidTextField(
-                    label: "Số, đường",
+                    label: Strings.fieldSoDuong,
                     text: $emDiaChiSoDuong,
                     isReadOnly: !isEditMode,
                     errorMessage: diaChiError
                 )
                 
                 VTSLiquidPickerField(
-                    label: "Phường, Xã",
+                    label: Strings.fieldPhuongXa,
                     selection: $emDiaChiPhuongXa,
                     options: {
                         var list = viewModel.phuongXas.map { $0.ma }
@@ -345,7 +384,7 @@ struct NhanVienDetailView: View {
                 .disabled(!isEditMode)
                 
                 VTSLiquidTextField(
-                    label: "Tỉnh, Thành",
+                    label: Strings.fieldTinhThanh,
                     text: Binding(
                         get: {
                             if let found = viewModel.phuongXas.first(where: { $0.ma == emDiaChiPhuongXa }) {
@@ -362,7 +401,7 @@ struct NhanVienDetailView: View {
                 )
                 
                 VTSLiquidTextField(
-                    label: "Ghi chú",
+                    label: Strings.fieldGhiChu,
                     text: $ghiChu,
                     placeholder: "",
                     isReadOnly: !isEditMode
@@ -376,7 +415,7 @@ struct NhanVienDetailView: View {
         Button {
             if !value.isEmpty {
                 UIPasteboard.general.string = value
-                ErrorManager.shared.showSuccess("Đã sao chép \(label.lowercased())")
+                ErrorManager.shared.showSuccess(Strings.copiedMessage(label))
             }
         } label: {
             HStack(spacing: 12) {
@@ -391,7 +430,7 @@ struct NhanVienDetailView: View {
                         .font(.vtsCaption)
                         .foregroundColor(.vtsTxtSecondary)
                     
-                    Text(value.isEmpty ? "Chưa thiết lập" : value)
+                    Text(value.isEmpty ? Strings.unconfigured : value)
                         .font(.vtsBody.bold())
                         .foregroundColor(value.isEmpty ? .vtsTxtTertiary : .vtsTxtPrimary)
                         .multilineTextAlignment(.leading)
@@ -463,52 +502,50 @@ struct NhanVienDetailView: View {
         var hasError = false
         
         if emHo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            hoError = "Vui lòng nhập họ và tên đệm"
+            hoError = Strings.errHo
             hasError = true
         } else {
             hoError = nil
         }
         
         if emTen.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            tenError = "Vui lòng nhập tên"
+            tenError = Strings.errTen
             hasError = true
         } else {
             tenError = nil
         }
         
         if emNgaySinhStr.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            ngaySinhError = "Vui lòng nhập ngày sinh"
+            ngaySinhError = Strings.errNgaySinh
             hasError = true
         } else {
             ngaySinhError = nil
         }
         
         if emcccdppSo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            cccdError = "Vui lòng nhập số căn cước"
+            cccdError = Strings.errCCCD
             hasError = true
         } else {
             cccdError = nil
         }
         
-        
-        
         if emDiaChiSoDuong.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            diaChiError = "Vui lòng nhập số nhà, tên đường"
+            diaChiError = Strings.errDiaChi
             hasError = true
         } else {
             diaChiError = nil
         }
         
         if emDiaChiPhuongXa.isEmpty {
-            phuongXaError = "Vui lòng chọn phường xã"
+            phuongXaError = Strings.errPhuongXa
             hasError = true
         } else {
             phuongXaError = nil
         }
         
         if hasError {
-            router.showAlert(.alert, title: "Lỗi nhập liệu", subtitle: "Vui lòng hoàn thiện các trường thông tin bắt buộc.") {
-                Button("OK") {}
+            router.showAlert(.alert, title: Strings.alertInputErrorTitle, subtitle: Strings.alertInputErrorSub) {
+                Button(Strings.btnOK) {}
             }
             return
         }
@@ -536,8 +573,8 @@ struct NhanVienDetailView: View {
         
         do {
             let _ = try await NhanVienService.shared.sua(data)
-            router.showAlert(.alert, title: "Thành công", subtitle: "Thông tin nhân viên đã được cập nhật.") {
-                Button("OK") {
+            router.showAlert(.alert, title: Strings.alertSuccessTitle, subtitle: Strings.alertUpdateSuccessSub) {
+                Button(Strings.btnOK) {
                     withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                         isEditMode = false
                     }
@@ -547,8 +584,8 @@ struct NhanVienDetailView: View {
                 }
             }
         } catch {
-            router.showAlert(.alert, title: "Lỗi", subtitle: error.localizedDescription) {
-                Button("OK") {}
+            router.showAlert(.alert, title: Strings.alertErrorTitle, subtitle: error.localizedDescription) {
+                Button(Strings.btnOK) {}
             }
         }
     }

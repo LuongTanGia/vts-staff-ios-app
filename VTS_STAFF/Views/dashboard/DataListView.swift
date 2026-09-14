@@ -9,6 +9,22 @@ import SwiftUI
 import SwiftfulRouting
 
 struct DataListView: View {
+    // MARK: - Strings
+    private enum Strings {
+        static let emptyTitle = "Không có chức năng"
+        static let emptySubtitle = "Tài khoản của bạn chưa được phân quyền chức năng nào."
+        static let toolbarTitle = "Dữ liệu"
+        
+        static let subHangHoa = "Danh sách hàng hóa giao, nhận"
+        static let subKhachHang = "Danh sách khách hàng, nhà cung cấp, đối tác giao, nhận"
+        static let subNhanVien = "Danh sách nhân viên hiện hữu của doanh nghiệp"
+        static let subXe = "Danh sách phương tiện vận tải thuộc sở hữu của doanh nghiệp"
+        static let subPhieuGiaCong = "Hàng hóa xuất gia công và nhận về"
+        static let subPhieuNhap = "Hàng hóa nhận về từ các nhà cung cấp"
+        static let subPhieuXuat = "Hàng hóa giao cho khách hàng"
+        static func codeSubtitle(_ code: String) -> String { "Mã: \(code)" }
+    }
+
     @Environment(\.router) private var router
     @ObservedObject private var authManager = AuthManager.shared
     @State private var selectedFunction: TChucNangPhanQuyen?
@@ -48,8 +64,8 @@ struct DataListView: View {
                 if groupedGroups.isEmpty {
                     VTSEmptyState(
                         icon: "square.grid.2x2",
-                        title: "Không có chức năng",
-                        subtitle: "Tài khoản của bạn chưa được phân quyền chức năng nào."
+                        title: Strings.emptyTitle,
+                        subtitle: Strings.emptySubtitle
                     )
                 } else {
                     // Content List
@@ -87,7 +103,7 @@ struct DataListView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Dữ liệu",
+            subtitle: Strings.toolbarTitle,
             isWhiteText: true
         ){
             
@@ -143,21 +159,21 @@ struct DataListView: View {
         }
         switch item.maChucNang {
         case "VTSSTAFF_DANHMUC_HANGHOA":
-            return "Danh sách hàng hóa giao, nhận"
+            return Strings.subHangHoa
         case "VTSSTAFF_DANHMUC_KHACHHANG":
-            return "Danh sách khách hàng, nhà cung cấp, đối tác giao, nhận"
+            return Strings.subKhachHang
         case "VTSSTAFF_DANHMUC_NHANVIEN":
-            return "Danh sách nhân viên hiện hữu của doanh nghiệp"
+            return Strings.subNhanVien
         case "VTSSTAFF_DANHMUC_XE":
-            return "Danh sách phương tiện vận tải thuộc sở hữu của doanh nghiệp"
+            return Strings.subXe
         case "VTSSTAFF_DULIEU_PHIEUGIACONG":
-            return "Hàng hóa xuất gia công và nhận về"
+            return Strings.subPhieuGiaCong
         case "VTSSTAFF_DULIEU_PHIEUNHAP":
-            return "Hàng hóa nhận về từ các nhà cung cấp"
+            return Strings.subPhieuNhap
         case "VTSSTAFF_DULIEU_PHIEUXUAT":
-            return "Hàng hóa giao cho khách hàng"
+            return Strings.subPhieuXuat
         default:
-            return "Mã: \(item.maChucNang)"
+            return Strings.codeSubtitle(item.maChucNang)
         }
     }
     

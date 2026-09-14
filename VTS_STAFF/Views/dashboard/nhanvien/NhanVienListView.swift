@@ -9,6 +9,21 @@ import SwiftUI
 import SwiftfulRouting
 
 struct NhanVienListView: View {
+    // MARK: - UI Text Strings
+    private enum Strings {
+        static let searchPlaceholder = "Nhập nội dung để tìm"
+        static let emptyTitle = "Không tìm thấy nhân viên"
+        static let emptySubtitle = "Vui lòng kiểm tra lại kết nối hoặc thử lại."
+        static let noResultTitle = "Không tìm thấy kết quả"
+        static let noResultSubtitle = "Vui lòng nhập từ khóa khác"
+        static let colIndex = "#"
+        static let colHo = "Họ"
+        static let colTen = "Tên"
+        static let colDienThoai = "Điện thoại"
+        static let subtitle = "Nhân viên"
+        static func totalCount(_ count: Int) -> String { "Tổng cộng: \(count)" }
+    }
+
     @Environment(\.router) private var router
     @StateObject private var viewModel = NhanVienListViewModel()
     @State private var showSearchBar = false
@@ -17,10 +32,10 @@ struct NhanVienListView: View {
     var body: some View {
         VTSPageContainer {
             VStack(spacing: 0) {
-                                if showSearchBar {
+                if showSearchBar {
                     VTSSearchBar(
                         text: $viewModel.searchText,
-                        placeholder: "Nhập nội dung để tìm",
+                        placeholder: Strings.searchPlaceholder,
                         onClose: {
                             withAnimation(.easeInOut(duration: 0.2)) {
                                 showSearchBar = false
@@ -33,11 +48,11 @@ struct NhanVienListView: View {
                     .background(Color.vtsPrimary)
                 }
                 
-                //                     Content list or table
+                // Content list or table
                 VTSAsyncContent(
                     state: viewModel.state,
-                    emptyTitle: "Không tìm thấy nhân viên",
-                    emptySubtitle: "Vui lòng kiểm tra lại kết nối hoặc thử lại.",
+                    emptyTitle: Strings.emptyTitle,
+                    emptySubtitle: Strings.emptySubtitle,
                     emptyIcon: "person.3.fill",
                     retry: {
                         Task {
@@ -52,8 +67,8 @@ struct NhanVienListView: View {
                             Spacer()
                             VTSEmptyState(
                                 icon: "person.crop.circle.badge.questionmark",
-                                title: "Không tìm thấy kết quả",
-                                subtitle: "Vui lòng nhập từ khóa khác"
+                                title: Strings.noResultTitle,
+                                subtitle: Strings.noResultSubtitle
                             )
                             Spacer()
                         } else {
@@ -61,19 +76,18 @@ struct NhanVienListView: View {
                                 dataSource: filtered,
                                 columns: [
                                     ERPColumn(
-                                        title: AnyView(Text("#")),
+                                        title: AnyView(Text(Strings.colIndex)),
                                         key: "emid",
                                         width: 0.1,
                                         alignment: .center,
                                         render: { _, index in
                                             AnyView(
                                                 Text(String(index + 1))
-                                                
                                             )
                                         }
                                     ),
                                     ERPColumn(
-                                        title: AnyView(Text("Họ")),
+                                        title: AnyView(Text(Strings.colHo)),
                                         key: "emHo",
                                         width: 0.4,
                                         alignment: .leading,
@@ -85,20 +99,19 @@ struct NhanVienListView: View {
                                         sorter: { $0.emHo.localizedCompare($1.emHo) == .orderedAscending }
                                     ),
                                     ERPColumn(
-                                        title: AnyView(Text("Tên")),
+                                        title: AnyView(Text(Strings.colTen)),
                                         key: "emTen",
                                         width: 0.2,
                                         alignment: .leading,
                                         render: { item, _ in
                                             AnyView(
-                                                
                                                 Text(item.emTen)
                                             )
                                         },
                                         sorter: { $0.emTen.localizedCompare($1.emTen) == .orderedAscending }
                                     ),
                                     ERPColumn(
-                                        title: AnyView(Text("Điện thoại")),
+                                        title: AnyView(Text(Strings.colDienThoai)),
                                         key: "emDienThoai",
                                         width: 0.3,
                                         alignment: .leading,
@@ -109,8 +122,7 @@ struct NhanVienListView: View {
                                         },
                                         sorter: { $0.emDienThoai.localizedCompare($1.emDienThoai) == .orderedAscending }
                                     ),
-                                    
-                                 ],
+                                ],
                                 defaultSortKey: "emTen",
                                 onRowLongPress: { row in
                                     router.showScreen(.push) { _ in
@@ -138,7 +150,7 @@ struct NhanVienListView: View {
                                 },
                                 backgroundPreferenceValue: Color.vtsPrimary,
                                 customFooterBuilder: { width in
-                                    AnyView(Text("Tổng cộng: \(viewModel.filteredNhanVien.count)")
+                                    AnyView(Text(Strings.totalCount(viewModel.filteredNhanVien.count))
                                         .font(.system(size: 12, weight: .bold))
                                         .padding(.vertical, 6)
                                         .foregroundColor(Color.vtsBg)
@@ -162,11 +174,10 @@ struct NhanVienListView: View {
                 hasLoadedData = true
             }
         }
-        
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Nhân viên",
+            subtitle: Strings.subtitle,
             isWhiteText: true,
             leading: {},
             trailing: {

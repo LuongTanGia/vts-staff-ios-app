@@ -9,6 +9,32 @@ import SwiftUI
 import SwiftfulRouting
 
 struct HangHoaListView: View {
+    // MARK: - UI Text Strings
+    private enum Strings {
+        static let searchPlaceholder = "Nhập nội dung để tìm"
+        static let emptyTitle = "Không tìm thấy hàng hoá"
+        static let emptySubtitle = "Vui lòng kiểm tra lại kết nối hoặc thử lại."
+        static let noResultTitle = "Không tìm thấy kết quả"
+        static let noResultSubtitle = "Vui lòng nhập từ khóa khác"
+        static let colIndex = "#"
+        static let colTen = "Tên"
+        static let colDVT = "ĐVT"
+        static let colLoai = "Loại"
+        static let subtitle = "Hàng hoá"
+        static func totalCount(_ count: Int) -> String { "Tổng cộng: \(count)" }
+        static let viewDetail = "Xem chi tiết"
+        static let deleteHangHoa = "Xoá hàng hoá"
+        static let deleteConfirmTitle = "Xác nhận xóa"
+        static func deleteConfirmSubtitle(_ ten: String, _ ma: String) -> String { "Bạn có chắc chắn muốn xóa hàng hóa \(ten) (\(ma))?" }
+        static let deleteBtn = "Xoá"
+        static let cancelBtn = "Huỷ"
+        static let errorTitle = "Lỗi"
+        static let okBtn = "OK"
+        static func subtitleModal(_ ma: String, _ dvt: String?) -> String {
+            "Mã: \(ma)" + (dvt != nil && !dvt!.isEmpty ? " • ĐVT: \(dvt!)" : "")
+        }
+    }
+
     @Environment(\.router) private var router
     @StateObject private var viewModel = HangHoaListViewModel()
     @State private var showSearchBar = false
@@ -18,10 +44,10 @@ struct HangHoaListView: View {
     var body: some View {
         VTSPageContainer {
             VStack(spacing: 0) {
-                                if showSearchBar {
+                if showSearchBar {
                     VTSSearchBar(
                         text: $viewModel.searchText,
-                        placeholder: "Nhập nội dung để tìm",
+                        placeholder: Strings.searchPlaceholder,
                         onClose: {
                             withAnimation(.easeInOut(duration: 0.2)) {
                                 showSearchBar = false
@@ -36,8 +62,8 @@ struct HangHoaListView: View {
                 
                 VTSAsyncContent(
                     state: viewModel.state,
-                    emptyTitle: "Không tìm thấy hàng hoá",
-                    emptySubtitle: "Vui lòng kiểm tra lại kết nối hoặc thử lại.",
+                    emptyTitle: Strings.emptyTitle,
+                    emptySubtitle: Strings.emptySubtitle,
                     emptyIcon: "cube.box.fill",
                     retry: {
                         Task {
@@ -52,8 +78,8 @@ struct HangHoaListView: View {
                             Spacer()
                             VTSEmptyState(
                                 icon: "doc.text.magnifyingglass",
-                                title: "Không tìm thấy kết quả",
-                                subtitle: "Vui lòng nhập từ khóa khác"
+                                title: Strings.noResultTitle,
+                                subtitle: Strings.noResultSubtitle
                             )
                             Spacer()
                         } else {
@@ -61,7 +87,7 @@ struct HangHoaListView: View {
                                 dataSource: filtered,
                                 columns: [
                                     ERPColumn(
-                                        title: AnyView(Text("#")),
+                                        title: AnyView(Text(Strings.colIndex)),
                                         key: "index",
                                         width: 0.1,
                                         alignment: .center,
@@ -73,7 +99,7 @@ struct HangHoaListView: View {
                                     ),
                                     
                                     ERPColumn(
-                                        title: AnyView(Text("Tên")),
+                                        title: AnyView(Text(Strings.colTen)),
                                         key: "ten",
                                         width: 0.45,
                                         alignment: .leading,
@@ -85,7 +111,7 @@ struct HangHoaListView: View {
                                         sorter: { $0.ten.localizedCompare($1.ten) == .orderedAscending }
                                     ),
                                     ERPColumn(
-                                        title: AnyView(Text("ĐVT")),
+                                        title: AnyView(Text(Strings.colDVT)),
                                         key: "dvt",
                                         width: 0.15,
                                         alignment: .center,
@@ -97,7 +123,7 @@ struct HangHoaListView: View {
                                         sorter: { ($0.dvt ?? "").localizedCompare($1.dvt ?? "") == .orderedAscending }
                                     ),
                                     ERPColumn(
-                                        title: AnyView(Text("Loại")),
+                                        title: AnyView(Text(Strings.colLoai)),
                                         key: "loai",
                                         width: 0.15,
                                         alignment: .leading,
@@ -142,7 +168,7 @@ struct HangHoaListView: View {
                                 },
                                 backgroundPreferenceValue: Color.vtsPrimary,
                                 customFooterBuilder: { width in
-                                    AnyView(Text("Tổng cộng: \(viewModel.filteredHangHoa.count)")
+                                    AnyView(Text(Strings.totalCount(viewModel.filteredHangHoa.count))
                                         .font(.system(size: 12, weight: .bold))
                                         .padding(.vertical, 6)
                                         .foregroundColor(Color.vtsBg)
@@ -163,19 +189,19 @@ struct HangHoaListView: View {
         .sheet(item: $selectedModalItem) { item in
             VTSActionModalSheet(
                 title: item.ten,
-                subtitle: "Mã: \(item.ma)" + (item.dvt != nil && !item.dvt!.isEmpty ? " • ĐVT: \(item.dvt!)" : ""),
+                subtitle: Strings.subtitleModal(item.ma, item.dvt),
                 actions: {
                     var acts: [VTSModalAction] = []
                     let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_HANGHOA")
                     if perm?.view == true || perm == nil {
-                        acts.append(VTSModalAction(title: "Xem chi tiết", icon: "eye.fill") {
+                        acts.append(VTSModalAction(title: Strings.viewDetail, icon: "eye.fill") {
                             router.showScreen(.push) { _ in
                                 HangHoaDetailView(maHH: item.ma, isEditMode: false)
                             }
                         })
                     }
                     if perm?.del == true {
-                        acts.append(VTSModalAction(title: "Xoá hàng hoá", icon: "trash.fill", isDestructive: true) {
+                        acts.append(VTSModalAction(title: Strings.deleteHangHoa, icon: "trash.fill", isDestructive: true) {
                             handleRowAction(.xoa, row: item)
                         })
                     }
@@ -197,11 +223,9 @@ struct HangHoaListView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Hàng hoá",
+            subtitle: Strings.subtitle,
             isWhiteText: true,
-            leading: {
-                
-            },
+            leading: {},
             trailing: {
                 HStack(spacing: 16) {
                     Button {
@@ -244,16 +268,16 @@ struct HangHoaListView: View {
                 HangHoaDetailView(maHH: row.ma, isEditMode: true)
             }
         case .xoa:
-            router.showAlert(.alert, title: "Xác nhận xóa", subtitle: "Bạn có chắc chắn muốn xóa hàng hóa \(row.ten) (\(row.ma))?") {
-                Button("Huỷ", role: .cancel) {}
-                Button("Xoá", role: .destructive) {
+            router.showAlert(.alert, title: Strings.deleteConfirmTitle, subtitle: Strings.deleteConfirmSubtitle(row.ten, row.ma)) {
+                Button(Strings.cancelBtn, role: .cancel) {}
+                Button(Strings.deleteBtn, role: .destructive) {
                     Task {
                         do {
                             let _ = try await HangHoaService.shared.xoa(ma: row.ma)
                             await viewModel.loadData()
                         } catch {
-                            router.showAlert(.alert, title: "Lỗi", subtitle: error.localizedDescription) {
-                                Button("OK") {}
+                            router.showAlert(.alert, title: Strings.errorTitle, subtitle: error.localizedDescription) {
+                                Button(Strings.okBtn) {}
                             }
                         }
                     }

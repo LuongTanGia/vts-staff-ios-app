@@ -9,6 +9,25 @@ import SwiftUI
 import SwiftfulRouting
 
 struct PhieuXuatListView: View {
+    // MARK: - UI Text Strings
+    private enum Strings {
+        static let searchPlaceholder = "Nhập nội dung để tìm"
+        static let emptyTitle = "Không tìm thấy phiếu xuất"
+        static let emptySubtitle = "Vui lòng kiểm tra lại kết nối hoặc thử lại."
+        static let noResultTitle = "Không tìm thấy kết quả"
+        static let noResultSubtitle = "Vui lòng nhập từ khóa khác"
+        static let deleteAlertTitle = "Xác nhận xoá"
+        static func deleteAlertSubtitle(_ soPhieu: String) -> String { "Bạn có chắc chắn muốn xoá phiếu xuất \(soPhieu)?" }
+        static let deleteBtn = "Xoá"
+        static let cancelBtn = "Huỷ"
+        static func modalTitle(_ soPhieu: String) -> String { "Phiếu xuất: \(soPhieu)" }
+        static let viewDetail = "Xem chi tiết"
+        static let deleteTicket = "Xoá phiếu"
+        static let navSubtitle = "Chuyển hàng giao"
+        static func totalTickets(_ count: Int) -> String { "Tổng cộng \(count) phiếu" }
+        static func deleteError(_ message: String) -> String { "Không thể xoá phiếu: \(message)" }
+    }
+
     @Environment(\.router) private var router
     @StateObject private var viewModel: PhieuXuatListViewModel
     @State private var showSearchBar: Bool
@@ -30,18 +49,18 @@ struct PhieuXuatListView: View {
     }
     
     private func deleteItem(_ item: TPhieuvc_Xuat_DanhSach) {
-        router.showAlert(.alert, title: "Xác nhận xoá", subtitle: "Bạn có chắc chắn muốn xoá phiếu xuất \(item.soPhieu)?") {
-            Button("Xoá", role: .destructive) {
+        router.showAlert(.alert, title: Strings.deleteAlertTitle, subtitle: Strings.deleteAlertSubtitle(item.soPhieu)) {
+            Button(Strings.deleteBtn, role: .destructive) {
                 Task {
                     do {
                         _ = try await PhieuXuatService.shared.xoa(soPhieu: item.soPhieu)
                         await viewModel.loadData()
                     } catch {
-                        ErrorManager.shared.showError("Không thể xoá phiếu: \(error.localizedDescription)")
+                        ErrorManager.shared.showError(Strings.deleteError(error.localizedDescription))
                     }
                 }
             }
-            Button("Huỷ", role: .cancel) {}
+            Button(Strings.cancelBtn, role: .cancel) {}
         }
     }
     
@@ -49,21 +68,21 @@ struct PhieuXuatListView: View {
         VTSPageContainer {
             VStack(spacing: 0) {
                 VStack(spacing: 0) {
-                                    if showSearchBar {
-                    VTSSearchBar(
-                        text: $viewModel.searchText,
-                        placeholder: "Nhập nội dung để tìm",
-                        onClose: {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                showSearchBar = false
+                    if showSearchBar {
+                        VTSSearchBar(
+                            text: $viewModel.searchText,
+                            placeholder: Strings.searchPlaceholder,
+                            onClose: {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    showSearchBar = false
+                                }
                             }
-                        }
-                    )
-                    .padding(.horizontal, VTSSpacing.xl)
-                    .padding(.top, 4)
-                    .padding(.bottom, 2)
-                    .background(Color.vtsPrimary)
-                }
+                        )
+                        .padding(.horizontal, VTSSpacing.xl)
+                        .padding(.top, 4)
+                        .padding(.bottom, 2)
+                        .background(Color.vtsPrimary)
+                    }
                     HStack(spacing: 8) {
                         SystemDateFilterHeader(
                             fromDate: $viewModel.fromDate,
@@ -81,8 +100,8 @@ struct PhieuXuatListView: View {
                 
                 VTSAsyncContent(
                     state: viewModel.state,
-                    emptyTitle: "Không tìm thấy phiếu xuất",
-                    emptySubtitle: "Vui lòng kiểm tra lại kết nối hoặc thử lại.",
+                    emptyTitle: Strings.emptyTitle,
+                    emptySubtitle: Strings.emptySubtitle,
                     emptyIcon: "doc.text.fill",
                     retry: {
                         Task {
@@ -97,8 +116,8 @@ struct PhieuXuatListView: View {
                             Spacer()
                             VTSEmptyState(
                                 icon: "doc.text.magnifyingglass",
-                                title: "Không tìm thấy kết quả",
-                                subtitle: "Vui lòng nhập từ khóa khác"
+                                title: Strings.noResultTitle,
+                                subtitle: Strings.noResultSubtitle
                             )
                             Spacer()
                         } else {
@@ -118,6 +137,7 @@ struct PhieuXuatListView: View {
                                     }
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 16)
+                                    .padding(.bottom, 16)
                                 }
                                 .refreshable {
                                     await viewModel.loadData()
@@ -128,7 +148,7 @@ struct PhieuXuatListView: View {
                         // Bottom Statistics Footer
                         let totalWeight = filtered.reduce(0.0) { $0 + Double($1.trongLuongHang) }
                         HStack(spacing: 0) {
-                            Text("Tổng cộng \(filtered.count) phiếu")
+                            Text(Strings.totalTickets(filtered.count))
                                 .font(.system(size: 13, weight: .bold))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity, alignment: .center)
@@ -160,11 +180,11 @@ struct PhieuXuatListView: View {
         }
         .sheet(item: $selectedModalItem) { item in
             VTSActionModalSheet(
-                title: "Phiếu xuất: \(item.soPhieu)",
+                title: Strings.modalTitle(item.soPhieu),
                 subtitle: "\(item.tenHangHoa) • \(item.ngay.toUIDateString)",
                 actions: {
                     var acts: [VTSModalAction] = []
-                    acts.append(VTSModalAction(title: "Xem chi tiết", icon: "eye.fill") {
+                    acts.append(VTSModalAction(title: Strings.viewDetail, icon: "eye.fill") {
                         router.showScreen(.push) { _ in
                             PhieuXuatDetailView(soPhieu: item.soPhieu, existing: item, onSaveSuccess: {
                                 Task {
@@ -174,7 +194,7 @@ struct PhieuXuatListView: View {
                         }
                     })
                     if hasDeletePermission {
-                        acts.append(VTSModalAction(title: "Xoá phiếu", icon: "trash.fill", isDestructive: true) {
+                        acts.append(VTSModalAction(title: Strings.deleteTicket, icon: "trash.fill", isDestructive: true) {
                             deleteItem(item)
                         })
                     }
@@ -190,7 +210,7 @@ struct PhieuXuatListView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Chuyển hàng giao",
+            subtitle: Strings.navSubtitle,
             isWhiteText: true,
             leading: {},
             trailing: {
@@ -257,14 +277,14 @@ struct PhieuXuatListView: View {
                         })
                     }
                 } label: {
-                    Label("Xem chi tiết", systemImage: "eye")
+                    Label(Strings.viewDetail, systemImage: "eye")
                 }
                 
                 if hasDeletePermission {
                     Button(role: .destructive) {
                         deleteItem(item)
                     } label: {
-                        Label("Xoá phiếu", systemImage: "trash")
+                        Label(Strings.deleteTicket, systemImage: "trash")
                     }
                 }
             }
@@ -272,20 +292,23 @@ struct PhieuXuatListView: View {
 }
 
 struct PhieuXuatCardView: View {
+    // MARK: - UI Text Strings
+    private enum Strings {
+        static let hangBan = "Hàng bán"
+        static let thuVe = "Thu về"
+        static let xeNgoai = "Xe ngoài"
+        static let emptyPlaceholder = "---"
+    }
+
     let item: TPhieuvc_Xuat_DanhSach
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Row 1: Số, Ngày
             HStack {
-                HStack(spacing: 4) {
-                    Text("Số:")
-                        .font(.vtsCallout)
-                        .foregroundColor(.vtsTxtSecondary)
-                    Text(item.soPhieu)
-                        .font(.system(size: 15, weight: .regular, design: .rounded))
-                        .foregroundColor(.vtsPrimary)
-                }
+                Text(item.soPhieu)
+                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                    .foregroundColor(.vtsPrimary)
                 
                 Spacer()
                 
@@ -296,63 +319,104 @@ struct PhieuXuatCardView: View {
             
             // Row 2: Khách hàng
             if let khach = item.tenKhachHang, !khach.isEmpty {
-                HStack(spacing: 6) {
-                    Text("Khách:")
-                        .font(.vtsCallout)
-                        .foregroundColor(.vtsTxtSecondary)
-                    Text(khach)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.vtsTxtPrimary)
-                        .lineLimit(1)
-                }
+                Text(khach)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.vtsTxtPrimary)
+                    .lineLimit(1)
             }
             
-            // Row 3: Hàng hoá & Khối lượng
+            // Row 3: Hàng hoá & Khối lượng (Hàng chính)
             HStack {
-                HStack(spacing: 4) {
-                    Text("Hàng:")
-                        .font(.vtsCallout)
-                        .foregroundColor(.vtsTxtSecondary)
-                    Text(item.tenHangHoa)
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.vtsPrimary)
-                        .lineLimit(1)
-                }
+                Text(item.tenHangHoa)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.vtsPrimary)
+                    .lineLimit(1)
                 
                 Spacer()
                 
-                HStack(spacing: 4) {
-                    Text("KL:")
-                        .font(.vtsCallout)
-                        .foregroundColor(.vtsTxtSecondary)
-                    let dvtSuffix = (item.dvt != nil && !item.dvt!.isEmpty) ? " \(item.dvt!)" : ""
-                    Text("\(Double(item.trongLuongHang).toQuantityString())\(dvtSuffix)")
+                let dvtSuffix = (item.dvt != nil && !item.dvt!.isEmpty) ? " \(item.dvt!)" : ""
+                Text("\(Double(item.trongLuongHang).toQuantityString())\(dvtSuffix)")
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .foregroundColor(.vtsPrimary)
+            }
+            
+            // Hàng bán (nếu có thông tin)
+            let tenGC = (item.tenHangHoaGC?.isEmpty == false ? item.tenHangHoaGC : item.hangHoaGC)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            if (!tenGC.isEmpty && tenGC != Strings.emptyPlaceholder) || item.trongLuongHangGC > 0 {
+                HStack {
+                    Text(tenGC.isEmpty ? Strings.hangBan : tenGC)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.vtsPrimary)
+                        .lineLimit(1)
+                    
+                    Spacer()
+                    
+                    let dvtGCSuffix = (item.dvtgc != nil && !item.dvtgc!.isEmpty) ? " \(item.dvtgc!)" : ""
+                    Text("\(Double(item.trongLuongHangGC).toQuantityString())\(dvtGCSuffix)")
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundColor(.vtsPrimary)
                 }
             }
             
-            // Row 4: Xe & Tài xế
-            HStack {
+            // Thu về (nếu có thông tin)
+            let tenTV = (item.tenHangHoaTV?.isEmpty == false ? item.tenHangHoaTV : item.hangHoaTV)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            if (!tenTV.isEmpty && tenTV != Strings.emptyPlaceholder) || item.trongLuongHangTV > 0 {
+                HStack {
+                    Text(tenTV.isEmpty ? Strings.thuVe : tenTV)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.vtsPrimary)
+                        .lineLimit(1)
+                    
+                    Spacer()
+                    
+                    let dvtTVSuffix = (item.dvttv != nil && !item.dvttv!.isEmpty) ? " \(item.dvttv!)" : ""
+                    Text("\(Double(item.trongLuongHangTV).toQuantityString())\(dvtTVSuffix)")
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundColor(.vtsPrimary)
+                }
+            }
+            
+            // Row 4: Checkbox Xe Ngoài, Số xe & Tài xế
+            HStack(spacing: 8) {
                 HStack(spacing: 4) {
-                    Text("Xe:")
-                        .font(.vtsCallout)
+                    Image(systemName: item.xeNgoai ? "checkmark.square.fill" : "square")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(item.xeNgoai ? .vtsPrimary : .gray)
+                    Text(Strings.xeNgoai)
+                        .font(.system(size: 13))
                         .foregroundColor(.vtsTxtSecondary)
-                    Text(item.soXe ?? "---")
-                        .font(.system(size: 13, weight: .regular))
-                        .foregroundColor(.vtsTxtPrimary)
                 }
                 
                 Spacer()
                 
-                HStack(spacing: 4) {
-                    Text("Tài xế:")
-                        .font(.vtsCallout)
-                        .foregroundColor(.vtsTxtSecondary)
-                    Text(item.taiXe ?? "---")
-                        .font(.system(size: 13, weight: .regular))
-                        .foregroundColor(.vtsTxtPrimary)
-                        .lineLimit(1)
+                HStack(spacing: 6) {
+                    let soXeDisplay = item.soXe?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                    let driverDisplay = ((item.taiXe?.isEmpty == false ? item.taiXe : item.tenNhanVien) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                    
+                    if !soXeDisplay.isEmpty {
+                        Text(soXeDisplay)
+                            .font(.system(size: 13, weight: .regular))
+                            .foregroundColor(.vtsTxtPrimary)
+                    }
+                    
+                    if !soXeDisplay.isEmpty && !driverDisplay.isEmpty {
+                        Text("•")
+                            .font(.system(size: 12))
+                            .foregroundColor(.vtsTxtSecondary)
+                    }
+                    
+                    if !driverDisplay.isEmpty {
+                        Text(driverDisplay)
+                            .font(.system(size: 13, weight: .regular))
+                            .foregroundColor(.vtsTxtPrimary)
+                            .lineLimit(1)
+                    }
+                    
+                    if soXeDisplay.isEmpty && driverDisplay.isEmpty {
+                        Text(Strings.emptyPlaceholder)
+                            .font(.system(size: 13, weight: .regular))
+                            .foregroundColor(.vtsTxtSecondary)
+                    }
                 }
             }
         }

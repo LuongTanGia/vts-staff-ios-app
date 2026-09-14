@@ -9,6 +9,39 @@ import SwiftUI
 import SwiftfulRouting
 
 struct HangHoaDetailView: View {
+    private enum Strings {
+        static let titleNew = "Thêm hàng hoá mới"
+        static let titleEdit = "Chỉnh sửa hàng hoá"
+        static let titleInfo = "Thông tin hàng hoá"
+        static let emptyTitle = "Không thể tải dữ liệu"
+        static let emptySubtitle = "Vui lòng kiểm tra kết nối mạng và thử lại."
+        static let btnCancel = "Huỷ"
+        static let btnSave = "Lưu"
+        static let btnEdit = "Sửa"
+        static let btnOK = "OK"
+        static let defaultNewProduct = "Tạo mới hàng hoá"
+        static let defaultProduct = "Hàng hoá"
+        static let placeholderHyphen = "—"
+        static let fieldMaHang = "Mã hàng"
+        static let fieldTenHang = "Tên hàng"
+        static let fieldDVT = "ĐVT (Đơn vị tính)"
+        static let fieldLoaiHang = "Loại hàng"
+        static let fieldNhomHang = "Nhóm hàng"
+        static let fieldGhiChu = "Ghi chú"
+        static let optionNone = "Không chọn"
+        static let unconfigured = "Chưa thiết lập"
+        static let errMaHang = "Vui lòng nhập mã hàng hóa"
+        static let errTenHang = "Vui lòng nhập tên hàng hóa"
+        static let errDVT = "Vui lòng nhập đơn vị tính"
+        static let alertInputErrorTitle = "Lỗi nhập liệu"
+        static let alertInputErrorSub = "Vui lòng hoàn thiện các trường thông tin bắt buộc."
+        static let alertSuccessTitle = "Thành công"
+        static let alertAddSuccessSub = "Thêm hàng hóa mới thành công."
+        static let alertUpdateSuccessSub = "Cập nhật thông tin hàng hóa thành công."
+        static let alertErrorTitle = "Lỗi"
+        static func copiedMessage(_ label: String) -> String { "Đã sao chép \(label.lowercased())" }
+    }
+    
     @Environment(\.router) private var router
     @StateObject private var viewModel: HangHoaDetailViewModel
     
@@ -46,8 +79,8 @@ struct HangHoaDetailView: View {
         VTSPageContainer(hasGradient: true) {
             VTSAsyncContent(
                 state: viewModel.state,
-                emptyTitle: "Không thể tải dữ liệu",
-                emptySubtitle: "Vui lòng kiểm tra kết nối mạng và thử lại.",
+                emptyTitle: Strings.emptyTitle,
+                emptySubtitle: Strings.emptySubtitle,
                 emptyIcon: "exclamationmark.triangle.fill",
                 retry: {
                     Task {
@@ -90,7 +123,7 @@ struct HangHoaDetailView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: viewModel.isNew ? "Thêm hàng hoá mới" : (isEditMode ? "Chỉnh sửa hàng hoá" : "Thông tin hàng hoá"),
+            subtitle: viewModel.isNew ? Strings.titleNew : (isEditMode ? Strings.titleEdit : Strings.titleInfo),
             isWhiteText: true,
             leading: {},
             trailing: {
@@ -107,7 +140,7 @@ struct HangHoaDetailView: View {
                             } label: {
                                 HStack(spacing: 6) {
                                     LucideIcon(.x, size: 18)
-                                    Text("Huỷ")
+                                    Text(Strings.btnCancel)
                                         .font(.vtsHeadline)
                                 }
                                 .foregroundColor(.red)
@@ -126,7 +159,7 @@ struct HangHoaDetailView: View {
                                         .tint(.primary)
                                 } else {
                                     LucideIcon(.check, size: 18)
-                                    Text("Lưu")
+                                    Text(Strings.btnSave)
                                         .font(.vtsHeadline)
                                 }
                             }
@@ -144,7 +177,7 @@ struct HangHoaDetailView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 LucideIcon(.pencil, size: 18)
-                                Text("Sửa")
+                                Text(Strings.btnEdit)
                                     .font(.vtsHeadline)
                             }
                             .foregroundColor(.primary)
@@ -201,12 +234,12 @@ struct HangHoaDetailView: View {
             
             // Middle Info Column (Matching Android screenshot)
             VStack(alignment: .leading, spacing: 2) {
-                Text(ten.isEmpty ? (viewModel.isNew ? "Tạo mới hàng hoá" : "Hàng hoá") : ten)
+                Text(ten.isEmpty ? (viewModel.isNew ? Strings.defaultNewProduct : Strings.defaultProduct) : ten)
                     .font(.system(size: 17, weight: .bold))
                     .foregroundColor(.white)
                     .lineLimit(1)
                 
-                Text(ma.isEmpty ? "—" : ma)
+                Text(ma.isEmpty ? Strings.placeholderHyphen : ma)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.white)
                     .lineLimit(1)
@@ -216,7 +249,7 @@ struct HangHoaDetailView: View {
                     dvt.isEmpty ? nil : "(\(dvt))"
                 ].compactMap { $0 }.joined(separator: " ")
                 
-                Text(subDetails.isEmpty ? (dvt.isEmpty ? "—" : dvt) : subDetails)
+                Text(subDetails.isEmpty ? (dvt.isEmpty ? Strings.placeholderHyphen : dvt) : subDetails)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.white)
                     .lineLimit(1)
@@ -233,50 +266,50 @@ struct HangHoaDetailView: View {
         VTSLiquidFormCard {
             VStack(alignment: .leading, spacing: 14) {
                 VTSLiquidTextField(
-                    label: "Mã hàng",
+                    label: Strings.fieldMaHang,
                     text: $ma,
                     isReadOnly: !viewModel.isNew || !isEditMode,
                     errorMessage: maError
                 )
                 
                 VTSLiquidTextField(
-                    label: "Tên hàng",
+                    label: Strings.fieldTenHang,
                     text: $ten,
                     isReadOnly: !isEditMode,
                     errorMessage: tenError
                 )
                 
                 VTSLiquidTextField(
-                    label: "ĐVT (Đơn vị tính)",
+                    label: Strings.fieldDVT,
                     text: $dvt,
                     isReadOnly: !isEditMode,
                     errorMessage: dvtError
                 )
                 
                 VTSLiquidPickerField(
-                    label: "Loại hàng",
+                    label: Strings.fieldLoaiHang,
                     selection: $selectedLoai,
                     options: [""] + viewModel.loaiHHs.map { $0.ma },
                     displayName: { code in
-                        if code.isEmpty { return "Không chọn" }
+                        if code.isEmpty { return Strings.optionNone }
                         return viewModel.loaiHHs.first(where: { $0.ma == code })?.ten ?? code
                     }
                 )
                 .disabled(!isEditMode)
                 
                 VTSLiquidPickerField(
-                    label: "Nhóm hàng",
+                    label: Strings.fieldNhomHang,
                     selection: $selectedNhom,
                     options: [""] + viewModel.nhomHHs.map { $0.ma },
                     displayName: { code in
-                        if code.isEmpty { return "Không chọn" }
+                        if code.isEmpty { return Strings.optionNone }
                         return viewModel.nhomHHs.first(where: { $0.ma == code })?.ten ?? code
                     }
                 )
                 .disabled(!isEditMode)
                 
                 VTSLiquidTextField(
-                    label: "Ghi chú",
+                    label: Strings.fieldGhiChu,
                     text: $ghiChu,
                     placeholder: "",
                     isReadOnly: !isEditMode
@@ -290,7 +323,7 @@ struct HangHoaDetailView: View {
         Button {
             if !value.isEmpty {
                 UIPasteboard.general.string = value
-                ErrorManager.shared.showSuccess("Đã sao chép \(label.lowercased())")
+                ErrorManager.shared.showSuccess(Strings.copiedMessage(label))
             }
         } label: {
             HStack(spacing: 12) {
@@ -305,7 +338,7 @@ struct HangHoaDetailView: View {
                         .font(.vtsCaption)
                         .foregroundColor(.vtsTxtSecondary)
                     
-                    Text(value.isEmpty ? "Chưa thiết lập" : value)
+                    Text(value.isEmpty ? Strings.unconfigured : value)
                         .font(.vtsBody.bold())
                         .foregroundColor(value.isEmpty ? .vtsTxtTertiary : .vtsTxtPrimary)
                         .multilineTextAlignment(.leading)
@@ -354,31 +387,29 @@ struct HangHoaDetailView: View {
         var hasError = false
         
         if ma.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            maError = "Vui lòng nhập mã hàng hóa"
+            maError = Strings.errMaHang
             hasError = true
         } else {
             maError = nil
         }
         
         if ten.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            tenError = "Vui lòng nhập tên hàng hóa"
+            tenError = Strings.errTenHang
             hasError = true
         } else {
             tenError = nil
         }
         
         if dvt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            dvtError = "Vui lòng nhập đơn vị tính"
+            dvtError = Strings.errDVT
             hasError = true
         } else {
             dvtError = nil
         }
         
-        
-        
         if hasError {
-            router.showAlert(.alert, title: "Lỗi nhập liệu", subtitle: "Vui lòng hoàn thiện các trường thông tin bắt buộc.") {
-                Button("OK") {}
+            router.showAlert(.alert, title: Strings.alertInputErrorTitle, subtitle: Strings.alertInputErrorSub) {
+                Button(Strings.btnOK) {}
             }
             return
         }
@@ -398,15 +429,15 @@ struct HangHoaDetailView: View {
         do {
             if viewModel.isNew {
                 let _ = try await HangHoaService.shared.them(data)
-                router.showAlert(.alert, title: "Thành công", subtitle: "Thêm hàng hóa mới thành công.") {
-                    Button("OK") {
+                router.showAlert(.alert, title: Strings.alertSuccessTitle, subtitle: Strings.alertAddSuccessSub) {
+                    Button(Strings.btnOK) {
                         router.dismissScreen()
                     }
                 }
             } else {
                 let _ = try await HangHoaService.shared.sua(data)
-                router.showAlert(.alert, title: "Thành công", subtitle: "Cập nhật thông tin hàng hóa thành công.") {
-                    Button("OK") {
+                router.showAlert(.alert, title: Strings.alertSuccessTitle, subtitle: Strings.alertUpdateSuccessSub) {
+                    Button(Strings.btnOK) {
                         isEditMode = false
                         Task {
                             await viewModel.loadDetails()
@@ -415,8 +446,8 @@ struct HangHoaDetailView: View {
                 }
             }
         } catch {
-            router.showAlert(.alert, title: "Lỗi", subtitle: error.localizedDescription) {
-                Button("OK") {}
+            router.showAlert(.alert, title: Strings.alertErrorTitle, subtitle: error.localizedDescription) {
+                Button(Strings.btnOK) {}
             }
         }
     }

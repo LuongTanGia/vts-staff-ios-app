@@ -9,6 +9,41 @@ import SwiftUI
 import SwiftfulRouting
 
 struct XeDetailView: View {
+    private enum Strings {
+        static let titleNew = "Thêm xe mới"
+        static let titleEdit = "Chỉnh sửa xe nhà"
+        static let titleInfo = "Thông tin xe nhà"
+        static let emptyTitle = "Không thể tải dữ liệu"
+        static let emptySubtitle = "Vui lòng kiểm tra kết nối mạng và thử lại."
+        static let btnCancel = "Huỷ"
+        static let btnSave = "Lưu"
+        static let btnEdit = "Sửa"
+        static let btnOK = "OK"
+        static let defaultNewVehicle = "Tạo mới phương tiện"
+        static let defaultVehicle = "Phương tiện"
+        static let placeholderHyphen = "—"
+        static let fieldBienSo = "Biển số"
+        static let fieldTenGoiNho = "Tên gợi nhớ của xe"
+        static let fieldLoaiXe = "Loại xe"
+        static let fieldNhomXe = "Nhóm xe"
+        static let fieldTaiXeCoDinh = "Tài xế cố định"
+        static let fieldGhiChu = "Ghi chú"
+        static let optionNone = "Không chọn"
+        static let unconfigured = "Chưa thiết lập"
+        static let errBienSo = "Vui lòng nhập biển số xe"
+        static let errTenXe = "Vui lòng nhập tên xe"
+        static let errLoaiXe = "Vui lòng chọn loại xe"
+        static let errNhomXe = "Vui lòng chọn nhóm xe"
+        static let errTaiXe = "Vui lòng chọn tài xế"
+        static let alertInputErrorTitle = "Lỗi nhập liệu"
+        static let alertInputErrorSub = "Vui lòng hoàn thiện các trường thông tin bắt buộc."
+        static let alertSuccessTitle = "Thành công"
+        static let alertAddSuccessSub = "Thêm phương tiện mới thành công."
+        static let alertUpdateSuccessSub = "Cập nhật thông tin phương tiện thành công."
+        static let alertErrorTitle = "Lỗi"
+        static func copiedMessage(_ label: String) -> String { "Đã sao chép \(label.lowercased())" }
+    }
+    
     @Environment(\.router) private var router
     @StateObject private var viewModel: XeDetailViewModel
     
@@ -47,8 +82,8 @@ struct XeDetailView: View {
         VTSPageContainer(hasGradient: true) {
             VTSAsyncContent(
                 state: viewModel.state,
-                emptyTitle: "Không thể tải dữ liệu",
-                emptySubtitle: "Vui lòng kiểm tra kết nối mạng và thử lại.",
+                emptyTitle: Strings.emptyTitle,
+                emptySubtitle: Strings.emptySubtitle,
                 emptyIcon: "exclamationmark.triangle.fill",
                 retry: {
                     Task {
@@ -91,7 +126,7 @@ struct XeDetailView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: viewModel.isNew ? "Thêm xe mới" : (isEditMode ? "Chỉnh sửa xe nhà" : "Thông tin xe nhà"),
+            subtitle: viewModel.isNew ? Strings.titleNew : (isEditMode ? Strings.titleEdit : Strings.titleInfo),
             isWhiteText: true,
             leading: {},
             trailing: {
@@ -108,7 +143,7 @@ struct XeDetailView: View {
                             } label: {
                                 HStack(spacing: 6) {
                                     LucideIcon(.x, size: 18)
-                                    Text("Huỷ")
+                                    Text(Strings.btnCancel)
                                         .font(.vtsHeadline)
                                 }
                                 .foregroundColor(.red)
@@ -127,7 +162,7 @@ struct XeDetailView: View {
                                         .tint(.primary)
                                 } else {
                                     LucideIcon(.check, size: 18)
-                                    Text("Lưu")
+                                    Text(Strings.btnSave)
                                         .font(.vtsHeadline)
                                 }
                             }
@@ -144,7 +179,7 @@ struct XeDetailView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 LucideIcon(.pencil, size: 18)
-                                Text("Sửa")
+                                Text(Strings.btnEdit)
                                     .font(.vtsHeadline)
                             }
                             .foregroundColor(.primary)
@@ -208,17 +243,17 @@ struct XeDetailView: View {
             }
             
             VStack(alignment: .leading, spacing: 2) {
-                Text(ma.isEmpty ? (viewModel.isNew ? "Tạo mới phương tiện" : "Phương tiện") : ma)
+                Text(ma.isEmpty ? (viewModel.isNew ? Strings.defaultNewVehicle : Strings.defaultVehicle) : ma)
                     .font(.system(size: 17, weight: .bold))
                     .foregroundColor(.white)
                     .lineLimit(1)
                 
-                Text(ten.isEmpty ? "—" : ten)
+                Text(ten.isEmpty ? Strings.placeholderHyphen : ten)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.white)
                     .lineLimit(1)
                 
-                let txTen = selectedTaiXe.isEmpty ? (selectedLoai.isEmpty ? "—" : (viewModel.loaiXes.first(where: { $0.ma == selectedLoai })?.ten ?? selectedLoai)) : (viewModel.taiXes.first(where: { $0.ma == selectedTaiXe })?.ten ?? selectedTaiXe)
+                let txTen = selectedTaiXe.isEmpty ? (selectedLoai.isEmpty ? Strings.placeholderHyphen : (viewModel.loaiXes.first(where: { $0.ma == selectedLoai })?.ten ?? selectedLoai)) : (viewModel.taiXes.first(where: { $0.ma == selectedTaiXe })?.ten ?? selectedTaiXe)
                 Text(txTen)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.white)
@@ -236,25 +271,25 @@ struct XeDetailView: View {
         VTSLiquidFormCard {
             VStack(alignment: .leading, spacing: 14) {
                 VTSLiquidTextField(
-                    label: "Biển số",
+                    label: Strings.fieldBienSo,
                     text: $ma,
                     isReadOnly: !viewModel.isNew || !isEditMode,
                     errorMessage: maError
                 )
                 
                 VTSLiquidTextField(
-                    label: "Tên gợi nhớ của xe",
+                    label: Strings.fieldTenGoiNho,
                     text: $ten,
                     isReadOnly: !isEditMode,
                     errorMessage: tenError
                 )
                 
                 VTSLiquidPickerField(
-                    label: "Loại xe",
+                    label: Strings.fieldLoaiXe,
                     selection: $selectedLoai,
                     options: [""] + viewModel.loaiXes.map { $0.ma },
                     displayName: { code in
-                        if code.isEmpty { return "Không chọn" }
+                        if code.isEmpty { return Strings.optionNone }
                         return viewModel.loaiXes.first(where: { $0.ma == code })?.ten ?? code
                     },
                     errorMessage: loaiError
@@ -262,11 +297,11 @@ struct XeDetailView: View {
                 .disabled(!isEditMode)
                 
                 VTSLiquidPickerField(
-                    label: "Nhóm xe",
+                    label: Strings.fieldNhomXe,
                     selection: $selectedNhom,
                     options: [""] + viewModel.nhomXes.map { $0.ma },
                     displayName: { code in
-                        if code.isEmpty { return "Không chọn" }
+                        if code.isEmpty { return Strings.optionNone }
                         return viewModel.nhomXes.first(where: { $0.ma == code })?.ten ?? code
                     },
                     errorMessage: nhomError
@@ -274,11 +309,11 @@ struct XeDetailView: View {
                 .disabled(!isEditMode)
                 
                 VTSLiquidPickerField(
-                    label: "Tài xế cố định",
+                    label: Strings.fieldTaiXeCoDinh,
                     selection: $selectedTaiXe,
                     options: [""] + viewModel.taiXes.map { $0.ma },
                     displayName: { code in
-                        if code.isEmpty { return "Không chọn" }
+                        if code.isEmpty { return Strings.optionNone }
                         return viewModel.taiXes.first(where: { $0.ma == code })?.ten ?? code
                     },
                     errorMessage: taiXeError
@@ -286,7 +321,7 @@ struct XeDetailView: View {
                 .disabled(!isEditMode)
                 
                 VTSLiquidTextField(
-                    label: "Ghi chú",
+                    label: Strings.fieldGhiChu,
                     text: $ghiChu,
                     placeholder: "",
                     isReadOnly: !isEditMode
@@ -300,7 +335,7 @@ struct XeDetailView: View {
         Button {
             if !value.isEmpty {
                 UIPasteboard.general.string = value
-                ErrorManager.shared.showSuccess("Đã sao chép \(label.lowercased())")
+                ErrorManager.shared.showSuccess(Strings.copiedMessage(label))
             }
         } label: {
             HStack(spacing: 12) {
@@ -315,7 +350,7 @@ struct XeDetailView: View {
                         .font(.vtsCaption)
                         .foregroundColor(.vtsTxtSecondary)
                     
-                    Text(value.isEmpty ? "Chưa thiết lập" : value)
+                    Text(value.isEmpty ? Strings.unconfigured : value)
                         .font(.vtsBody.bold())
                         .foregroundColor(value.isEmpty ? .vtsTxtTertiary : .vtsTxtPrimary)
                         .multilineTextAlignment(.leading)
@@ -364,43 +399,43 @@ struct XeDetailView: View {
         var hasError = false
         
         if ma.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            maError = "Vui lòng nhập biển số xe"
+            maError = Strings.errBienSo
             hasError = true
         } else {
             maError = nil
         }
         
         if ten.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            tenError = "Vui lòng nhập tên xe"
+            tenError = Strings.errTenXe
             hasError = true
         } else {
             tenError = nil
         }
         
         if selectedLoai.isEmpty {
-            loaiError = "Vui lòng chọn loại xe"
+            loaiError = Strings.errLoaiXe
             hasError = true
         } else {
             loaiError = nil
         }
         
         if selectedNhom.isEmpty {
-            nhomError = "Vui lòng chọn nhóm xe"
+            nhomError = Strings.errNhomXe
             hasError = true
         } else {
             nhomError = nil
         }
         
         if selectedTaiXe.isEmpty {
-            taiXeError = "Vui lòng chọn tài xế"
+            taiXeError = Strings.errTaiXe
             hasError = true
         } else {
             taiXeError = nil
         }
         
         if hasError {
-            router.showAlert(.alert, title: "Lỗi nhập liệu", subtitle: "Vui lòng hoàn thiện các trường thông tin bắt buộc.") {
-                Button("OK") {}
+            router.showAlert(.alert, title: Strings.alertInputErrorTitle, subtitle: Strings.alertInputErrorSub) {
+                Button(Strings.btnOK) {}
             }
             return
         }
@@ -420,15 +455,15 @@ struct XeDetailView: View {
         do {
             if viewModel.isNew {
                 let _ = try await XeService.shared.them(data)
-                router.showAlert(.alert, title: "Thành công", subtitle: "Thêm phương tiện mới thành công.") {
-                    Button("OK") {
+                router.showAlert(.alert, title: Strings.alertSuccessTitle, subtitle: Strings.alertAddSuccessSub) {
+                    Button(Strings.btnOK) {
                         router.dismissScreen()
                     }
                 }
             } else {
                 let _ = try await XeService.shared.sua(data)
-                router.showAlert(.alert, title: "Thành công", subtitle: "Cập nhật thông tin phương tiện thành công.") {
-                    Button("OK") {
+                router.showAlert(.alert, title: Strings.alertSuccessTitle, subtitle: Strings.alertUpdateSuccessSub) {
+                    Button(Strings.btnOK) {
                         isEditMode = false
                         Task {
                             await viewModel.loadData()
@@ -437,8 +472,8 @@ struct XeDetailView: View {
                 }
             }
         } catch {
-            router.showAlert(.alert, title: "Lỗi", subtitle: error.localizedDescription) {
-                Button("OK") {}
+            router.showAlert(.alert, title: Strings.alertErrorTitle, subtitle: error.localizedDescription) {
+                Button(Strings.btnOK) {}
             }
         }
     }

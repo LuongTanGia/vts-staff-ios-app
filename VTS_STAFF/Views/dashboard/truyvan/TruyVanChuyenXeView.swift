@@ -9,6 +9,27 @@ import SwiftUI
 import SwiftfulRouting
 
 struct TruyVanChuyenXeView: View {
+    // MARK: - UI Text Strings
+    private enum Strings {
+        static let searchPlaceholder = "Nhập nội dung để tìm"
+        static let emptyTitle = "Không tìm thấy chuyến xe"
+        static let emptySubtitle = "Vui lòng chọn khoảng ngày khác hoặc thử lại."
+        static let noResultTitle = "Không tìm thấy kết quả"
+        static let noResultSubtitle = "Vui lòng nhập từ khóa khác"
+        static let colIndex = "#"
+        static let colHangHoa = "Hàng hóa"
+        static let colXeNhan = "Xe nhận"
+        static let colSoNhan = "Số nhận"
+        static let colXeGiao = "Xe giao"
+        static let colSoGiao = "Số giao"
+        static let groupNhan = "Nhận"
+        static let groupGiao = "Giao"
+        static let colXe = "Xe"
+        static let colSoLuong = "Số lượng"
+        static let footerSum = "Cộng"
+        static let subtitle = "Hàng hóa theo chuyến"
+    }
+
     @Environment(\.router) private var router
     @StateObject private var viewModel: TruyVanChuyenXeViewModel
     @State private var showSearchBar = false
@@ -21,15 +42,10 @@ struct TruyVanChuyenXeView: View {
     var body: some View {
         VTSPageContainer {
             VStack(spacing: 0) {
-               
-//                .padding(.horizontal, VTSSpacing.xl)
-//                .padding(.top, VTSSpacing.md)
-//                .padding(.bottom, showSearchBar ? 0 : VTSSpacing.md)
-                
                 if showSearchBar {
                     VTSSearchBar(
                         text: $viewModel.searchText,
-                        placeholder: "Nhập nội dung để tìm",
+                        placeholder: Strings.searchPlaceholder,
                         onClose: {
                             withAnimation(.easeInOut(duration: 0.2)) {
                                 showSearchBar = false
@@ -58,8 +74,8 @@ struct TruyVanChuyenXeView: View {
                 
                 VTSAsyncContent(
                     state: viewModel.state,
-                    emptyTitle: "Không tìm thấy chuyến xe",
-                    emptySubtitle: "Vui lòng chọn khoảng ngày khác hoặc thử lại.",
+                    emptyTitle: Strings.emptyTitle,
+                    emptySubtitle: Strings.emptySubtitle,
                     emptyIcon: "bus.fill",
                     retry: {
                         Task {
@@ -74,8 +90,8 @@ struct TruyVanChuyenXeView: View {
                             Spacer()
                             VTSEmptyState(
                                 icon: "magnifyingglass",
-                                title: "Không tìm thấy kết quả",
-                                subtitle: "Vui lòng nhập từ khóa khác"
+                                title: Strings.noResultTitle,
+                                subtitle: Strings.noResultSubtitle
                             )
                             Spacer()
                         } else {
@@ -88,7 +104,7 @@ struct TruyVanChuyenXeView: View {
                                 dataSource: filtered,
                                 columns: [
                                     ERPColumn(
-                                        title: AnyView(Text("#")),
+                                        title: AnyView(Text(Strings.colIndex)),
                                         key: "index",
                                         width: 0.08,
                                         alignment: .center,
@@ -98,7 +114,7 @@ struct TruyVanChuyenXeView: View {
                                         footer: AnyView(Text("").font(.system(size: 13, weight: .bold)))
                                     ),
                                     ERPColumn(
-                                        title: AnyView(Text("Hàng hóa")),
+                                        title: AnyView(Text(Strings.colHangHoa)),
                                         key: "colName",
                                         width: 0.30,
                                         alignment: .leading,
@@ -106,10 +122,10 @@ struct TruyVanChuyenXeView: View {
                                             AnyView(Text(item.colName ?? ""))
                                         },
                                         sorter: { ($0.colName ?? "") < ($1.colName ?? "") },
-                                        footer: AnyView(Text("Cộng").font(.system(size: 13, weight: .bold)))
+                                        footer: AnyView(Text(Strings.footerSum).font(.system(size: 13, weight: .bold)))
                                     ),
                                     ERPColumn(
-                                        title: AnyView(Text("Xe nhận")),
+                                        title: AnyView(Text(Strings.colXeNhan)),
                                         key: "colValue1",
                                         width: 0.14,
                                         alignment: .trailing,
@@ -120,7 +136,7 @@ struct TruyVanChuyenXeView: View {
                                         footer: AnyView(Text("\(totalValue1)").font(.system(size: 13, weight: .bold)))
                                     ),
                                     ERPColumn(
-                                        title: AnyView(Text("Số nhận")),
+                                        title: AnyView(Text(Strings.colSoNhan)),
                                         key: "colValue2",
                                         width: 0.17,
                                         alignment: .trailing,
@@ -131,7 +147,7 @@ struct TruyVanChuyenXeView: View {
                                         footer: AnyView(Text(totalValue2.toFormattedString(maxDecimals: 2)).font(.system(size: 13, weight: .bold)))
                                     ),
                                     ERPColumn(
-                                        title: AnyView(Text("Xe giao")),
+                                        title: AnyView(Text(Strings.colXeGiao)),
                                         key: "colValue3",
                                         width: 0.15,
                                         alignment: .trailing,
@@ -142,7 +158,7 @@ struct TruyVanChuyenXeView: View {
                                         footer: AnyView(Text("\(totalValue3)").font(.system(size: 13, weight: .bold)))
                                     ),
                                     ERPColumn(
-                                        title: AnyView(Text("Số giao")),
+                                        title: AnyView(Text(Strings.colSoGiao)),
                                         key: "colValue4",
                                         width: 0.16,
                                         alignment: .trailing,
@@ -175,14 +191,14 @@ struct TruyVanChuyenXeView: View {
                                     
                                     return AnyView(
                                         HStack(spacing: 0) {
-                                            Text("#")
+                                            Text(Strings.colIndex)
                                                 .font(.system(size: 13, weight: .bold))
                                                 .foregroundColor(.white)
                                                 .frame(width: col1Width, alignment: .center)
                                                 .frame(maxHeight: .infinity)
                                                 .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                                             
-                                            Text("Hàng hóa")
+                                            Text(Strings.colHangHoa)
                                                 .font(.system(size: 13, weight: .bold))
                                                 .foregroundColor(.white)
                                                 .padding(.horizontal, 4)
@@ -192,7 +208,7 @@ struct TruyVanChuyenXeView: View {
                                             
                                             // Group "Nhận"
                                             VStack(spacing: 0) {
-                                                Text("Nhận")
+                                                Text(Strings.groupNhan)
                                                     .font(.system(size: 13, weight: .bold))
                                                     .foregroundColor(.white)
                                                     .padding(.vertical, 5)
@@ -200,7 +216,7 @@ struct TruyVanChuyenXeView: View {
                                                     .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
                                                 
                                                 HStack(spacing: 0) {
-                                                    Text("Xe")
+                                                    Text(Strings.colXe)
                                                         .font(.system(size: 12, weight: .bold))
                                                         .foregroundColor(.white)
                                                         .padding(.vertical, 4)
@@ -208,7 +224,7 @@ struct TruyVanChuyenXeView: View {
                                                         .frame(maxHeight: .infinity)
                                                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                                                     
-                                                    Text("Số lượng")
+                                                    Text(Strings.colSoLuong)
                                                         .font(.system(size: 12, weight: .bold))
                                                         .foregroundColor(.white)
                                                         .padding(.vertical, 4)
@@ -220,7 +236,7 @@ struct TruyVanChuyenXeView: View {
                                             
                                             // Group "Giao"
                                             VStack(spacing: 0) {
-                                                Text("Giao")
+                                                Text(Strings.groupGiao)
                                                     .font(.system(size: 13, weight: .bold))
                                                     .foregroundColor(.white)
                                                     .padding(.vertical, 5)
@@ -228,7 +244,7 @@ struct TruyVanChuyenXeView: View {
                                                     .overlay(Rectangle().frame(height: 0.5).foregroundColor(tableBorderColor), alignment: .bottom)
                                                 
                                                 HStack(spacing: 0) {
-                                                    Text("Xe")
+                                                    Text(Strings.colXe)
                                                         .font(.system(size: 12, weight: .bold))
                                                         .foregroundColor(.white)
                                                         .padding(.vertical, 4)
@@ -236,7 +252,7 @@ struct TruyVanChuyenXeView: View {
                                                         .frame(maxHeight: .infinity)
                                                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                                                     
-                                                    Text("Số lượng")
+                                                    Text(Strings.colSoLuong)
                                                         .font(.system(size: 12, weight: .bold))
                                                         .foregroundColor(.white)
                                                         .padding(.vertical, 4)
@@ -269,7 +285,7 @@ struct TruyVanChuyenXeView: View {
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
-            subtitle: "Hàng hóa theo chuyến",
+            subtitle: Strings.subtitle,
             isWhiteText: true,
             leading: {},
             trailing: {
