@@ -143,7 +143,7 @@ struct VTSConfirmDialog: ViewModifier {
     func body(content: Content) -> some View {
         content.alert(title, isPresented: $isPresented) {
             Button(confirmLabel, role: confirmStyle == .destructive ? .destructive : nil, action: onConfirm)
-            Button("Huỷ", role: .cancel) {}
+            Button("Hủy", role: .cancel) {}
         } message: {
             Text(message)
         }

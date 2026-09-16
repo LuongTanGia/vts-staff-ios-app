@@ -358,6 +358,8 @@ struct VTSCompanyFooter: View {
     let companyName: String
     let address: String
     
+    private static let hasLogo: Bool = (UIImage(named: "logoFooter") != nil)
+    
     init(
         companyName: String = "Viettas SaiGon JSC.",
         address: String = "351/9 Nơ Trang Long, P. Bình Lợi Trung, Tp.HCM"
@@ -368,7 +370,7 @@ struct VTSCompanyFooter: View {
     
     var body: some View {
         HStack(alignment: .center, spacing: 10) {
-            if UIImage(named: "logoFooter") != nil {
+            if Self.hasLogo {
                 Image("logoFooter")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -403,8 +405,10 @@ struct VTSCompanyFooter: View {
         .padding(.vertical, 6)
         .frame(maxWidth: .infinity)
         .frame(height: 50)
-        .background(Color.vtsPrimary)
-        .ignoresSafeArea(edges: .bottom)
+        .background(
+            Color.vtsPrimary
+                .ignoresSafeArea(edges: .bottom)
+        )
     }
 }
 

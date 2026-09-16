@@ -395,7 +395,7 @@ struct CenteredDatePickerModal: View {
                 
                 // Action Buttons for Wheel Picker
                 HStack(spacing: VTSSpacing.md) {
-                    VTSButton("Huỷ", style: .secondary, size: .large) {
+                    VTSButton("Hủy", style: .secondary, size: .large) {
                         isPresented = false
                     }
                     .frame(maxWidth: .infinity)

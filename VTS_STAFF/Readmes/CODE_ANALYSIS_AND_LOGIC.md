@@ -27,14 +27,14 @@ func getPermission(for moduleKey: String) -> ModulePermission?
 ```
 - **Logic xử lý**:
   - Tra cứu trong mảng `userPermissions` theo `moduleKey` (ví dụ: `"VTSSTAFF_DANHMUC_NHANVIEN"` hoặc `"VTSSTAFF_PHIEU_NHAP"`).
-  - Trả về đối tượng chứa các quyền: `view` (Xem), `add` (Thêm), `edit` (Sửa), `delete` (Xoá).
-  - Được sử dụng trực tiếp trên các giao diện Toolbar để ẩn/hiện nút **Sửa**, **Xoá** hoặc nút **Tạo mới**.
+  - Trả về đối tượng chứa các quyền: `view` (Xem), `add` (Thêm), `edit` (Sửa), `delete` (Xóa).
+  - Được sử dụng trực tiếp trên các giao diện Toolbar để ẩn/hiện nút **Sửa**, **Xóa** hoặc nút **Tạo mới**.
 
 ```swift
 /// Đăng xuất và dọn dẹp bộ nhớ an toàn
 func logout()
 ```
-- **Logic xử lý**: Xoá Token khỏi Keychain, xoá dữ liệu người dùng tạm thời, và kích hoạt chuyển View về màn hình `LoginView`.
+- **Logic xử lý**: Xóa Token khỏi Keychain, xóa dữ liệu người dùng tạm thời, và kích hoạt chuyển View về màn hình `LoginView`.
 
 ---
 

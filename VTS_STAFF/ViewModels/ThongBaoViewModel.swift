@@ -185,7 +185,7 @@ final class ThongBaoViewModel: ObservableObject {
     func parseVoucherTarget(from item: TThongBao_DanhSach) -> VoucherNavigationTarget? {
         let fullText = ((item.tieuDe ?? "") + " " + (item.noiDung ?? "")).uppercased()
         
-        // Bỏ qua phiếu xoá
+        // Bỏ qua phiếu xóa
         if fullText.contains("XÓA") || fullText.contains("XOA") {
             return nil
         }

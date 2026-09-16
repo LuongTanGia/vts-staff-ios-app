@@ -35,11 +35,11 @@ public enum LucideIconName: String, CaseIterable, Identifiable, Sendable {
     case search             = "search"                // Tìm kiếm
     case plus               = "plus"                  // Thêm mới
     case pencil             = "pencil"                // Chỉnh sửa
-    case trash2             = "trash_2"               // Xoá
+    case trash2             = "trash_2"               // Xóa
     case eye                = "eye"                   // Xem chi tiết
     case eyeOff             = "eye_off"               // Ẩn chi tiết
-    case x                  = "x"                     // Đóng / Huỷ
-    case xCircle            = "x_circle"              // Huỷ tròn
+    case x                  = "x"                     // Đóng / Hủy
+    case xCircle            = "x_circle"              // Hủy tròn
     case check              = "check"                 // Chọn / Lưu
     case checkCircle2       = "check_circle_2"        // Hoàn tất tròn
     case copy               = "copy"                  // Sao chép

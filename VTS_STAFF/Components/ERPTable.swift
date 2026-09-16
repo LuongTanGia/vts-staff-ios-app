@@ -251,7 +251,6 @@ public struct ERPTable<Data: Identifiable>: View {
                                 .frame(height: 0)
                                 .id("BOTTOM")
                         }
-                        .id(tableWidth)
                     }
                     .onScrollGeometryChange(for: CGFloat.self) { geometry in
                         geometry.contentOffset.y

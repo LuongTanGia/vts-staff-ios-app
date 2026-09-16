@@ -9,6 +9,22 @@ import SwiftUI
 import SwiftfulRouting
 
 struct LoginView: View {
+    // MARK: - UI Text Strings
+    private enum Strings {
+        static let appTitle = "VTS STAFF"
+        static let appSubtitle = "Hệ thống quản lý vận chuyển nội bộ"
+        static let formTitle = "ĐĂNG NHẬP"
+        static let usernameLabel = "Tên đăng nhập"
+        static let usernamePlaceholder = "Nhập tài khoản nhân viên..."
+        static let passwordLabel = "Mật khẩu"
+        static let passwordPlaceholder = "Nhập mật khẩu an toàn..."
+        static let agreePrefix = "Tôi đồng ý với"
+        static let termsTitle = "Điều khoản dịch vụ"
+        static let termsSheetTitle = "Điều khoản sử dụng"
+        static let loginButton = "Đăng nhập"
+        static let version = "Phiên bản 1.0.0 (VTS Tech)"
+    }
+
     @StateObject private var viewModel = LoginViewModel()
     @State private var showPolicySheet: Bool = false
     
@@ -36,12 +52,12 @@ struct LoginView: View {
                         }
                         
                         VStack(spacing: VTSSpacing.xs) {
-                            Text("VTS STAFF")
+                            Text(Strings.appTitle)
                                 .font(.system(size: 32, weight: .black, design: .rounded))
                                 .foregroundColor(.vtsBg)
                                 .tracking(2)
                             
-                            Text("Hệ thống quản lý vận chuyển nội bộ")
+                            Text(Strings.appSubtitle)
                                 .font(.vtsCallout)
                                 .foregroundColor(.vtsBg)
                                 .multilineTextAlignment(.center)
@@ -52,7 +68,7 @@ struct LoginView: View {
                     // MARK: Glass Form Card
                     VTSGlassCard {
                         VStack(spacing: VTSSpacing.xl) {
-                            Text("ĐĂNG NHẬP")
+                            Text(Strings.formTitle)
                                 .font(.vtsTitle2.bold())
                                 .foregroundColor(.vtsTxtPrimary)
                                 .frame(maxWidth: .infinity, alignment: .center)
@@ -61,8 +77,8 @@ struct LoginView: View {
                             VStack(spacing: VTSSpacing.lg) {
                                 // Username Field
                                 VTSInputField(
-                                    label: "Tên đăng nhập",
-                                    placeholder: "Nhập tài khoản nhân viên...",
+                                    label: Strings.usernameLabel,
+                                    placeholder: Strings.usernamePlaceholder,
                                     text: $viewModel.username,
                                     icon: "person.fill"
                                 )
@@ -70,22 +86,52 @@ struct LoginView: View {
                                 
                                 // Password Field
                                 VTSInputField(
-                                    label: "Mật khẩu",
-                                    placeholder: "Nhập mật khẩu an toàn...",
+                                    label: Strings.passwordLabel,
+                                    placeholder: Strings.passwordPlaceholder,
                                     text: $viewModel.password,
                                     icon: "lock.fill",
                                     isSecure: true
                                 )
                                 .focused($isFocused)
                             }
-                            
-                            
-                            
+                            // MARK: Terms & Conditions Checkbox
+                            HStack(alignment: .center, spacing: 8) {
+                                Button {
+                                    if !viewModel.hasAcceptedTerms {
+                                        showPolicySheet = true
+                                    } else {
+                                        viewModel.hasAcceptedTerms.toggle()
+                                    }
+                                } label: {
+                                    Image(systemName: viewModel.hasAcceptedTerms ? "checkmark.square.fill" : "square")
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundColor(viewModel.hasAcceptedTerms ? .vtsPrimary : .gray)
+                                }
+                                .buttonStyle(.plain)
+                                
+                                HStack(spacing: 4) {
+                                    Text(Strings.agreePrefix)
+                                        .foregroundColor(.vtsTxtSecondary)
+                                    Button {
+                                        showPolicySheet = true
+                                    } label: {
+                                        Text(Strings.termsTitle)
+                                            .foregroundColor(.vtsPrimary)
+                                            .fontWeight(.semibold)
+                                            .underline()
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                                .font(.system(size: 13))
+                                
+                                Spacer()
+                            }
+                            .padding(.top, 2)
                             
                             // MARK: Submit Button & FaceID
                             HStack(spacing: VTSSpacing.md) {
                                 VTSButton(
-                                    "Đăng nhập",
+                                    Strings.loginButton,
                                     icon: "arrow.right.circle.fill",
                                     style: .primary,
                                     size: .large,
@@ -133,7 +179,7 @@ struct LoginView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 LucideIcon(.info, size: 15, color: .vtsTxtSecondary)
-                                Text("Chính sách & Điều khoản")
+                                Text(Strings.termsTitle)
                                     .font(.system(size: 13, weight: .medium))
                                     .foregroundColor(.vtsTxtSecondary)
                                     .underline()
@@ -141,7 +187,7 @@ struct LoginView: View {
                         }
                         .buttonStyle(.plain)
                         
-                        Text("Phiên bản 1.0.0 (VTS Tech)")
+                        Text(Strings.version)
                             .font(.vtsCaption)
                             .foregroundColor(.vtsTxtTertiary)
                     }
@@ -153,7 +199,14 @@ struct LoginView: View {
         .environment(\.colorScheme, .light)
         .sheet(isPresented: $showPolicySheet) {
             RouterView { _ in
-                PolicyDocumentView()
+                PolicyDocumentView(
+                    documentName: "terms",
+                    title: Strings.termsSheetTitle,
+                    showAcceptButton: true,
+                    onAccept: {
+                        viewModel.hasAcceptedTerms = true
+                    }
+                )
             }
         }
         .onTapGesture {
@@ -161,12 +214,21 @@ struct LoginView: View {
         }
         .onAppear {
             viewModel.checkBiometricAvailability()
-            if viewModel.enableBiometrics {
+            
+            // Chỉ hỏi điều khoản lần đầu vào app nếu chưa từng chấp nhận
+            if !viewModel.hasAcceptedTerms {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    showPolicySheet = true
+                }
+            } else if viewModel.enableBiometrics {
                 Task {
                     try? await Task.sleep(nanoseconds: 500_000_000) // 0.5s delay
                     await viewModel.loginWithBiometrics()
                 }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            viewModel.checkBiometricAvailability()
         }
     }
 }

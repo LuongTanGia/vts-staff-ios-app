@@ -136,7 +136,7 @@ struct VTSImageEditorView: View {
     // MARK: - Header
     private var headerView: some View {
         HStack {
-            Button("Huỷ") {
+            Button("Hủy") {
                 onCancel()
             }
             .font(.system(size: 16, weight: .semibold))

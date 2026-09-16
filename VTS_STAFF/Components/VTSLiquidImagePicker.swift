@@ -4,7 +4,7 @@
 //  VTS_STAFF
 //
 //  Component chụp/chọn ảnh dùng trên Form Phiếu VC
-//  Android: 2 ô cạnh nhau – ô trái là thumbnail có nút Xem👁 + Xoá❌,
+//  Android: 2 ô cạnh nhau – ô trái là thumbnail có nút Xem👁 + Xóa❌,
 //           ô phải là nút thêm ảnh mới (camera icon)
 //
 //  iOS Liquid Glass:
@@ -167,7 +167,7 @@ struct VTSLiquidImageSlot: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             
-            // Action buttons: Xem + Cắt/Xoay + Xoá
+            // Action buttons: Xem + Cắt/Xoay + Xóa
             HStack(spacing: 8) {
                 // Xem
                 imageActionButton(icon: .eye, bgColor: Color.black.opacity(0.65)) {
@@ -181,7 +181,7 @@ struct VTSLiquidImageSlot: View {
                 imageActionButton(icon: .crop, bgColor: Color.black.opacity(0.65)) {
                     editingImage = IdentifiableImage(image: img)
                 }
-                // Xoá
+                // Xóa
                 imageActionButton(icon: .trash2, bgColor: Color(hex: "BA1A1A").opacity(0.85)) {
                     withAnimation(.spring(response: 0.3)) {
                         state = .empty

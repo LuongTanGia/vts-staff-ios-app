@@ -3,7 +3,7 @@
 //  VTSLiquidContextMenu.swift
 //  VTS_STAFF
 //
-//  Popover menu Xem / Sửa / Xoá – xuất hiện khi tap vào hàng trong bảng
+//  Popover menu Xem / Sửa / Xóa – xuất hiện khi tap vào hàng trong bảng
 //  Android: Dialog nổi góc phải với icon + text
 //  iOS:     Liquid Glass popover với blur material + shadow
 //

@@ -14,6 +14,13 @@ final class LoginViewModel: ObservableObject {
     @Published var enableBiometrics = false
     @Published var showBiometricButton = false
     
+    private let termsKey = "vts_has_accepted_terms"
+    @Published var hasAcceptedTerms: Bool {
+        didSet {
+            UserDefaults.standard.set(hasAcceptedTerms, forKey: termsKey)
+        }
+    }
+    
     private let authService: AuthService
     
     init(authService: AuthService? = nil) {
@@ -22,12 +29,15 @@ final class LoginViewModel: ObservableObject {
         // Tải cấu hình từ UserDefaults
         self.savePasswordLocal = UserDefaults.standard.object(forKey: "vts_remember_account") as? Bool ?? true
         self.enableBiometrics = UserDefaults.standard.bool(forKey: "vts_enable_biometrics")
+        self.hasAcceptedTerms = UserDefaults.standard.bool(forKey: "vts_has_accepted_terms")
         
         checkBiometricAvailability()
     }
     
     var isSubmitDisabled: Bool {
-        username.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || password.isEmpty
+        username.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        password.isEmpty ||
+        !hasAcceptedTerms
     }
     
     func checkBiometricAvailability() {
@@ -49,6 +59,8 @@ final class LoginViewModel: ObservableObject {
     }
     
     func loginWithBiometrics() async {
+        guard hasAcceptedTerms else { return }
+        
         let context = LAContext()
         var error: NSError?
         
@@ -80,6 +92,10 @@ final class LoginViewModel: ObservableObject {
     }
     
     func login() async {
+        guard hasAcceptedTerms else {
+            ErrorManager.shared.showWarning("Vui lòng xác nhận đồng ý Điều khoản dịch vụ để tiếp tục.")
+            return
+        }
         isLoading = true
         
         do {

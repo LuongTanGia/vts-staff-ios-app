@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftfulRouting
 
 struct HomeView: View {
-    // MARK: - Strings
+    // MARK: - UI Text Strings
     private enum Strings {
         static let emptyTitle = "Không có dữ liệu thống kê"
         static let emptySubtitle = "Vui lòng thử lại sau hoặc liên hệ quản trị viên."

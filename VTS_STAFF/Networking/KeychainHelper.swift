@@ -25,7 +25,7 @@ final class KeychainHelper {
             kSecValueData:   data
         ]
         
-        // Xoá nếu đã tồn tại
+        // Xóa nếu đã tồn tại
         SecItemDelete(query as CFDictionary)
         
         let status = SecItemAdd(query as CFDictionary, nil)

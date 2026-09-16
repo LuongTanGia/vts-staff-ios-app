@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftfulRouting
 
 struct DataListView: View {
-    // MARK: - Strings
+    // MARK: - UI Text Strings
     private enum Strings {
         static let emptyTitle = "Không có chức năng"
         static let emptySubtitle = "Tài khoản của bạn chưa được phân quyền chức năng nào."

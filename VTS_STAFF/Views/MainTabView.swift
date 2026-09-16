@@ -10,13 +10,16 @@ import SwiftfulRouting
 
 struct MainTabView: View {
     @ObservedObject private var authManager = AuthManager.shared
-    @State private var selectedTab = 0
+    @State private var selectedTab: Int
     
     private var hasHomePermission: Bool {
         authManager.chucNangPhanQuyens.contains(where: { $0.maChucNang == "VTSSTAFF_DASBOARD_NHANVIEN" && $0.visible && $0.view })
     }
     
     init() {
+        let hasHome = AuthManager.shared.chucNangPhanQuyens.contains(where: { $0.maChucNang == "VTSSTAFF_DASBOARD_NHANVIEN" && $0.visible && $0.view })
+        self._selectedTab = State(initialValue: hasHome ? 0 : 1)
+        
         // Cấu hình giao diện UITabBar chuyên nghiệp, hòa hợp với nền tối màu của app
         let appearance = UITabBarAppearance()
         appearance.configureWithDefaultBackground()
@@ -46,7 +49,7 @@ struct MainTabView: View {
                     HomeView()
                 }
                 .tabItem {
-                    Label("Trang chủ", image: "lucide_home")
+                    Label(Strings.tabHome, image: "lucide_home")
                 }
                 .tag(0)
             }
@@ -56,7 +59,7 @@ struct MainTabView: View {
                 DataListView()
             }
             .tabItem {
-                Label("Dữ liệu", image: "lucide_layout_grid")
+                Label(Strings.tabData, image: "lucide_layout_grid")
             }
             .tag(1)
             
@@ -65,7 +68,7 @@ struct MainTabView: View {
                 ThongBaoView()
             }
             .tabItem {
-                Label("Thông báo", image: "lucide_bell")
+                Label(Strings.tabNotifications, image: "lucide_bell")
             }
             .tag(2)
             
@@ -74,7 +77,7 @@ struct MainTabView: View {
                 InfoView()
             }
             .tabItem {
-                Label("Thông tin", image: "lucide_info")
+                Label(Strings.tabInfo, image: "lucide_info")
             }
             .tag(3)
             
@@ -83,23 +86,26 @@ struct MainTabView: View {
                 SettingsView()
             }
             .tabItem {
-                Label("Cài đặt", image: "lucide_settings")
+                Label(Strings.tabSettings, image: "lucide_settings")
             }
             .tag(4)
         }
-        .onAppear {
-            if !hasHomePermission {
+        .onChange(of: hasHomePermission) { _, hasHome in
+            if !hasHome && selectedTab == 0 {
                 selectedTab = 1
-            } else {
-                selectedTab = 0
             }
         }
         .tint(.vtsPrimary)
-        .tabViewStyle(.sidebarAdaptable)
-        
-        
-        
     }
+}
+
+// MARK: - UI Text Strings
+private enum Strings {
+    static let tabHome = "Trang chủ"
+    static let tabData = "Dữ liệu"
+    static let tabNotifications = "Thông báo"
+    static let tabInfo = "Thông tin"
+    static let tabSettings = "Cài đặt"
 }
 
 #Preview {

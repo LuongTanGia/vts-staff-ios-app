@@ -195,9 +195,9 @@ struct VTSPressButtonStyle: ButtonStyle {
         LinearGradient.vtsBackground.ignoresSafeArea()
         VStack(spacing: 16) {
             VTSButton("Đăng nhập", icon: "arrow.right", style: .primary, size: .large) {}
-            VTSButton("Huỷ bỏ", icon: "xmark", style: .secondary) {}
+            VTSButton("Hủy bỏ", icon: "xmark", style: .secondary) {}
             VTSButton("Thêm mới", icon: "plus", style: .outline) {}
-            VTSButton("Xoá", icon: "trash", style: .destructive, size: .small) {}
+            VTSButton("Xóa", icon: "trash", style: .destructive, size: .small) {}
             HStack {
                 VTSIconButton("plus", style: .primary) {}
                 VTSIconButton("trash", style: .destructive) {}

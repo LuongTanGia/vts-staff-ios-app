@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftfulRouting
 
 struct ThongBaoView: View {
-    // MARK: - Strings
+    // MARK: - UI Text Strings
     private enum Strings {
         static let toolbarTitle = "Thông báo"
         static let searchPlaceholder = "Nhập nội dung để tìm"

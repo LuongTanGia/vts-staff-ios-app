@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "logoviettas.svg",
+      "filename" : "logoFooter_1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "logoFooter_2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "logoFooter_3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

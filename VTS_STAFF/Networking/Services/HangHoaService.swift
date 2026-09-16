@@ -42,7 +42,7 @@ final class HangHoaService {
         return try await net.post(path: "/api/hanghoa/Sua", body: data)
     }
     
-    // MARK: - Xoá
+    // MARK: - Xóa
     func xoa(ma: String) async throws -> ApiResult<AnyCodable> {
         let body = Params_Ma(ma: ma)
         return try await net.post(path: "/api/hanghoa/Xoa", body: body)

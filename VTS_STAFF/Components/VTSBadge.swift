@@ -112,8 +112,8 @@ struct VTSPhieuStatusChip: View {
             return ("Hoàn thành", .success)
         case "cho duyet", "chờ duyệt", "pending":
             return ("Chờ duyệt", .warning)
-        case "xoa", "xoá", "cancelled", "huy", "huỷ":
-            return ("Đã huỷ", .danger)
+        case "xoa", "xoá", "xóa", "cancelled", "huy", "huỷ", "hủy":
+            return ("Đã hủy", .danger)
         case "dang xu ly", "đang xử lý", "processing":
             return ("Đang xử lý", .info)
         default:
@@ -206,7 +206,7 @@ struct VTSCountBadge: View {
             HStack(spacing: 8) {
                 VTSBadge("Hoàn thành", color: .vtsSuccess)
                 VTSBadge("Chờ duyệt",  color: .vtsWarning)
-                VTSBadge("Đã huỷ",     color: .vtsDanger, filled: true)
+                VTSBadge("Đã hủy",     color: .vtsDanger, filled: true)
                 VTSBadge("Mới",        color: .vtsPrimary, filled: true)
             }
             
@@ -214,7 +214,7 @@ struct VTSCountBadge: View {
             HStack(spacing: 8) {
                 VTSStatusChip("Hoàn thành", status: .success)
                 VTSStatusChip("Chờ duyệt",  status: .warning)
-                VTSStatusChip("Đã huỷ",     status: .danger)
+                VTSStatusChip("Đã hủy",     status: .danger)
             }
             
             // Phieu status (auto)

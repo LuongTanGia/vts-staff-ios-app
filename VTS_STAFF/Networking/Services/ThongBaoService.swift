@@ -48,13 +48,13 @@ final class ThongBaoService {
         return try await net.post(path: "/api/settings/SET_MSG_TAOPHIEU", body: body)
     }
     
-    /// Lấy cấu hình thông báo khi xoá phiếu
+    /// Lấy cấu hình thông báo khi xóa phiếu
     func getMsgXoaPhieu() async throws -> ApiResult<AnyCodable> {
         let emptyBody: [String: String]? = nil
         return try await net.post(path: "/api/settings/GET_MSG_XOAPHIEU", body: emptyBody)
     }
     
-    /// Cập nhật cấu hình thông báo khi xoá phiếu
+    /// Cập nhật cấu hình thông báo khi xóa phiếu
     func setMsgXoaPhieu(clientToken: String?, enabled: Bool) async throws -> ApiResult<AnyCodable> {
         let body = Params_MSG_XOAPHIEU(clientToken: clientToken, msgXoaPhieu: enabled)
         return try await net.post(path: "/api/settings/SET_MSG_XOAPHIEU", body: body)

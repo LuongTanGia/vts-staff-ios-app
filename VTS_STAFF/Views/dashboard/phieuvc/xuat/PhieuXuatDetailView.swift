@@ -10,6 +10,7 @@ import SwiftfulRouting
 import PhotosUI
 
 struct PhieuXuatDetailView: View {
+    // MARK: - UI Text Strings
     private enum Strings {
         static let navTitle = "VTS-Staff"
         static let titleNew = "Chuyến hàng giao mới"
@@ -17,7 +18,7 @@ struct PhieuXuatDetailView: View {
         static let titleInfo = "Thông tin chuyến hàng giao"
         static let emptyTitle = "Không tìm thấy thông tin phiếu xuất"
         static let emptySubtitle = "Số phiếu có thể không tồn tại hoặc đã bị xóa."
-        static let btnCancel = "Huỷ"
+        static let btnCancel = "Hủy"
         static let btnSave = "Lưu"
         static let btnEdit = "Sửa"
         static let btnDone = "Xong"
@@ -49,9 +50,9 @@ struct PhieuXuatDetailView: View {
         static let alertSuccessTitle = "Thành công"
         static let alertCreateSuccessSub = "Tạo phiếu xuất mới thành công."
         static let alertUpdateSuccessSub = "Cập nhật phiếu xuất thành công."
-        static let alertDeleteSuccessSub = "Đã xoá phiếu xuất."
+        static let alertDeleteSuccessSub = "Đã xóa phiếu xuất."
         static let alertErrorTitle = "Lỗi"
-        static let alertDeleteErrorTitle = "Lỗi xoá phiếu"
+        static let alertDeleteErrorTitle = "Lỗi xóa phiếu"
         static let defaultDash = "---"
         static func driverSubtitle(_ name: String) -> String { "Tài xế: \(name)" }
     }

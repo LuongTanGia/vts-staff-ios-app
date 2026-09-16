@@ -16,16 +16,16 @@ struct PhieuNhapListView: View {
         static let emptySubtitle = "Vui lòng kiểm tra lại kết nối hoặc thử lại."
         static let noResultTitle = "Không tìm thấy kết quả"
         static let noResultSubtitle = "Vui lòng nhập từ khóa khác"
-        static let deleteAlertTitle = "Xác nhận xoá"
-        static func deleteAlertSubtitle(_ soPhieu: String) -> String { "Bạn có chắc chắn muốn xoá phiếu nhập \(soPhieu)?" }
-        static let deleteBtn = "Xoá"
-        static let cancelBtn = "Huỷ"
+        static let deleteAlertTitle = "Xác nhận xóa"
+        static func deleteAlertSubtitle(_ soPhieu: String) -> String { "Bạn có chắc chắn muốn xóa phiếu nhập \(soPhieu)?" }
+        static let deleteBtn = "Xóa"
+        static let cancelBtn = "Hủy"
         static func modalTitle(_ soPhieu: String) -> String { "Phiếu nhập: \(soPhieu)" }
         static let viewDetail = "Xem chi tiết"
-        static let deleteTicket = "Xoá phiếu"
+        static let deleteTicket = "Xóa phiếu"
         static let navSubtitle = "Chuyển hàng thu về"
         static func totalTickets(_ count: Int) -> String { "Tổng cộng \(count) phiếu" }
-        static func deleteError(_ message: String) -> String { "Không thể xoá phiếu: \(message)" }
+        static func deleteError(_ message: String) -> String { "Không thể xóa phiếu: \(message)" }
     }
 
     @Environment(\.router) private var router
@@ -295,128 +295,138 @@ struct PhieuNhapCardView: View {
     // MARK: - UI Text Strings
     private enum Strings {
         static let hangBan = "Hàng bán"
-        static let thuVe = "Thu về"
-        static let xeNgoai = "Xe ngoài"
+        static let hangBanLabel = "Hàng bán:"
+        static let thuVe = "hàng hoá"
+        static let thuVeLabel = "Hàng thu về:"
+        static let xeNgoai = "Xe ngoài:"
         static let emptyPlaceholder = "---"
     }
 
     let item: TPhieuvc_Nhap_DanhSach
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Row 1: Số, Ngày
-            HStack {
+        VStack(alignment: .leading, spacing: 10) {
+            // Dòng 1: Số phiếu : Ngày
+            HStack(spacing: 8) {
                 Text(item.soPhieu)
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundColor(.vtsPrimary)
+                
+                Text(":")
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundColor(.vtsPrimary)
+                
+                Text(item.ngay.toUIDateString)
+                    .font(.system(size: 15, weight: .bold))
                     .foregroundColor(.vtsPrimary)
                 
                 Spacer()
+            }
+            
+            // Dòng 2: Checkbox Xe ngoài, Biển số xe, Tài xế
+            HStack(spacing: 8) {
+                Image(systemName: item.xeNgoai ? "checkmark.square.fill" : "square")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(item.xeNgoai ? .vtsPrimary : Color.primary.opacity(0.65))
                 
-                Text(item.ngay.toUIDateString)
-                    .font(.system(size: 13))
-                    .foregroundColor(.vtsTxtSecondary)
-            }
-            
-            // Row 2: Khách hàng
-            if let khach = item.tenKhachHang, !khach.isEmpty {
-                Text(khach)
-                    .font(.system(size: 14, weight: .medium))
+                Text(Strings.xeNgoai)
+                    .font(.system(size: 14, weight: .regular))
                     .foregroundColor(.vtsTxtPrimary)
-                    .lineLimit(1)
+                
+                let soXeDisplay = item.soXe?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                if !soXeDisplay.isEmpty {
+                    Text(soXeDisplay)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.vtsPrimary)
+                }
+                
+                let driverDisplay = ((item.taiXe?.isEmpty == false ? item.taiXe : item.tenNhanVien) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                if !driverDisplay.isEmpty {
+                    Text(driverDisplay)
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundColor(.vtsTxtPrimary)
+                        .lineLimit(1)
+                }
+                
+                Spacer()
             }
             
-            // Row 3: Hàng hoá & Khối lượng (Hàng chính)
-            HStack {
+            // Dòng 3: Hàng hoá : Khối lượng (ĐVT)
+            HStack(spacing: 6) {
                 Text(item.tenHangHoa)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.vtsPrimary)
                     .lineLimit(1)
                 
-                Spacer()
+                Text(":")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.vtsPrimary)
                 
-                let dvtSuffix = (item.dvt != nil && !item.dvt!.isEmpty) ? " \(item.dvt!)" : ""
+                let dvtSuffix = (item.dvt != nil && !item.dvt!.isEmpty) ? " (\(item.dvt!))" : ""
                 Text("\(Double(item.trongLuongHang).toQuantityString())\(dvtSuffix)")
                     .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundColor(.vtsPrimary)
+                
+                Spacer()
             }
             
-            // Hàng bán (nếu có thông tin)
-            let tenGC = (item.tenHangHoaGC?.isEmpty == false ? item.tenHangHoaGC : item.hangHoaGC)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            if (!tenGC.isEmpty && tenGC != Strings.emptyPlaceholder) || item.trongLuongHangGC > 0 {
-                HStack {
-                    Text(tenGC.isEmpty ? Strings.hangBan : tenGC)
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.vtsPrimary)
-                        .lineLimit(1)
-                    
-                    Spacer()
-                    
-                    let dvtGCSuffix = (item.dvtgc != nil && !item.dvtgc!.isEmpty) ? " \(item.dvtgc!)" : ""
-                    Text("\(Double(item.trongLuongHangGC).toQuantityString())\(dvtGCSuffix)")
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
-                        .foregroundColor(.vtsPrimary)
-                }
+            // Dòng 4: Khách hàng
+            if let khach = item.tenKhachHang, !khach.isEmpty {
+                Text(khach)
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundColor(.vtsPrimary)
+                    .lineLimit(2)
             }
             
-            // Thu về (nếu có thông tin)
+            // Dòng 5: Hàng thu về (nếu có thông tin)
             let tenTV = (item.tenHangHoaTV?.isEmpty == false ? item.tenHangHoaTV : item.hangHoaTV)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             if (!tenTV.isEmpty && tenTV != Strings.emptyPlaceholder) || item.trongLuongHangTV > 0 {
-                HStack {
+                HStack(spacing: 6) {
+                    Text(Strings.thuVeLabel)
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundColor(.vtsTxtPrimary)
+                    
                     Text(tenTV.isEmpty ? Strings.thuVe : tenTV)
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.vtsPrimary)
                         .lineLimit(1)
                     
-                    Spacer()
+                    Text(":")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.vtsPrimary)
                     
-                    let dvtTVSuffix = (item.dvttv != nil && !item.dvttv!.isEmpty) ? " \(item.dvttv!)" : ""
+                    let dvtTVSuffix = (item.dvttv != nil && !item.dvttv!.isEmpty) ? " (\(item.dvttv!))" : ""
                     Text("\(Double(item.trongLuongHangTV).toQuantityString())\(dvtTVSuffix)")
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundColor(.vtsPrimary)
+                    
+                    Spacer()
                 }
             }
             
-            // Row 4: Checkbox Xe Ngoài, Số xe & Tài xế
-            HStack(spacing: 8) {
-                HStack(spacing: 4) {
-                    Image(systemName: item.xeNgoai ? "checkmark.square.fill" : "square")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(item.xeNgoai ? .vtsPrimary : .gray)
-                    Text(Strings.xeNgoai)
-                        .font(.system(size: 13))
-                        .foregroundColor(.vtsTxtSecondary)
-                }
-                
-                Spacer()
-                
+            // Hàng bán / gia công (nếu có thông tin)
+            let tenGC = (item.tenHangHoaGC?.isEmpty == false ? item.tenHangHoaGC : item.hangHoaGC)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            if (!tenGC.isEmpty && tenGC != Strings.emptyPlaceholder) || item.trongLuongHangGC > 0 {
                 HStack(spacing: 6) {
-                    let soXeDisplay = item.soXe?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-                    let driverDisplay = ((item.taiXe?.isEmpty == false ? item.taiXe : item.tenNhanVien) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                    Text(Strings.hangBanLabel)
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundColor(.vtsTxtPrimary)
                     
-                    if !soXeDisplay.isEmpty {
-                        Text(soXeDisplay)
-                            .font(.system(size: 13, weight: .regular))
-                            .foregroundColor(.vtsTxtPrimary)
-                    }
+                    Text(tenGC.isEmpty ? Strings.hangBan : tenGC)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.vtsPrimary)
+                        .lineLimit(1)
                     
-                    if !soXeDisplay.isEmpty && !driverDisplay.isEmpty {
-                        Text("•")
-                            .font(.system(size: 12))
-                            .foregroundColor(.vtsTxtSecondary)
-                    }
+                    Text(":")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.vtsPrimary)
                     
-                    if !driverDisplay.isEmpty {
-                        Text(driverDisplay)
-                            .font(.system(size: 13, weight: .regular))
-                            .foregroundColor(.vtsTxtPrimary)
-                            .lineLimit(1)
-                    }
+                    let dvtGCSuffix = (item.dvtgc != nil && !item.dvtgc!.isEmpty) ? " (\(item.dvtgc!))" : ""
+                    Text("\(Double(item.trongLuongHangGC).toQuantityString())\(dvtGCSuffix)")
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundColor(.vtsPrimary)
                     
-                    if soXeDisplay.isEmpty && driverDisplay.isEmpty {
-                        Text(Strings.emptyPlaceholder)
-                            .font(.system(size: 13, weight: .regular))
-                            .foregroundColor(.vtsTxtSecondary)
-                    }
+                    Spacer()
                 }
             }
         }

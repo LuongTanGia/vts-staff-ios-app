@@ -7,7 +7,7 @@
 //    • Lưu / đọc access token & refresh token từ Keychain
 //    • Tự động gắn Bearer header vào mọi request
 //    • Tự động refresh token khi nhận 401 (một lần duy nhất)
-//    • Đăng xuất và xoá toàn bộ session
+//    • Đăng xuất và xóa toàn bộ session
 //
 
 import Foundation

@@ -52,12 +52,12 @@ struct VTSSplashView: View {
                 
                 // Khu vực tiêu đề ứng dụng
                 VStack(spacing: VTSSpacing.md) {
-                    Text("VTS STAFF")
+                    Text(Strings.appTitle)
                         .font(.system(size: 36, weight: .black, design: .rounded))
                         .foregroundColor(.vtsBg)
                         .tracking(3)
                     
-                    Text("HỆ THỐNG QUẢN LÝ VẬN CHUYỂN NỘI BỘ")
+                    Text(Strings.appSubtitle)
                         .font(.vtsCaption.bold())
                         .foregroundColor(.vtsBg)
                         .tracking(2)
@@ -73,7 +73,7 @@ struct VTSSplashView: View {
                         .tint(.vtsBg)
                         .scaleEffect(1.2)
                     
-                    Text("Đang khởi động hệ thống...")
+                    Text(Strings.loading)
                         .font(.vtsCaption)
                         .foregroundColor(.vtsTxtTertiary)
                         .tracking(1)
@@ -100,6 +100,13 @@ struct VTSSplashView: View {
             isRotationActive = true
         }
     }
+}
+
+// MARK: - UI Text Strings
+private enum Strings {
+    static let appTitle = "VTS STAFF"
+    static let appSubtitle = "HỆ THỐNG QUẢN LÝ VẬN CHUYỂN NỘI BỘ"
+    static let loading = "Đang khởi động hệ thống..."
 }
 
 #Preview {

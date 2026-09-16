@@ -18,7 +18,7 @@ struct TransportManifest: Identifiable {
 }
 
 struct ERPTableShowcaseView: View {
-    // MARK: - Strings
+    // MARK: - UI Text Strings
     private enum Strings {
         static let toolbarTitle = "Tính năng nâng cấp biểu mẫu"
         static let searchPlaceholder = "Tìm kiếm mã phiếu, số xe, khách hàng..."
@@ -51,7 +51,7 @@ struct ERPTableShowcaseView: View {
         TransportManifest(id: "PX-002", plateNumber: "29C-987.65", customer: "Doanh nghiệp Hùng Phát", weight: 32.0, driver: "Trần Thế Minh", status: "Đang xử lý"),
         TransportManifest(id: "PN-003", plateNumber: "43S-456.78", customer: "Hóa chất Đại Việt", weight: 18.5, driver: "Lê Hồng Quân", status: "Hoàn thành"),
         TransportManifest(id: "PX-004", plateNumber: "60H-222.11", customer: "Vật liệu Xây dựng Miền Nam", weight: 54.0, driver: "Phan Văn Đức", status: "Chờ duyệt"),
-        TransportManifest(id: "PN-005", plateNumber: "51D-333.44", customer: "Logistics Toàn Cầu", weight: 27.8, driver: "Hoàng Minh Tuấn", status: "Đã huỷ"),
+        TransportManifest(id: "PN-005", plateNumber: "51D-333.44", customer: "Logistics Toàn Cầu", weight: 27.8, driver: "Hoàng Minh Tuấn", status: "Đã hủy"),
         TransportManifest(id: "PX-006", plateNumber: "36C-555.66", customer: "Nông sản Việt", weight: 12.3, driver: "Đỗ Gia Bảo", status: "Đang xử lý"),
         TransportManifest(id: "PN-007", plateNumber: "75A-777.88", customer: "Thép Thái Nguyên", weight: 62.5, driver: "Trịnh Quốc Việt", status: "Hoàn thành"),
         TransportManifest(id: "PX-008", plateNumber: "86C-888.99", customer: "Xi măng Hà Tiên", weight: 38.1, driver: "Vũ Tiến Dũng", status: "Chờ duyệt"),

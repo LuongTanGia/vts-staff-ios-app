@@ -65,7 +65,7 @@ struct ComponentShowcaseView: View {
                             VTSButton("Lưu phiếu",  icon: "checkmark.circle", style: .primary,  size: .large) { showToast = true }
                             VTSButton("Làm mới",     icon: "arrow.clockwise", style: .secondary)  {}
                             VTSButton("Thêm mới",    icon: "plus",            style: .outline)    {}
-                            VTSButton("Xoá phiếu",  icon: "trash",           style: .destructive) { showConfirm = true }
+                            VTSButton("Xóa phiếu",  icon: "trash",           style: .destructive) { showConfirm = true }
                             VTSButton("Thử nghiệm OCR (Quét chữ)", icon: "doc.text.viewfinder", style: .outline, size: .large) {
                                 router.showScreen(.push) { _ in
                                     OCRTestView()
@@ -86,7 +86,7 @@ struct ComponentShowcaseView: View {
                             HStack(spacing: 8) {
                                 VTSBadge("Hoàn thành", color: .vtsSuccess)
                                 VTSBadge("Chờ duyệt",  color: .vtsWarning)
-                                VTSBadge("Đã huỷ",     color: .vtsDanger, filled: true)
+                                VTSBadge("Đã hủy",     color: .vtsDanger, filled: true)
                                 VTSBadge("Mới",        color: .vtsPrimary, filled: true)
                             }
                             HStack(spacing: 8) {
@@ -185,9 +185,9 @@ struct ComponentShowcaseView: View {
         .vtsToast(isPresented: $showToast, message: "Lưu thành công!", type: .success)
         .vtsConfirm(
             isPresented: $showConfirm,
-            title: "Xoá phiếu",
-            message: "Bạn có chắc muốn xoá phiếu này? Hành động không thể hoàn tác.",
-            confirmLabel: "Xoá"
+            title: "Xóa phiếu",
+            message: "Bạn có chắc muốn xóa phiếu này? Hành động không thể hoàn tác.",
+            confirmLabel: "Xóa"
         ) { print("Confirmed delete") }
     }
     

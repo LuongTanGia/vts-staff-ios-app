@@ -20,7 +20,7 @@ final class PhieuXuatDetailViewModel: ObservableObject {
     let statusOptions = [
         TDanhSachMaTen(ma: "HT", ten: "Hoàn thành"),
         TDanhSachMaTen(ma: "MO", ten: "Mới"),
-        TDanhSachMaTen(ma: "HU", ten: "Huỷ")
+        TDanhSachMaTen(ma: "HU", ten: "Hủy")
     ]
     
     let soPhieu: String?

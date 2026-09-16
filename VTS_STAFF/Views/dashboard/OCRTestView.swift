@@ -11,7 +11,7 @@ import PhotosUI
 import SwiftfulRouting
 
 struct OCRTestView: View {
-    // MARK: - Strings
+    // MARK: - UI Text Strings
     private enum Strings {
         static let toolbarTitle = "Thử nghiệm quét chữ (OCR)"
         static let sectionImageTitle = "Hình ảnh cần quét"
@@ -26,7 +26,7 @@ struct OCRTestView: View {
         static let dialogTitle = "Chọn nguồn ảnh"
         static let btnCamera = "Chụp ảnh"
         static let btnLibrary = "Chọn từ thư viện"
-        static let btnCancel = "Huỷ"
+        static let btnCancel = "Hủy"
         static let successCopied = "Đã sao chép văn bản vào bộ nhớ tạm"
     }
 

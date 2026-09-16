@@ -9,14 +9,14 @@ import SwiftUI
 import SwiftfulRouting
 
 struct NhanVienDetailDemoView: View {
-    // MARK: - Strings
+    // MARK: - UI Text Strings
     private enum Strings {
         static let emptyTitle = "Không tìm thấy thông tin nhân viên"
         static let emptySubtitle = "Hồ sơ có thể đã bị xóa hoặc không hợp lệ."
         
         static let toolbarTitleEdit = "Sửa hồ sơ nhân viên"
         static let toolbarTitleView = "Hồ sơ nhân viên"
-        static let btnCancel = "Huỷ"
+        static let btnCancel = "Hủy"
         static let btnSave = "Lưu"
         static let btnEdit = "Sửa"
         static let btnOk = "OK"

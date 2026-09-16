@@ -8,6 +8,14 @@
 import SwiftUI
 
 struct BiometricUnlockView: View {
+    // MARK: - UI Text Strings
+    private enum Strings {
+        static let lockedTitle = "Ứng dụng đang khóa"
+        static let lockedSubtitle = "Xác thực FaceID để mở khóa ứng dụng VTS STAFF"
+        static let unlockButton = "Mở khóa bằng Face ID"
+        static let switchAccountButton = "Đăng nhập tài khoản khác"
+    }
+
     let onUnlockAttempt: () -> Void
     let onLogout: () -> Void
     
@@ -51,11 +59,11 @@ struct BiometricUnlockView: View {
                     }
                     
                     VStack(spacing: VTSSpacing.sm) {
-                        Text("Ứng dụng đang khóa")
+                        Text(Strings.lockedTitle)
                             .font(.vtsTitle.bold())
                             .foregroundColor(.vtsTxtPrimary)
                         
-                        Text("Xác thực FaceID để mở khóa ứng dụng VTS STAFF")
+                        Text(Strings.lockedSubtitle)
                             .font(.vtsCallout)
                             .foregroundColor(.vtsTxtSecondary)
                             .multilineTextAlignment(.center)
@@ -68,7 +76,7 @@ struct BiometricUnlockView: View {
                 // MARK: Actions Area
                 VStack(spacing: VTSSpacing.lg) {
                     VTSButton(
-                        "Mở khóa bằng Face ID",
+                        Strings.unlockButton,
                         icon: "faceid",
                         style: .primary,
                         size: .large
@@ -77,7 +85,7 @@ struct BiometricUnlockView: View {
                     }
                     
                     VTSButton(
-                        "Đăng nhập tài khoản khác",
+                        Strings.switchAccountButton,
                         icon: "rectangle.portrait.and.arrow.right",
                         style: .ghost,
                         size: .medium

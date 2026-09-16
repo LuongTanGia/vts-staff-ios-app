@@ -23,11 +23,11 @@ struct XeListView: View {
         static let subtitle = "Xe nhà"
         static func totalCount(_ count: Int) -> String { "Tổng cộng: \(count)" }
         static let viewDetail = "Xem chi tiết"
-        static let deleteVehicle = "Xoá phương tiện"
+        static let deleteVehicle = "Xóa phương tiện"
         static let deleteConfirmTitle = "Xác nhận xóa"
         static func deleteConfirmSubtitle(_ ten: String, _ ma: String) -> String { "Bạn có chắc chắn muốn xóa phương tiện \(ten) (\(ma))?" }
-        static let deleteBtn = "Xoá"
-        static let cancelBtn = "Huỷ"
+        static let deleteBtn = "Xóa"
+        static let cancelBtn = "Hủy"
         static let errorTitle = "Lỗi"
         static let okBtn = "OK"
         static func subtitleModal(_ ma: String, _ loai: String) -> String { "Mã: \(ma) • Loại: \(loai)" }

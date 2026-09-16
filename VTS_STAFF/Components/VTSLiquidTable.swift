@@ -59,7 +59,7 @@ public struct VTSRowAction: Hashable, Identifiable {
     // Default static actions for backward compatibility
     public static let xem = VTSRowAction(id: "xem", label: "Xem", icon: "eye.fill", tintColor: .vtsPrimary)
     public static let sua = VTSRowAction(id: "sua", label: "Sửa", icon: "pencil", tintColor: .vtsSecondary)
-    public static let xoa = VTSRowAction(id: "xoa", label: "Xoá", icon: "trash.fill", tintColor: .vtsDanger, isDestructive: true)
+    public static let xoa = VTSRowAction(id: "xoa", label: "Xóa", icon: "trash.fill", tintColor: .vtsDanger, isDestructive: true)
 }
 
 // MARK: - VTSLiquidTable
@@ -187,7 +187,7 @@ struct VTSLiquidTable<T: Identifiable>: View {
                 selectedID = selectedID == row.id ? nil : row.id
             }
         }
-        // Context menu (Xem / Sửa / Xoá) – hiện khi hàng được chọn
+        // Context menu (Xem / Sửa / Xóa) – hiện khi hàng được chọn
         .overlay(alignment: .trailing) {
             if isSelected {
                 VTSLiquidContextMenu(actions: actions) { action in

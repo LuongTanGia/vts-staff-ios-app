@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftfulRouting
 
 struct InfoView: View {
-    // MARK: - Strings
+    // MARK: - UI Text Strings
     private enum Strings {
         static let toolbarTitle = "Thông tin"
         static let companyFullName = "Công Ty Cổ Phần Giải Pháp Thương Mại\nViệt Nam Sài Gòn"

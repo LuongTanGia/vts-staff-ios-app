@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FilterSettingsView: View {
-    // MARK: - Strings
+    // MARK: - UI Text Strings
     private enum Strings {
         static let toolbarTitle = "Chọn định dạng xem dữ liệu"
         static let sectionNhap = "Dữ liệu Hàng nhận (Nhập)"

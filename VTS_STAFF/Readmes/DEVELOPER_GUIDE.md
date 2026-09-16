@@ -37,7 +37,7 @@ VTS_STAFF/
 │   ├── Services/                 # CÁC DỊCH VỤ GỌI API THEO PHÂN HỆ
 │   │   ├── AuthService.swift     # API Đăng nhập / Đổi mật khẩu
 │   │   ├── DashboardService.swift# API Thống kê tổng quan Home
-│   │   ├── PhieuVCService.swift  # API Phiếu VC (Thêm/Sửa/Xoá/Chi tiết Nhập, Xuất, Gia Công)
+│   │   ├── PhieuVCService.swift  # API Phiếu VC (Thêm/Sửa/Xóa/Chi tiết Nhập, Xuất, Gia Công)
 │   │   ├── TruyVanService.swift  # API Truy vấn Chuyến xe / Nhập / Xuất
 │   │   ├── ListHelpersService.swift # API danh sách bổ trợ (Dropdown options)
 │   │   ├── HangHoaService.swift  # API Danh mục Hàng hoá
@@ -154,7 +154,7 @@ Dự án áp dụng mô hình **MVVM**:
   - Nếu ô phía trước chưa có ảnh, ô tiếp theo sẽ hiển thị trạng thái làm mờ (`opacity 0.5`) kèm dòng chữ nhãn hướng dẫn *"Thêm ảnh (n-1) trước"*.
 
 ### 6.2. Chuẩn Hoá Biển Số Xe & Tự Động Gợi Ý
-Trong các form phiếu, hàm `normalizePlate(_ input: String)` tự động xoá các ký tự khoảng trắng, dấu gạch ngang, dấu chấm và viết hoa toàn bộ biển số xe (vd: `51C-123.45` ➔ `51C12345`). Qua đó tự động đối soát với danh sách `xeOptions` để tự động chọn đúng loại **Xe nhà / Xe ngoài** và điền tên tài xế/nhân viên tương ứng.
+Trong các form phiếu, hàm `normalizePlate(_ input: String)` tự động xóa các ký tự khoảng trắng, dấu gạch ngang, dấu chấm và viết hoa toàn bộ biển số xe (vd: `51C-123.45` ➔ `51C12345`). Qua đó tự động đối soát với danh sách `xeOptions` để tự động chọn đúng loại **Xe nhà / Xe ngoài** và điền tên tài xế/nhân viên tương ứng.
 
 ---
 

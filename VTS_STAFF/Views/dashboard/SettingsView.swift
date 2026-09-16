@@ -11,7 +11,7 @@ import LocalAuthentication
 import UserNotifications
 
 struct SettingsView: View {
-    // MARK: - Strings
+    // MARK: - UI Text Strings
     private enum Strings {
         static let toolbarTitle = "Cài đặt"
         static let btnDangXuat = "Đăng xuất khỏi tài khoản"
@@ -47,8 +47,41 @@ struct SettingsView: View {
     
     // Device / UI States
     @State private var isBiometricsAvailable = false
+    @State private var biometryType: LABiometryType = .none
+    @State private var isBiometricsPermissionDenied = false
+    @State private var notificationAuthStatus: UNAuthorizationStatus = .notDetermined
     @State private var savedUsername = "gia"
     @State private var showLogoutConfirm = false
+    
+    private var biometryName: String {
+        switch biometryType {
+        case .faceID: return "Face ID"
+        case .touchID: return "Touch ID"
+        case .opticID: return "Optic ID"
+        default: return "Sinh trắc học"
+        }
+    }
+    
+    private var biometryIcon: String {
+        switch biometryType {
+        case .faceID: return "faceid"
+        case .touchID: return "touchid"
+        default: return "lock.shield"
+        }
+    }
+    
+    private var notificationStatusSubtitle: String {
+        switch notificationAuthStatus {
+        case .authorized, .provisional, .ephemeral:
+            return "Đã cho phép trong Cài đặt máy"
+        case .denied:
+            return "Đã tắt trong Cài đặt máy"
+        case .notDetermined:
+            return "Chưa cấp quyền thông báo"
+        @unknown default:
+            return "Không xác định"
+        }
+    }
     
     private var userInitials: String {
         let name = authManager.hoTen ?? savedUsername
@@ -112,14 +145,32 @@ struct SettingsView: View {
                     settingsSection(title: Strings.sectionBaoMat, icon: "shield.lock.fill") {
                         VStack(spacing: 0) {
                             settingRow(
-                                icon: "faceid",
+                                icon: biometryIcon,
                                 iconBg: Color.purple,
-                                title: Strings.rowFaceID
+                                title: "Sử dụng \(biometryName)",
+                                subtitle: isBiometricsPermissionDenied
+                                    ? "Đã tắt trong Cài đặt máy"
+                                    : (isBiometricsAvailable ? "Đăng nhập nhanh thay cho mật khẩu" : "Thiết bị không hỗ trợ hoặc chưa cài đặt")
                             ) {
-                                Toggle("", isOn: $enableBiometrics)
+                                if isBiometricsPermissionDenied {
+                                    Button(action: openSystemSettings) {
+                                        Text("Cài đặt")
+                                            .font(.system(size: 12, weight: .semibold))
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 5)
+                                            .background(Color.orange)
+                                            .cornerRadius(8)
+                                    }
+                                } else {
+                                    Toggle("", isOn: Binding(
+                                        get: { enableBiometrics },
+                                        set: { handleToggleBiometrics(newValue: $0) }
+                                    ))
                                     .labelsHidden()
                                     .tint(.vtsPrimary)
                                     .disabled(!isBiometricsAvailable)
+                                }
                             }
                         }
                     }
@@ -127,6 +178,47 @@ struct SettingsView: View {
                     // MARK: - 3. Thông báo
                     settingsSection(title: Strings.sectionThongBao, icon: "bell.badge.fill") {
                         VStack(spacing: 0) {
+                            // Dòng trạng thái quyền thông báo hệ thống máy
+                            settingRow(
+                                icon: "bell.fill",
+                                iconBg: Color.blue,
+                                title: "Thông báo hệ thống",
+                                subtitle: notificationStatusSubtitle
+                            ) {
+                                if notificationAuthStatus == .denied {
+                                    Button(action: openSystemSettings) {
+                                        Text("Cài đặt")
+                                            .font(.system(size: 12, weight: .semibold))
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 5)
+                                            .background(Color.orange)
+                                            .cornerRadius(8)
+                                    }
+                                } else if notificationAuthStatus == .notDetermined {
+                                    Button(action: requestNotificationPermission) {
+                                        Text("Cho phép")
+                                            .font(.system(size: 12, weight: .semibold))
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 5)
+                                            .background(Color.vtsPrimary)
+                                            .cornerRadius(8)
+                                    }
+                                } else {
+                                    Text("Đã bật")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundColor(.green)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(Color.green.opacity(0.12))
+                                        .cornerRadius(8)
+                                }
+                            }
+                            
+                            VTSDivider()
+                                .padding(.leading, 46)
+                            
                             settingRow(
                                 icon: "doc.badge.plus",
                                 iconBg: Color.indigo,
@@ -135,7 +227,9 @@ struct SettingsView: View {
                                 Toggle("", isOn: $notifyTicketCreated)
                                     .labelsHidden()
                                     .tint(.vtsPrimary)
+                                    .disabled(notificationAuthStatus != .authorized && notificationAuthStatus != .provisional)
                             }
+                            .opacity((notificationAuthStatus == .authorized || notificationAuthStatus == .provisional) ? 1.0 : 0.5)
                             
                             VTSDivider()
                                 .padding(.leading, 46)
@@ -148,7 +242,9 @@ struct SettingsView: View {
                                 Toggle("", isOn: $notifyTicketDeleted)
                                     .labelsHidden()
                                     .tint(.vtsPrimary)
+                                    .disabled(notificationAuthStatus != .authorized && notificationAuthStatus != .provisional)
                             }
+                            .opacity((notificationAuthStatus == .authorized || notificationAuthStatus == .provisional) ? 1.0 : 0.5)
                         }
                     }
                     
@@ -357,22 +453,79 @@ struct SettingsView: View {
     
     // MARK: - Device Settings Synchronization
     private func updateDeviceSettingsState() {
-        // 1. Check Biometrics Availability from Device
+        // 1. Kiểm tra quyền Sinh trắc học (Face ID / Touch ID) từ hệ thống máy
         let context = LAContext()
         var error: NSError?
         let canEvaluate = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+        self.biometryType = context.biometryType
         self.isBiometricsAvailable = canEvaluate
-        if !canEvaluate {
-            self.enableBiometrics = false
+        
+        if canEvaluate {
+            self.isBiometricsPermissionDenied = false
+        } else {
+            if let laError = error as? LAError, laError.code == .biometryNotAvailable && context.biometryType != .none {
+                self.isBiometricsPermissionDenied = true
+            } else {
+                self.isBiometricsPermissionDenied = false
+            }
+            if enableBiometrics {
+                self.enableBiometrics = false
+            }
         }
         
-        // 2. Username Display
+        // 2. Kiểm tra quyền Thông báo từ Cài đặt máy
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async {
+                self.notificationAuthStatus = settings.authorizationStatus
+            }
+        }
+        
+        // 3. Username Display
         if let saved = KeychainHelper.shared.load(forKey: "vts_saved_username"), !saved.isEmpty {
             self.savedUsername = saved
         } else if let maNV = authManager.maNV, !maNV.isEmpty {
             self.savedUsername = maNV
         } else {
             self.savedUsername = "gia"
+        }
+    }
+    
+    private func openSystemSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString),
+              UIApplication.shared.canOpenURL(url) else { return }
+        UIApplication.shared.open(url)
+    }
+    
+    private func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
+            DispatchQueue.main.async {
+                updateDeviceSettingsState()
+                if granted {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            }
+        }
+    }
+    
+    private func handleToggleBiometrics(newValue: Bool) {
+        if newValue {
+            if isBiometricsPermissionDenied {
+                openSystemSettings()
+                return
+            }
+            let context = LAContext()
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Xác thực \(biometryName) để kích hoạt đăng nhập nhanh") { success, _ in
+                DispatchQueue.main.async {
+                    if success {
+                        self.enableBiometrics = true
+                    } else {
+                        self.enableBiometrics = false
+                    }
+                    updateDeviceSettingsState()
+                }
+            }
+        } else {
+            self.enableBiometrics = false
         }
     }
 }

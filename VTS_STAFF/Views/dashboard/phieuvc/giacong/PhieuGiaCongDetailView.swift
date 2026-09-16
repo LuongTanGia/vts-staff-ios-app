@@ -10,6 +10,7 @@ import SwiftfulRouting
 import PhotosUI
 
 struct PhieuGiaCongDetailView: View {
+    // MARK: - UI Text Strings
     private enum Strings {
         static let navTitle = "VTS-Staff"
         static let titleNew = "Chuyến hàng gia công mới"
@@ -17,7 +18,7 @@ struct PhieuGiaCongDetailView: View {
         static let titleInfo = "Thông tin chuyến hàng gia công"
         static let emptyTitle = "Không tìm thấy thông tin phiếu gia công"
         static let emptySubtitle = "Số phiếu có thể không tồn tại hoặc đã bị xóa."
-        static let btnCancel = "Huỷ"
+        static let btnCancel = "Hủy"
         static let btnSave = "Lưu"
         static let btnEdit = "Sửa"
         static let btnOK = "OK"
@@ -50,9 +51,9 @@ struct PhieuGiaCongDetailView: View {
         static let alertSuccessTitle = "Thành công"
         static let alertCreateSuccessSub = "Tạo phiếu gia công mới thành công."
         static let alertUpdateSuccessSub = "Cập nhật phiếu gia công thành công."
-        static let alertDeleteSuccessSub = "Đã xoá phiếu gia công."
+        static let alertDeleteSuccessSub = "Đã xóa phiếu gia công."
         static let alertErrorTitle = "Lỗi"
-        static let alertDeleteErrorTitle = "Lỗi xoá phiếu"
+        static let alertDeleteErrorTitle = "Lỗi xóa phiếu"
         static let galleryItem1 = "Ảnh 1 - Hàng hoá chính 1"
         static let galleryItem2 = "Ảnh 2 - Hàng hoá chính 2"
         static let galleryItem3 = "Ảnh 3 - Hàng gia công 1"
