@@ -142,83 +142,74 @@ struct ThongBaoCard: View {
     let onTap: () -> Void
     
     private var isDeleteNotification: Bool {
-        let text = (item.tieuDe ?? "") + (item.noiDung ?? "")
-        return text.lowercased().contains("xóa") || text.lowercased().contains("xoa")
+        let text = ((item.tieuDe ?? "") + " " + (item.noiDung ?? "")).lowercased()
+        return text.contains("xóa") || text.contains("xoa")
     }
     
-    private var iconName: String {
-        let text = (item.tieuDe ?? "") + (item.noiDung ?? "")
-        if text.contains("PGC.") || text.lowercased().contains("gia công") {
-            return "gearshape.fill"
-        } else if text.contains("PX.") || text.lowercased().contains("xuất") {
-            return "truck.box.fill"
-        } else if text.contains("PN.") || text.lowercased().contains("nhập") {
-            return "building.2.crop.circle.fill"
+    private var iconAssetName: String {
+        let text = ((item.tieuDe ?? "") + " " + (item.noiDung ?? "")).uppercased()
+        if text.contains("PGC.") || text.contains("GIA CÔNG") {
+            return "lucide_settings_arrow"
+        } else if text.contains("PX.") || text.contains("XUẤT") {
+            return "lucide_truck"
+        } else if text.contains("PN.") || text.contains("NHẬP") {
+            return "lucide_factory"
         }
-        return "bell.fill"
+        return "lucide_bell"
     }
     
-    private var accentColor: Color {
-        isDeleteNotification ? Color(hex: "DC2626") : Color(hex: "004B87")
+    private var titleColor: Color {
+        isDeleteNotification ? Color(hex: "DC2626") : Color.vtsPrimary
     }
     
     var body: some View {
         Button(action: onTap) {
-            HStack(alignment: .top, spacing: 14) {
-                // Icon Header Box
-                LucideIcon(iconName, size: 20, color: accentColor)
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(accentColor)
-                    .frame(width: 36, height: 36)
-                    .background(accentColor.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                
-                VStack(alignment: .leading, spacing: 6) {
-                    // Title Header (Blue or Red)
+            VStack(alignment: .leading, spacing: 6) {
+                // Header: Icon + Title
+                HStack(spacing: 8) {
+                    Image(iconAssetName)
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                        .foregroundColor(Color.vtsPrimary)
+                    
                     if let tieuDe = item.tieuDe, !tieuDe.isEmpty {
                         Text(tieuDe)
-                            .font(.system(size: 15, weight: .bold))
-                            .foregroundColor(accentColor)
-                            .multilineTextAlignment(.leading)
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(titleColor)
+                            .lineLimit(1)
                     }
                     
-                    // Description Body
-                    if let noiDung = item.noiDung, !noiDung.isEmpty {
-                        Text(noiDung)
-                            .font(.system(size: 13, weight: .regular))
-                            .foregroundColor(Color(hex: "0F2D59"))
-                            .multilineTextAlignment(.leading)
-                            .lineSpacing(3)
-                    }
+                    Spacer()
                     
-                    // Date Timestamp
-                    if let ngay = item.ngay, !ngay.isEmpty {
-                        HStack {
-                            Spacer()
-                            Text(ngay.toDisplayDateTime())
-                                .font(.system(size: 11))
-                                .foregroundColor(Color(hex: "64748B"))
-                        }
-                        .padding(.top, 2)
+                    if item.daDoc != true {
+                        Circle()
+                            .fill(Color.vtsPrimary)
+                            .frame(width: 8, height: 8)
                     }
                 }
                 
-                // Unread Indicator Dot
-                if item.daDoc != true {
-                    Circle()
-                        .fill(Color(hex: "004B87"))
-                        .frame(width: 9, height: 9)
-                        .padding(.top, 4)
+                // Content Body
+                if let noiDung = item.noiDung, !noiDung.isEmpty {
+                    Text(noiDung)
+                        .font(.system(size: 13.5, weight: .regular))
+                        .foregroundColor(Color(hex: "1E293B"))
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .lineSpacing(3)
                 }
             }
-            .padding(14)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.white)
-            .cornerRadius(14)
+            .cornerRadius(12)
             .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(item.daDoc == true ? Color(hex: "E2E8F0") : Color(hex: "93C5FD"), lineWidth: item.daDoc == true ? 1 : 1.5)
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color(hex: "E2E8F0"), lineWidth: 1.2)
             )
-            .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
+            .shadow(color: Color.black.opacity(0.02), radius: 3, x: 0, y: 1)
         }
         .buttonStyle(.plain)
     }

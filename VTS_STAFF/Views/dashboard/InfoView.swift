@@ -32,7 +32,6 @@ struct InfoView: View {
         static let appCopyright = "Công Ty Cổ Phần Giải Pháp Thương Mại Việt Nam Sài Gòn bảo lưu mọi quyền."
         static let rowDieuKhoan = "Điều khoản sử dụng:"
         static let rowChinhSach = "Chính sách bảo mật:"
-        static let rowThanhPhan = "Thành phần & Thử nghiệm OCR:"
         static let btnXemNoiDung = "Xem nội dung"
     }
 
@@ -179,14 +178,6 @@ struct InfoView: View {
                             policyRow(title: Strings.rowChinhSach, action: {
                                 router.showScreen(.push) { _ in
                                     PolicyDocumentView(documentName: "privacy", title: "Chính sách bảo mật")
-                                }
-                            })
-                            
-                            VTSDivider()
-                            
-                            policyRow(title: Strings.rowThanhPhan, action: {
-                                router.showScreen(.push) { _ in
-                                    ComponentShowcaseView()
                                 }
                             })
                         }

@@ -15,7 +15,9 @@ public enum LucideIconName: String, CaseIterable, Identifiable, Sendable {
     case users              = "users"                 // Nhân viên / Đội ngũ
     case user               = "user"                  // Người dùng / Cá nhân
     case truck              = "truck"                 // Xe nhà / Phương tiện
+    case factory            = "factory"               // Nhà máy / Phiếu nhập
     case cog                = "cog"                   // Chuyến hàng gia công / Bánh răng
+    case settingsArrow      = "settings_arrow"        // Gia công (Bánh răng & Mũi tên)
     case wrench             = "wrench"                // Dụng cụ sửa chữa
     case arrowDownToDot     = "arrow_down_to_dot"     // Chuyến hàng nhận / Nhập
     case arrowUpFromDot     = "arrow_up_from_dot"     // Chuyến hàng giao / Xuất
@@ -101,6 +103,12 @@ public enum LucideIconName: String, CaseIterable, Identifiable, Sendable {
         }
         if lower.contains("truck") || lower.contains("car") || lower.contains("xe") {
             return .truck
+        }
+        if lower.contains("factory") {
+            return .factory
+        }
+        if lower.contains("settings_arrow") || lower.contains("settingsarrow") {
+            return .settingsArrow
         }
         if lower.contains("gearshape.2") || lower.contains("gearshape") || lower.contains("cog") || lower.contains("wrench") || lower.contains("giacong") || lower.contains("gia_cong") {
             return .cog
