@@ -51,31 +51,9 @@
 		38C085682FEB8C2C00965985 /* VTS_STAFFTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VTS_STAFFTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		38C085742FEB8C6D00965985 /* Exceptions for "VTS_STAFF" folder in "VTS_STAFF" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Networking/Extensions/VTSCommonTests.swift,
-			);
-			target = 38B6B5FD2FE6516500CDA812 /* VTS_STAFF */;
-		};
-		38C085752FEB8C6D00965985 /* Exceptions for "VTS_STAFF" folder in "VTS_STAFFTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Networking/Extensions/VTSCommon.swift,
-				Networking/Extensions/VTSCommonTests.swift,
-			);
-			target = 38C085672FEB8C2C00965985 /* VTS_STAFFTests */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		38B6B6002FE6516500CDA812 /* VTS_STAFF */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				38C085742FEB8C6D00965985 /* Exceptions for "VTS_STAFF" folder in "VTS_STAFF" target */,
-				38C085752FEB8C6D00965985 /* Exceptions for "VTS_STAFF" folder in "VTS_STAFFTests" target */,
-			);
 			path = VTS_STAFF;
 			sourceTree = "<group>";
 		};
