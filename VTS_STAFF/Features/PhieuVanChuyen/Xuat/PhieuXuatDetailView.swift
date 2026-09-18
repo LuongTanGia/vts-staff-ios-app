@@ -336,7 +336,7 @@ struct PhieuXuatDetailView: View {
                             let text = await VTSImageOCRHelper.performOCR(on: croppedImg)
                             hinh01Text = text
                             if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
-                                trongLuongHang = String(qty)
+                                trongLuongHang = VTSQuantityHelper.formatForInput(qty)
                             }
                         }
                     } else if target == 2 {
@@ -345,7 +345,7 @@ struct PhieuXuatDetailView: View {
                             let text = await VTSImageOCRHelper.performOCR(on: croppedImg)
                             hinh02Text = text
                             if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
-                                trongLuongHang = String(qty)
+                                trongLuongHang = VTSQuantityHelper.formatForInput(qty)
                             }
                         }
                     }
@@ -379,7 +379,7 @@ struct PhieuXuatDetailView: View {
                             let text = await VTSImageOCRHelper.performOCR(on: updatedImage)
                             hinh01Text = text
                             if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
-                                trongLuongHang = String(qty)
+                                trongLuongHang = VTSQuantityHelper.formatForInput(qty)
                             }
                         }
                     } else if slot == 2 {
@@ -388,7 +388,7 @@ struct PhieuXuatDetailView: View {
                             let text = await VTSImageOCRHelper.performOCR(on: updatedImage)
                             hinh02Text = text
                             if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
-                                trongLuongHang = String(qty)
+                                trongLuongHang = VTSQuantityHelper.formatForInput(qty)
                             }
                         }
                     }
@@ -565,10 +565,16 @@ struct PhieuXuatDetailView: View {
                 VTSLiquidTextField(
                     label: Strings.fieldSoLuong,
                     text: $trongLuongHang,
-                    keyboardType: .decimalPad,
+                    keyboardType: VTSQuantityHelper.keyboardType,
                     isReadOnly: !isEditMode,
                     errorMessage: trongLuongHangError
                 )
+                .onChange(of: trongLuongHang) { _, newValue in
+                    let sanitized = VTSQuantityHelper.sanitize(newValue)
+                    if sanitized != newValue {
+                        trongLuongHang = sanitized
+                    }
+                }
                 
                 if !currentDVTDisplay.isEmpty {
                     VTSLiquidReadonlyField(currentDVTDisplay, caption: Strings.fieldDVT)
@@ -742,7 +748,7 @@ struct PhieuXuatDetailView: View {
         khachHang = details.khachHang ?? ""
         hangHoa = details.hangHoa
         if details.trongLuongHang > 0 {
-            trongLuongHang = (details.trongLuongHang.truncatingRemainder(dividingBy: 1) == 0) ? String(Int(details.trongLuongHang)) : String(details.trongLuongHang)
+            trongLuongHang = VTSQuantityHelper.formatForInput(details.trongLuongHang)
         } else {
             trongLuongHang = ""
         }

@@ -440,7 +440,7 @@ struct HomeView: View {
                             .frame(maxHeight: .infinity)
                             .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                         
-                        Text(item.colValue1.toFormattedString(maxDecimals: 2))
+                        Text(item.colValue1.toFormattedString(maxDecimals: 0))
                             .font(.system(size: 13))
                             .foregroundColor(Color(hex: "0F2D59"))
                             .padding(.horizontal, 4)
@@ -448,7 +448,7 @@ struct HomeView: View {
                             .frame(maxHeight: .infinity)
                             .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                         
-                        Text(item.colValue2.toFormattedString(maxDecimals: 2))
+                        Text(item.colValue2.toQuantityString())
                             .font(.system(size: 13))
                             .foregroundColor(Color(hex: "0F2D59"))
                             .padding(.horizontal, 4)
@@ -456,7 +456,7 @@ struct HomeView: View {
                             .frame(maxHeight: .infinity)
                             .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                         
-                        Text(item.colValue3.toFormattedString(maxDecimals: 2))
+                        Text(item.colValue3.toFormattedString(maxDecimals: 0))
                             .font(.system(size: 13))
                             .foregroundColor(Color(hex: "0F2D59"))
                             .padding(.horizontal, 4)
@@ -464,7 +464,7 @@ struct HomeView: View {
                             .frame(maxHeight: .infinity)
                             .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                         
-                        Text(item.colValue4.toFormattedString(maxDecimals: 2))
+                        Text(item.colValue4.toQuantityString())
                             .font(.system(size: 13))
                             .foregroundColor(Color(hex: "0F2D59"))
                             .padding(.horizontal, 4)
@@ -494,7 +494,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text(totalCol1.toFormattedString(maxDecimals: 2))
+                    Text(totalCol1.toFormattedString(maxDecimals: 0))
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
@@ -502,7 +502,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text(totalCol2.toFormattedString(maxDecimals: 2))
+                    Text(totalCol2.toQuantityString())
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
@@ -510,7 +510,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text(totalCol3.toFormattedString(maxDecimals: 2))
+                    Text(totalCol3.toFormattedString(maxDecimals: 0))
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
@@ -518,7 +518,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text(totalCol4.toFormattedString(maxDecimals: 2))
+                    Text(totalCol4.toQuantityString())
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 4)
@@ -600,7 +600,7 @@ struct HomeView: View {
                                 .frame(maxHeight: .infinity)
                                 .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                             
-                            Text(item.colValue.toFormattedString(maxDecimals: 0))
+                            Text(item.colValue.toQuantityString())
                                 .font(.system(size: 13))
                                 .foregroundColor(Color(hex: "0F2D59"))
                                 .padding(.horizontal, 6)
@@ -628,7 +628,7 @@ struct HomeView: View {
                                 .frame(maxHeight: .infinity)
                                 .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                             
-                            Text(item.colValue.toFormattedString(maxDecimals: 0))
+                            Text(item.colValue.toQuantityString())
                                 .font(.system(size: 13, weight: .bold))
                                 .foregroundColor(headerTextColor)
                                 .padding(.horizontal, 6)
@@ -659,7 +659,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text(totalQty.toFormattedString(maxDecimals: 0))
+                    Text(totalQty.toQuantityString())
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 6)
@@ -741,7 +741,7 @@ struct HomeView: View {
                                 .frame(maxHeight: .infinity)
                                 .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                             
-                            Text(item.colValue.toFormattedString(maxDecimals: 0))
+                            Text(item.colValue.toQuantityString())
                                 .font(.system(size: 13))
                                 .foregroundColor(Color(hex: "0F2D59"))
                                 .padding(.horizontal, 6)
@@ -769,7 +769,7 @@ struct HomeView: View {
                                 .frame(maxHeight: .infinity)
                                 .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                             
-                            Text(item.colValue.toFormattedString(maxDecimals: 0))
+                            Text(item.colValue.toQuantityString())
                                 .font(.system(size: 13, weight: .bold))
                                 .foregroundColor(headerTextColor)
                                 .padding(.horizontal, 6)
@@ -800,7 +800,7 @@ struct HomeView: View {
                         .frame(maxHeight: .infinity)
                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(tableBorderColor), alignment: .trailing)
                     
-                    Text(totalQty.toFormattedString(maxDecimals: 0))
+                    Text(totalQty.toQuantityString())
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(headerTextColor)
                         .padding(.horizontal, 6)

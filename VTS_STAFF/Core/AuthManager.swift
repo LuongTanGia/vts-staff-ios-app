@@ -44,7 +44,27 @@ final class AuthManager: ObservableObject {
     @Published private(set) var maNV: String? = nil
     @Published private(set) var avatar: String? = nil
     @Published private(set) var chucNangPhanQuyens: [TChucNangPhanQuyen] = []
-    @Published private(set) var soLEHeThong: TSoLeHeThong? = nil
+    @Published private(set) var soLEHeThong: TSoLeHeThong? = nil {
+        didSet {
+            Self.setCachedSoLe(soLEHeThong)
+        }
+    }
+    
+    // MARK: - Thread-safe access for formatters
+    nonisolated private static let soLeLock = NSLock()
+    nonisolated(unsafe) private static var _cachedSoLe: TSoLeHeThong? = nil
+    
+    nonisolated static var currentSoLeHeThong: TSoLeHeThong? {
+        soLeLock.lock()
+        defer { soLeLock.unlock() }
+        return _cachedSoLe
+    }
+    
+    nonisolated private static func setCachedSoLe(_ val: TSoLeHeThong?) {
+        soLeLock.lock()
+        _cachedSoLe = val
+        soLeLock.unlock()
+    }
     
     var isBypassActive: Bool {
         #if DEBUG

@@ -141,10 +141,10 @@ struct TruyVanChuyenXeView: View {
                                         width: 0.17,
                                         alignment: .trailing,
                                         render: { item, _ in
-                                            AnyView(Text(item.colValue2.toFormattedString(maxDecimals: 2)))
+                                            AnyView(Text(item.colValue2.toQuantityString()))
                                         },
                                         sorter: { $0.colValue2 < $1.colValue2 },
-                                        footer: AnyView(Text(totalValue2.toFormattedString(maxDecimals: 2)).font(.system(size: 13, weight: .bold)))
+                                        footer: AnyView(Text(totalValue2.toQuantityString()).font(.system(size: 13, weight: .bold)))
                                     ),
                                     ERPColumn(
                                         title: AnyView(Text(Strings.colXeGiao)),
@@ -163,10 +163,10 @@ struct TruyVanChuyenXeView: View {
                                         width: 0.16,
                                         alignment: .trailing,
                                         render: { item, _ in
-                                            AnyView(Text(item.colValue4.toFormattedString(maxDecimals: 2)))
+                                            AnyView(Text(item.colValue4.toQuantityString()))
                                         },
                                         sorter: { $0.colValue4 < $1.colValue4 },
-                                        footer: AnyView(Text(totalValue4.toFormattedString(maxDecimals: 2)).font(.system(size: 13, weight: .bold)))
+                                        footer: AnyView(Text(totalValue4.toQuantityString()).font(.system(size: 13, weight: .bold)))
                                     )
                                 ],
                                 loadDataIfNeeded: {

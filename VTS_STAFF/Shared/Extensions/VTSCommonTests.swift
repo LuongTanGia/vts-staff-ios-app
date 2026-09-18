@@ -87,25 +87,35 @@ final class VTSCommonTests: XCTestCase {
         XCTAssertEqual(array?[1]["id"] as? String, "2")
     }
     
-    // MARK: - Numeric Tests (VND Formatting)
-    //    func testNumericToVND() {
-    //        let amount1: Int = 1500000
-    //        XCTAssertEqual(amount1.toVND(), "1.500.000 ₫")
-    //        
-    //        let amount2: Double = 500000.5
-    //        XCTAssertEqual(amount2.toVND(), "500.000 ₫") // Làm tròn do tối đa 0 chữ số thập phân
-    //        
-    //        let amount3: Decimal = 12000000
-    //        XCTAssertEqual(amount3.toVND(), "12.000.000 ₫")
-    //    }
-    //    
-    //    func testNumericToFormattedString() {
-    //        let number: Double = 1234567.89
-    //        XCTAssertEqual(number.toFormattedString(), "1.234.567,89")
-    //        
-    //        let integer: Int = 1000000
-    //        XCTAssertEqual(integer.toFormattedString(), "1.000.000")
-    //    }
+    // MARK: - Numeric Tests (VND & SoLeHeThong Formatting)
+    func testNumericToVND() {
+        let amount1: Int = 1500000
+        XCTAssertEqual(amount1.toVND(), "1.500.000 ₫")
+        
+        let amount2: Double = 500000.5
+        XCTAssertEqual(amount2.toVND(), "500.001 ₫") // SOLESOTIEN mặc định = 0 làm tròn lên
+        
+        let amount3: Decimal = 12000000
+        XCTAssertEqual(amount3.toVND(), "12.000.000 ₫")
+    }
+    
+    func testNumericToFormattedString() {
+        let number: Double = 1234567.89
+        XCTAssertEqual(number.toFormattedString(), "1.234.567,89")
+        
+        let integer: Int = 1000000
+        XCTAssertEqual(integer.toFormattedString(), "1.000.000")
+        
+        let quantity: Double = 123.456
+        XCTAssertEqual(quantity.toFormattedString(maxDecimals: 1), "123,5")
+    }
+    
+    func testStringToDoubleVietnamese() {
+        XCTAssertEqual("1.234,5".toDouble(), 1234.5)
+        XCTAssertEqual("123,45".toDouble(), 123.45)
+        XCTAssertEqual("123.45".toDouble(), 123.45)
+        XCTAssertEqual("1000".toDouble(), 1000.0)
+    }
     
     // MARK: - Array Tests
     func testArraySafeSubscript() {

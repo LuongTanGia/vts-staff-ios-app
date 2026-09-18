@@ -17,7 +17,7 @@ struct TDangNhap: Decodable {
     let userTest: Bool
     let ngayHetHan: String?
     let chucNangPhanQuyens: [TChucNangPhanQuyen]
-    let soLEHeThong: TSoLeHeThong
+    let soLEHeThong: TSoLeHeThong?
     let dataError: Int
     let dataErrorDescription: String
     
@@ -71,8 +71,26 @@ struct TChucNangPhanQuyen: Codable, Hashable, Identifiable {
 }
 
 // MARK: - TSoLeHeThong
-struct TSoLeHeThong: Codable, Sendable {
-    let solesoluong, soledongia, solesotien, soletyle: Int
+struct TSoLeHeThong: Codable, Sendable, Equatable {
+    let solesoluong: Int
+    let soledongia: Int
+    let solesotien: Int
+    let soletyle: Int
+    
+    init(solesoluong: Int = 2, soledongia: Int = 0, solesotien: Int = 0, soletyle: Int = 0) {
+        self.solesoluong = solesoluong
+        self.soledongia = soledongia
+        self.solesotien = solesotien
+        self.soletyle = soletyle
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.solesoluong = (try? container.decodeIfPresent(Int.self, forKey: .solesoluong)) ?? 2
+        self.soledongia = (try? container.decodeIfPresent(Int.self, forKey: .soledongia)) ?? 0
+        self.solesotien = (try? container.decodeIfPresent(Int.self, forKey: .solesotien)) ?? 0
+        self.soletyle = (try? container.decodeIfPresent(Int.self, forKey: .soletyle)) ?? 0
+    }
     
     enum CodingKeys: String, CodingKey {
         case solesoluong = "SOLESOLUONG"

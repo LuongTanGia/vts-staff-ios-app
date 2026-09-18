@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 // MARK: - ============================================================
 //                         NUMBER & CURRENCY FORMATTER
@@ -23,59 +24,141 @@ extension Float: VTSNumeric { public var doubleValue: Double { Double(self) } }
 extension Decimal: VTSNumeric { public var doubleValue: Double { NSDecimalNumber(decimal: self).doubleValue } }
 
 private struct VTSNumberFormatterCache {
-    static let vndFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale(identifier: "vi_VN")
-        formatter.currencySymbol = "₫" // Đảm bảo hiển thị ký hiệu đồng ₫
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 0 // VND thông thường không có phần thập phân
-        return formatter
-    }()
+    private static let lock = NSLock()
+    private static var decimalFormatters: [Int: NumberFormatter] = [:]
     
-    static let decimalFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.locale = Locale(identifier: "vi_VN") // Định dạng VN: 1.234.567,89
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 2
-        return formatter
-    }()
+    static func formatDecimal(_ value: Double, maxDecimals: Int) -> String {
+        let decimals = max(0, min(maxDecimals, 8))
+        lock.lock()
+        defer { lock.unlock() }
+        let formatter: NumberFormatter
+        if let cached = decimalFormatters[decimals] {
+            formatter = cached
+        } else {
+            let f = NumberFormatter()
+            f.numberStyle = .decimal
+            f.locale = Locale(identifier: "vi_VN") // Định dạng VN: 1.234.567,89
+            f.minimumFractionDigits = 0
+            f.maximumFractionDigits = decimals
+            decimalFormatters[decimals] = f
+            formatter = f
+        }
+        return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+    }
 }
 
 public extension VTSNumeric {
-    /// Định dạng số sang tiền VND (Ví dụ: 1000000 -> "1.000.000 ₫")
+    /// Định dạng số sang tiền VND (Ví dụ: 1000000 -> "1.000.000 ₫" hoặc có phần lẻ theo SOLESOTIEN)
     func toVND() -> String {
-        return VTSNumberFormatterCache.vndFormatter.string(from: NSNumber(value: self.doubleValue)) ?? "\(Int(self.doubleValue)) ₫"
+        let maxDecimals = AuthManager.currentSoLeHeThong?.solesotien ?? 0
+        return "\(toFormattedString(maxDecimals: maxDecimals)) ₫"
     }
     
     /// Định dạng số thông thường với dấu phân cách hàng nghìn (Ví dụ: 1234567.89 -> "1.234.567,89")
     /// - Parameter maxDecimals: Số lượng chữ số sau dấu phẩy tối đa
     func toFormattedString(maxDecimals: Int = 2) -> String {
-        let formatter = VTSNumberFormatterCache.decimalFormatter
-        formatter.maximumFractionDigits = maxDecimals
-        return formatter.string(from: NSNumber(value: self.doubleValue)) ?? "\(self.doubleValue)"
+        return VTSNumberFormatterCache.formatDecimal(self.doubleValue, maxDecimals: maxDecimals)
     }
     
     /// Định dạng số lượng hàng hóa theo cấu hình ThongSoHeThong (solesoluong)
-    @MainActor
     func toQuantityString() -> String {
-        let maxDecimals = AuthManager.shared.soLEHeThong?.solesoluong ?? 2
+        let maxDecimals = AuthManager.currentSoLeHeThong?.solesoluong ?? 2
         return toFormattedString(maxDecimals: maxDecimals)
     }
     
     /// Định dạng đơn giá theo cấu hình ThongSoHeThong (soledongia)
-    @MainActor
     func toPriceString() -> String {
-        let maxDecimals = AuthManager.shared.soLEHeThong?.soledongia ?? 0
+        let maxDecimals = AuthManager.currentSoLeHeThong?.soledongia ?? 0
         return toFormattedString(maxDecimals: maxDecimals)
     }
     
     /// Định dạng số tiền theo cấu hình ThongSoHeThong (solesotien)
-    @MainActor
     func toAmountString() -> String {
-        let maxDecimals = AuthManager.shared.soLEHeThong?.solesotien ?? 0
+        let maxDecimals = AuthManager.currentSoLeHeThong?.solesotien ?? 0
         return toFormattedString(maxDecimals: maxDecimals)
+    }
+    
+    /// Định dạng tỷ lệ theo cấu hình ThongSoHeThong (soletyle)
+    func toRateString() -> String {
+        let maxDecimals = AuthManager.currentSoLeHeThong?.soletyle ?? 0
+        return toFormattedString(maxDecimals: maxDecimals)
+    }
+    
+    /// Định dạng phần trăm theo cấu hình ThongSoHeThong (soletyle) (Ví dụ: "10%" hoặc "10,5%")
+    func toPercentString() -> String {
+        return "\(toRateString())%"
+    }
+}
+
+// MARK: - ============================================================
+//                         QUANTITY HELPER
+// MARK: - ============================================================
+
+public struct VTSQuantityHelper {
+    /// Cấu hình số lẻ số lượng hiện tại (mặc định 2 nếu chưa đăng nhập)
+    public static var maxDecimals: Int {
+        AuthManager.currentSoLeHeThong?.solesoluong ?? 2
+    }
+    
+    /// Cho phép nhập số lẻ hay không (khác 0 -> true, bằng 0 -> false)
+    public static var allowsDecimal: Bool {
+        maxDecimals > 0
+    }
+    
+    /// Bàn phím phù hợp: Nếu cho phép số lẻ dùng .decimalPad, nếu khóa số lẻ dùng .numberPad
+    public static var keyboardType: UIKeyboardType {
+        allowsDecimal ? .decimalPad : .numberPad
+    }
+    
+    /// Định dạng số Double để hiển thị trong ô nhập liệu (không dùng dấu phân cách hàng nghìn)
+    public static func formatForInput(_ value: Double) -> String {
+        if value <= 0 { return "" }
+        let maxDec = maxDecimals
+        if maxDec <= 0 || value.truncatingRemainder(dividingBy: 1) == 0 {
+            return String(Int(value))
+        }
+        let formatter = NumberFormatter()
+        formatter.locale = Locale(identifier: "vi_VN")
+        formatter.numberStyle = .decimal
+        formatter.usesGroupingSeparator = false
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = maxDec
+        return formatter.string(from: NSNumber(value: value)) ?? String(value)
+    }
+    
+    /// Làm sạch chuỗi nhập số lượng:
+    /// - Nếu maxDecimals == 0: Chỉ cho phép chữ số (khóa hoàn toàn dấu chấm, dấu phẩy).
+    /// - Nếu maxDecimals > 0: Cho phép tối đa 1 dấu phân cách thập phân (dấu phẩy hoặc chấm) và tối đa maxDecimals chữ số sau dấu.
+    public static func sanitize(_ input: String) -> String {
+        let maxDec = maxDecimals
+        if maxDec <= 0 {
+            return input.filter { $0.isNumber }
+        }
+        
+        var result = ""
+        var hasSeparator = false
+        var decimalCount = 0
+        
+        for ch in input {
+            if ch.isNumber {
+                if hasSeparator {
+                    if decimalCount < maxDec {
+                        result.append(ch)
+                        decimalCount += 1
+                    }
+                } else {
+                    result.append(ch)
+                }
+            } else if (ch == "," || ch == ".") && !hasSeparator {
+                // Tự động thêm '0' đằng trước nếu bắt đầu bằng dấu phân cách (ví dụ: ",5" -> "0,5")
+                if result.isEmpty {
+                    result.append("0")
+                }
+                hasSeparator = true
+                result.append(ch)
+            }
+        }
+        return result
     }
 }
 
@@ -136,10 +219,15 @@ public extension String {
         return Int(self.trimmed())
     }
     
-    /// Ép kiểu an toàn sang Double
+    /// Ép kiểu an toàn sang Double (hỗ trợ cả định dạng "1.234,5", "123.45", "123,45")
     func toDouble() -> Double? {
-        // Hỗ trợ cả dấu chấm lẫn dấu phẩy trong chuỗi (ví dụ "123.45" hoặc "123,45")
-        let cleanStr = self.trimmed().replacingOccurrences(of: ",", with: ".")
+        let trimmed = self.trimmed()
+        if trimmed.isEmpty { return nil }
+        if trimmed.contains(".") && trimmed.contains(",") {
+            let sanitized = trimmed.replacingOccurrences(of: ".", with: "").replacingOccurrences(of: ",", with: ".")
+            return Double(sanitized)
+        }
+        let cleanStr = trimmed.replacingOccurrences(of: ",", with: ".")
         return Double(cleanStr)
     }
     

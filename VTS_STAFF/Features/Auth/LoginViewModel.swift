@@ -118,7 +118,8 @@ final class LoginViewModel: ObservableObject {
                         TChucNangPhanQuyen(sapXep: "3", nhomChucNang: "02", tenNhomChucNang: "Vận chuyển", maChucNang: "VTSSTAFF_DANHMUC_XE", tenChucNang: "Danh mục xe", ghiChu: "Quản lý danh sách phương tiện vận tải", allowVisible: true, allowView: true, allowAdd: true, allowDel: true, allowEdit: true, allowRun: true, allowExcel: true, allowToolbar: true, visible: true, view: true, add: true, del: true, edit: true, run: true, excel: true, toolbar: true),
                         TChucNangPhanQuyen(sapXep: "4", nhomChucNang: "02", tenNhomChucNang: "Vận chuyển", maChucNang: "VTSSTAFF_DANHMUC_KHACHHANG", tenChucNang: "Danh mục đối tác", ghiChu: "Quản lý danh sách khách hàng & nhà cung cấp", allowVisible: true, allowView: true, allowAdd: true, allowDel: true, allowEdit: true, allowRun: true, allowExcel: true, allowToolbar: true, visible: true, view: true, add: true, del: true, edit: true, run: true, excel: true, toolbar: true),
                         TChucNangPhanQuyen(sapXep: "1", nhomChucNang: "03", tenNhomChucNang: "Quản trị nhân sự", maChucNang: "HRM_LIST", tenChucNang: "Danh mục nhân viên", ghiChu: "Danh sách hồ sơ nhân sự", allowVisible: true, allowView: true, allowAdd: true, allowDel: true, allowEdit: true, allowRun: true, allowExcel: true, allowToolbar: true, visible: true, view: true, add: true, del: true, edit: true, run: true, excel: true, toolbar: true)
-                    ]
+                    ],
+                    soLEHeThong: TSoLeHeThong(solesoluong: 1, soledongia: 0, solesotien: 0, soletyle: 0)
                 )
                 
                 // Luôn âm thầm lưu thông tin tài khoản vào Keychain

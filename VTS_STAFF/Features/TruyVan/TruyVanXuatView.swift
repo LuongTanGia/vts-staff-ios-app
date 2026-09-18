@@ -185,7 +185,7 @@ struct TruyVanXuatView: View {
                                 alignment: .trailing,
                                 render: { item, _ in
                                     AnyView(
-                                        Text(item.colValue.toFormattedString(maxDecimals: 0))
+                                        Text(item.colValue.toQuantityString())
                                             .font(.system(size: 11.5, weight: item.colDataType == 1 ? .bold : .regular))
                                             .foregroundColor(Color(hex: "0F2D59"))
                                     )
@@ -227,7 +227,7 @@ struct TruyVanXuatView: View {
                                         .frame(maxHeight: .infinity)
                                         .border(Color.vtsBorder, width: 0.5)
                                     
-                                    Text(item.colValue.toFormattedString(maxDecimals: 0))
+                                    Text(item.colValue.toQuantityString())
                                         .font(.system(size: 12.5, weight: isSubtotal ? .bold : .regular))
                                         .foregroundColor(Color(hex: "0F2D59"))
                                         .padding(.horizontal, 4)
@@ -249,7 +249,7 @@ struct TruyVanXuatView: View {
                                         .frame(width: width * 0.70, alignment: .center)
                                         .overlay(Rectangle().frame(width: 0.5).foregroundColor(Color.white.opacity(0.3)), alignment: .trailing)
                                     
-                                    Text(grandTotal.toFormattedString(maxDecimals: 0))
+                                    Text(grandTotal.toQuantityString())
                                         .font(.system(size: 12, weight: .bold))
                                         .foregroundColor(.white)
                                         .padding(.horizontal, 6)
