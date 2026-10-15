@@ -30,6 +30,7 @@ struct VTSLiquidTextField: View {
     let keyboardType: UIKeyboardType
     let isReadOnly: Bool
     let errorMessage: String?
+    let isNumber: Bool
     
     @FocusState private var focused: Bool
     @State private var didCopy = false
@@ -41,7 +42,8 @@ struct VTSLiquidTextField: View {
         isSecure: Bool = false,
         keyboardType: UIKeyboardType = .default,
         isReadOnly: Bool = false,
-        errorMessage: String? = nil
+        errorMessage: String? = nil,
+        isNumber: Bool = false
     ) {
         self.label       = label
         self._text       = text
@@ -50,6 +52,7 @@ struct VTSLiquidTextField: View {
         self.keyboardType = keyboardType
         self.isReadOnly  = isReadOnly
         self.errorMessage = errorMessage
+        self.isNumber    = isNumber
     }
     
     var shouldFloat: Bool { focused || !text.isEmpty }
@@ -157,6 +160,21 @@ struct VTSLiquidTextField: View {
                         .padding(.vertical, 5)
                         .background(Color.vtsPrimary)
                         .cornerRadius(8)
+                    }
+                }
+            }
+        }
+        .onChange(of: focused) { _, isFocused in
+            if isNumber && !isReadOnly {
+                if isFocused {
+                    let unformatted = VTSQuantityHelper.unformat(text)
+                    if unformatted != text {
+                        text = unformatted
+                    }
+                } else {
+                    let formatted = VTSQuantityHelper.format(text)
+                    if formatted != text {
+                        text = formatted
                     }
                 }
             }

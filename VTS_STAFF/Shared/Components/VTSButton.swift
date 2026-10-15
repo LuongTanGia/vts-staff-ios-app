@@ -84,17 +84,16 @@ struct VTSButton: View {
         .buttonStyle(VTSPressButtonStyle())
     }
     
+    // Standard unified button size across the app
+    public static let standardHeight: CGFloat = 44
+    
     // MARK: Computed properties
     private var height: CGFloat {
-        switch size {
-        case .small:  return 34
-        case .medium: return 44
-        case .large:  return 52
-        }
+        return Self.standardHeight
     }
     private var horizontalPadding: CGFloat {
         switch size {
-        case .small:  return 12
+        case .small:  return 14
         case .medium: return 18
         case .large:  return 20
         }
@@ -102,18 +101,17 @@ struct VTSButton: View {
     private var cornerRadius: CGFloat {
         switch size {
         case .small:  return VTSRadius.sm
-        case .medium: return VTSRadius.md
-        case .large:  return VTSRadius.lg
+        case .medium, .large: return VTSRadius.md
         }
     }
     private var titleFont: Font {
         switch size {
         case .small:  return .vtsCaption.bold()
         case .medium: return .vtsCallout.bold()
-        case .large:  return .vtsBody.bold()
+        case .large:  return .vtsHeadline
         }
     }
-    private var iconSize: CGFloat { size == .small ? 12 : 14 }
+    private var iconSize: CGFloat { 16 }
     
     @ViewBuilder private var background: some View {
         switch style {
@@ -151,12 +149,14 @@ struct VTSButton: View {
 
 // MARK: - Icon-only Button
 struct VTSIconButton: View {
+    public static let standardSize: CGFloat = 44
+
     let icon: String
     let style: VTSButtonStyle
     let size: CGFloat
     let action: () -> Void
     
-    init(_ icon: String, style: VTSButtonStyle = .secondary, size: CGFloat = 40, action: @escaping () -> Void) {
+    init(_ icon: String, style: VTSButtonStyle = .secondary, size: CGFloat = standardSize, action: @escaping () -> Void) {
         self.icon   = icon
         self.style  = style
         self.size   = size
@@ -166,7 +166,7 @@ struct VTSIconButton: View {
     var body: some View {
         Button(action: action) {
             LucideIcon(icon, size: 20, color: .vtsPrimary)
-                .font(.system(size: size * 0.4, weight: .semibold))
+                .font(.system(size: 20, weight: .semibold))
                 .foregroundColor(style == .destructive ? .vtsDanger : .vtsPrimary)
                 .frame(width: size, height: size)
                 .background(

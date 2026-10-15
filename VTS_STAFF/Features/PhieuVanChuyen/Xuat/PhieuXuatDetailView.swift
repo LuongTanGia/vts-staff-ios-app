@@ -61,6 +61,7 @@ struct PhieuXuatDetailView: View {
     @StateObject private var viewModel: PhieuXuatDetailViewModel
     
     @State private var isEditMode: Bool = false
+    @State private var keyboardHeight: CGFloat = 0
     private let initialEditMode: Bool
     
     // Form fields State
@@ -204,10 +205,13 @@ struct PhieuXuatDetailView: View {
                         .padding(.horizontal, VTSSpacing.sm)
                         .padding(.vertical, 16)
                     }
+                    .scrollDismissesKeyboard(.interactively)
                     
-                    VTSCompanyFooter()
+                    if keyboardHeight == 0 {
+                        VTSCompanyFooter()
+                    }
                 }
-                .ignoresSafeArea(edges: .bottom)
+                .vtsFormKeyboardAdaptive(keyboardHeight: $keyboardHeight)
                 .onAppear {
                     if let details = details {
                         populateFields(with: details)
@@ -336,7 +340,7 @@ struct PhieuXuatDetailView: View {
                             let text = await VTSImageOCRHelper.performOCR(on: croppedImg)
                             hinh01Text = text
                             if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
-                                trongLuongHang = VTSQuantityHelper.formatForInput(qty)
+                                trongLuongHang = VTSQuantityHelper.format(qty)
                             }
                         }
                     } else if target == 2 {
@@ -345,7 +349,7 @@ struct PhieuXuatDetailView: View {
                             let text = await VTSImageOCRHelper.performOCR(on: croppedImg)
                             hinh02Text = text
                             if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
-                                trongLuongHang = VTSQuantityHelper.formatForInput(qty)
+                                trongLuongHang = VTSQuantityHelper.format(qty)
                             }
                         }
                     }
@@ -379,7 +383,7 @@ struct PhieuXuatDetailView: View {
                             let text = await VTSImageOCRHelper.performOCR(on: updatedImage)
                             hinh01Text = text
                             if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
-                                trongLuongHang = VTSQuantityHelper.formatForInput(qty)
+                                trongLuongHang = VTSQuantityHelper.format(qty)
                             }
                         }
                     } else if slot == 2 {
@@ -388,7 +392,7 @@ struct PhieuXuatDetailView: View {
                             let text = await VTSImageOCRHelper.performOCR(on: updatedImage)
                             hinh02Text = text
                             if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
-                                trongLuongHang = VTSQuantityHelper.formatForInput(qty)
+                                trongLuongHang = VTSQuantityHelper.format(qty)
                             }
                         }
                     }
@@ -567,7 +571,8 @@ struct PhieuXuatDetailView: View {
                     text: $trongLuongHang,
                     keyboardType: VTSQuantityHelper.keyboardType,
                     isReadOnly: !isEditMode,
-                    errorMessage: trongLuongHangError
+                    errorMessage: trongLuongHangError,
+                    isNumber: true
                 )
                 .onChange(of: trongLuongHang) { _, newValue in
                     let sanitized = VTSQuantityHelper.sanitize(newValue)
@@ -641,7 +646,7 @@ struct PhieuXuatDetailView: View {
                             ZStack {
                                 Circle()
                                     .fill(Color.black.opacity(0.7))
-                                    .frame(width: 42, height: 42)
+                                    .frame(width: 44, height: 44)
                                     .overlay(
                                         Circle()
                                             .stroke(Color.white.opacity(0.4), lineWidth: 1)
@@ -658,7 +663,7 @@ struct PhieuXuatDetailView: View {
                                 ZStack {
                                     Circle()
                                         .fill(Color(hex: "BA1A1A").opacity(0.85))
-                                        .frame(width: 42, height: 42)
+                                        .frame(width: 44, height: 44)
                                         .overlay(
                                             Circle()
                                                 .stroke(Color.white.opacity(0.3), lineWidth: 1)
@@ -748,7 +753,7 @@ struct PhieuXuatDetailView: View {
         khachHang = details.khachHang ?? ""
         hangHoa = details.hangHoa
         if details.trongLuongHang > 0 {
-            trongLuongHang = VTSQuantityHelper.formatForInput(details.trongLuongHang)
+            trongLuongHang = VTSQuantityHelper.format(details.trongLuongHang)
         } else {
             trongLuongHang = ""
         }

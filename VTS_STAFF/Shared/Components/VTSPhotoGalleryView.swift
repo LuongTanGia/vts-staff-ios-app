@@ -186,8 +186,8 @@ struct VTSPhotoGalleryView: View {
                         ZStack {
                             Circle()
                                 .fill(Color.black.opacity(0.5))
-                                .frame(width: 36, height: 36)
-                            LucideIcon(.x, size: 18, color: .white)
+                                .frame(width: 44, height: 44)
+                            LucideIcon(.x, size: 20, color: .white)
                         }
                     }
                     .buttonStyle(VTSPressButtonStyle())

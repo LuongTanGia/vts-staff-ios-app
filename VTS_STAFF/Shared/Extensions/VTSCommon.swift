@@ -110,6 +110,30 @@ public struct VTSQuantityHelper {
         allowsDecimal ? .decimalPad : .numberPad
     }
     
+    /// Định dạng số Double sang chuỗi hiển thị chuẩn VN (có dấu chấm phân cách hàng nghìn, ví dụ: 15000 -> "15.000", 1234.5 -> "1.234,5")
+    public static func format(_ value: Double) -> String {
+        if value <= 0 { return "" }
+        return value.toQuantityString()
+    }
+    
+    /// Định dạng chuỗi số sang chuỗi hiển thị chuẩn VN (có dấu chấm phân cách hàng nghìn)
+    public static func format(_ text: String) -> String {
+        let trimmed = text.trimmed()
+        if trimmed.isEmpty { return "" }
+        guard let val = trimmed.toDouble() else { return text }
+        if val == 0 { return "0" }
+        if val < 0 { return "" }
+        return val.toQuantityString()
+    }
+    
+    /// Bỏ định dạng phân cách hàng nghìn khi người dùng chạm vào ô để sửa (ví dụ: "15.000" -> "15000", "1.234,5" -> "1234,5")
+    public static func unformat(_ text: String) -> String {
+        let trimmed = text.trimmed()
+        if trimmed.isEmpty { return "" }
+        guard let val = trimmed.toDouble() else { return text }
+        return formatForInput(val)
+    }
+
     /// Định dạng số Double để hiển thị trong ô nhập liệu (không dùng dấu phân cách hàng nghìn)
     public static func formatForInput(_ value: Double) -> String {
         if value <= 0 { return "" }
@@ -131,6 +155,11 @@ public struct VTSQuantityHelper {
     /// - Nếu maxDecimals > 0: Cho phép tối đa 1 dấu phân cách thập phân (dấu phẩy hoặc chấm) và tối đa maxDecimals chữ số sau dấu.
     public static func sanitize(_ input: String) -> String {
         let maxDec = maxDecimals
+        // Nếu chuỗi đã được định dạng chuẩn VN (VD: "15.000", "1.234.567" hoặc "1.234,5"), không làm hỏng chuỗi
+        if let val = input.toDouble(), val.toQuantityString() == input {
+            return input
+        }
+        
         if maxDec <= 0 {
             return input.filter { $0.isNumber }
         }
@@ -219,16 +248,61 @@ public extension String {
         return Int(self.trimmed())
     }
     
-    /// Ép kiểu an toàn sang Double (hỗ trợ cả định dạng "1.234,5", "123.45", "123,45")
+    /// Ép kiểu an toàn sang Double (hỗ trợ cả định dạng "1.234.567,89", "15.000", "1.234,5", "123.45", "123,45")
     func toDouble() -> Double? {
         let trimmed = self.trimmed()
         if trimmed.isEmpty { return nil }
+        
+        // 1. Cả dấu chấm và dấu phẩy (VD: "1.234.567,89" hoặc "1,234,567.89")
         if trimmed.contains(".") && trimmed.contains(",") {
-            let sanitized = trimmed.replacingOccurrences(of: ".", with: "").replacingOccurrences(of: ",", with: ".")
-            return Double(sanitized)
+            guard let lastDot = trimmed.lastIndex(of: "."),
+                  let lastComma = trimmed.lastIndex(of: ",") else {
+                return nil
+            }
+            if lastComma > lastDot {
+                // Định dạng VN: 1.234,56 -> bỏ '.', đổi ',' thành '.'
+                let clean = trimmed.replacingOccurrences(of: ".", with: "").replacingOccurrences(of: ",", with: ".")
+                return Double(clean)
+            } else {
+                // Định dạng US: 1,234.56 -> bỏ ','
+                let clean = trimmed.replacingOccurrences(of: ",", with: "")
+                return Double(clean)
+            }
         }
-        let cleanStr = trimmed.replacingOccurrences(of: ",", with: ".")
-        return Double(cleanStr)
+        
+        // 2. Chỉ có dấu phẩy (VD: "123,45" hoặc "1,000,000")
+        if trimmed.contains(",") {
+            let parts = trimmed.split(separator: ",")
+            if parts.count > 2 {
+                // Nhiều dấu phẩy: "1,234,567" (phân cách hàng nghìn US)
+                return Double(trimmed.replacingOccurrences(of: ",", with: ""))
+            }
+            // 1 dấu phẩy: "123,45" -> số thập phân VN
+            let clean = trimmed.replacingOccurrences(of: ",", with: ".")
+            return Double(clean)
+        }
+        
+        // 3. Chỉ có dấu chấm (VD: "1.234.567", "15.000", "123.45")
+        if trimmed.contains(".") {
+            let parts = trimmed.split(separator: ".")
+            if parts.count > 2 {
+                // Nhiều dấu chấm: "1.234.567" -> phân cách hàng nghìn VN
+                return Double(trimmed.replacingOccurrences(of: ".", with: ""))
+            }
+            if parts.count == 2 {
+                // 1 dấu chấm:
+                // Nếu phần sau có đúng 3 chữ số (VD: "15.000", "1.000", "250.000"),
+                // trong ứng dụng VN đây là dấu phân cách hàng nghìn!
+                if parts[1].count == 3 {
+                    return Double(trimmed.replacingOccurrences(of: ".", with: ""))
+                }
+                // Nếu khác 3 chữ số (VD: "12.5", "123.45"): coi là số thập phân
+                return Double(trimmed)
+            }
+        }
+        
+        // 4. Số nguyên bình thường (VD: "1000", "15000")
+        return Double(trimmed)
     }
     
     /// Parse JSON String thành Dictionary [String: Any]

@@ -14,12 +14,12 @@ import UIKit
 // MARK: - TDangNhap
 struct TDangNhap: Decodable {
     let rtkn, tkn: String?
-    let userTest: Bool
+    let userTest: Bool?
     let ngayHetHan: String?
-    let chucNangPhanQuyens: [TChucNangPhanQuyen]
+    let chucNangPhanQuyens: [TChucNangPhanQuyen]?
     let soLEHeThong: TSoLeHeThong?
-    let dataError: Int
-    let dataErrorDescription: String
+    let dataError: Int?
+    let dataErrorDescription: String?
     
     enum CodingKeys: String, CodingKey {
         case rtkn = "RTKN"

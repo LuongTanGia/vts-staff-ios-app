@@ -96,7 +96,7 @@ public struct VTSActionModalSheet: View {
                             ZStack {
                                 Circle()
                                     .fill(item.isDestructive ? Color.vtsDanger.opacity(0.16) : Color.vtsPrimary.opacity(0.16))
-                                    .frame(width: 42, height: 42)
+                                    .frame(width: 44, height: 44)
                                 LucideIcon(item.icon, size: 22, color: item.isDestructive ? .vtsDanger : .vtsPrimary)
                                     .foregroundColor(item.isDestructive ? .vtsDanger : .vtsPrimary)
                             }

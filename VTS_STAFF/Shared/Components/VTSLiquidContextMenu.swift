@@ -66,9 +66,9 @@ struct VTSLiquidContextMenu: View {
                 ZStack {
                     Circle()
                         .fill(action.tintColor.opacity(0.12))
-                        .frame(width: 32, height: 32)
-                    LucideIcon(action.icon, size: 18, color: action.tintColor)
-                        .font(.system(size: 14, weight: .semibold))
+                        .frame(width: 44, height: 44)
+                    LucideIcon(action.icon, size: 20, color: action.tintColor)
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(action.tintColor)
                 }
                 Text(action.label)

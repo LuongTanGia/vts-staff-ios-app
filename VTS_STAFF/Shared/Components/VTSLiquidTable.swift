@@ -57,9 +57,9 @@ public struct VTSRowAction: Hashable, Identifiable {
     }
     
     // Default static actions for backward compatibility
-    public static let xem = VTSRowAction(id: "xem", label: "Xem", icon: "eye.fill", tintColor: .vtsPrimary)
+    public static let xem = VTSRowAction(id: "xem", label: "Xem chi tiết", icon: "eye.fill", tintColor: .vtsPrimary)
     public static let sua = VTSRowAction(id: "sua", label: "Sửa", icon: "pencil", tintColor: .vtsSecondary)
-    public static let xoa = VTSRowAction(id: "xoa", label: "Xóa", icon: "trash.fill", tintColor: .vtsDanger, isDestructive: true)
+    public static let xoa = VTSRowAction(id: "xoa", label: "Xóa dữ liệu", icon: "trash.fill", tintColor: .vtsDanger, isDestructive: true)
 }
 
 // MARK: - VTSLiquidTable

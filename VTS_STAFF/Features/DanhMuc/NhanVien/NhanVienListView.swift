@@ -21,6 +21,7 @@ struct NhanVienListView: View {
         static let colTen = "Tên"
         static let colDienThoai = "Điện thoại"
         static let subtitle = "Nhân viên"
+        static let viewDetail = "Xem chi tiết"
         static func totalCount(_ count: Int) -> String { "Tổng cộng: \(count)" }
     }
 
@@ -28,7 +29,7 @@ struct NhanVienListView: View {
     @StateObject private var viewModel = NhanVienListViewModel()
     @State private var showSearchBar = false
     @State private var hasLoadedData = false
-    @State private var selectedModalItem: TNhanVien_DanhSach? = nil
+    
     var body: some View {
         VTSPageContainer {
             VStack(spacing: 0) {
@@ -124,9 +125,16 @@ struct NhanVienListView: View {
                                     ),
                                 ],
                                 defaultSortKey: "emTen",
+                                onRowTap: { row in
+                                    let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_NHANVIEN")
+                                    if perm?.view == true || perm == nil {
+                                        navigateToDetail(row: row)
+                                    }
+                                },
                                 onRowLongPress: { row in
-                                    router.showScreen(.push) { _ in
-                                        NhanVienDetailView(maNV: row.emid, isEditMode: false)
+                                    let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_NHANVIEN")
+                                    if perm?.view == true || perm == nil {
+                                        navigateToDetail(row: row)
                                     }
                                 },
                                 onRowAction: { action, row in
@@ -196,12 +204,16 @@ struct NhanVienListView: View {
         .toolbar(.hidden, for: .tabBar)
     }
     
+    private func navigateToDetail(row: TNhanVien_DanhSach) {
+        router.showScreen(.push) { _ in
+            NhanVienDetailView(maNV: row.emid, isEditMode: false)
+        }
+    }
+    
     private func handleRowAction(_ action: VTSRowAction, row: TNhanVien_DanhSach) {
         switch action {
         case .xem:
-            router.showScreen(.push) { _ in
-                NhanVienDetailView(maNV: row.emid, isEditMode: false)
-            }
+            navigateToDetail(row: row)
         default:
             break
         }

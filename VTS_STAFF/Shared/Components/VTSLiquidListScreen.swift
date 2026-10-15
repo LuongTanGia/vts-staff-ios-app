@@ -110,9 +110,9 @@ struct VTSLiquidDateFilter: View {
             if let onSearch {
                 Button(action: onSearch) {
                     Image(systemName: "magnifyingglass")
-                        .font(.system(size: 17, weight: .semibold))
+                        .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(Color.vtsPrimary)
-                        .frame(width: 36, height: 36)
+                        .frame(width: 44, height: 44)
                         .background(Color.vtsPrimary.opacity(0.1), in: Circle())
                 }
                 .buttonStyle(VTSPressButtonStyle())
@@ -242,26 +242,38 @@ struct VTSLiquidFAB: View {
         Button(action: action) {
             HStack(spacing: label != nil ? 8 : 0) {
                 LucideIcon(icon, size: 20, color: .vtsPrimary)
-                    .font(.system(size: 22, weight: .bold))
+                    .font(.system(size: 20, weight: .bold))
                 if let label {
                     Text(label).font(.system(size: 15, weight: .semibold))
                 }
             }
             .foregroundStyle(.white)
-            .padding(label != nil ? EdgeInsets(top: 14, leading: 20, bottom: 14, trailing: 20)
-                     : EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+            .padding(.horizontal, label != nil ? 18 : 0)
+            .frame(width: label != nil ? nil : 44, height: 44)
             .background(
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.vtsPrimary, Color.vtsSecondary],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .if(label != nil) { $0.clipShape(Capsule()) }
+                Group {
+                    if label != nil {
+                        Capsule()
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color.vtsPrimary, Color.vtsSecondary],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    } else {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color.vtsPrimary, Color.vtsSecondary],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    }
+                }
             )
-            .shadow(color: Color.vtsPrimary.opacity(0.45), radius: 14, x: 0, y: 6)
+            .shadow(color: Color.vtsPrimary.opacity(0.45), radius: 10, x: 0, y: 4)
         }
         .buttonStyle(VTSPressButtonStyle())
     }

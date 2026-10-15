@@ -371,52 +371,43 @@ private extension ERPTable {
         }
         .frame(maxWidth: .infinity)
         
-        let cell = Group {
-            if onRowTap != nil || onRowLongPress != nil || onRowAction != nil {
-                let r = baseRow
-                    .background(selectedRow == data.id ? Color.vtsPrimary.opacity(0.12) : Color.clear)
-                    .contentShape(Rectangle())
-                
-                if let onRowTap = onRowTap, let onRowLongPress = onRowLongPress {
-                    r.onTapGesture {
+        let hasDeleteAction = actions.contains(where: { $0.isDestructive || $0 == .xoa })
+        let canShowContextMenu = onRowAction != nil && hasDeleteAction
+        
+        let interactiveRow = baseRow
+            .background(selectedRow == data.id ? Color.vtsPrimary.opacity(0.12) : Color.clear)
+            .contentShape(Rectangle())
+        
+        return Group {
+            if canShowContextMenu, let onRowAction = onRowAction {
+                interactiveRow
+                    .onTapGesture {
                         selectedRow = data.id
-                        onRowTap(data)
+                        onRowTap?(data)
+                    }
+                    .contextMenu {
+                        ForEach(actions, id: \.self) { action in
+                            Button(role: action.isDestructive ? .destructive : .none) {
+                                onRowAction(action, data)
+                            } label: {
+                                Label(action.label, systemImage: action.icon)
+                            }
+                        }
+                    }
+            } else {
+                interactiveRow
+                    .onTapGesture {
+                        selectedRow = data.id
+                        onRowTap?(data)
                     }
                     .onLongPressGesture {
                         selectedRow = data.id
-                        onRowLongPress(data)
-                    }
-                } else if let onRowTap = onRowTap {
-                    r.onTapGesture {
-                        selectedRow = data.id
-                        onRowTap(data)
-                    }
-                } else if let onRowLongPress = onRowLongPress {
-                    r.onLongPressGesture {
-                        selectedRow = data.id
-                        onRowLongPress(data)
-                    }
-                } else {
-                    r
-                }
-            } else {
-                baseRow
-            }
-        }
-        
-        return Group {
-            if let onRowAction = onRowAction {
-                cell.contextMenu {
-                    ForEach(actions, id: \.self) { action in
-                        Button(role: action.isDestructive ? .destructive : .none) {
-                            onRowAction(action, data)
-                        } label: {
-                            Label(action.label, systemImage: action.icon)
+                        if let onRowLongPress = onRowLongPress {
+                            onRowLongPress(data)
+                        } else {
+                            onRowTap?(data)
                         }
                     }
-                }
-            } else {
-                cell
             }
         }
     }
@@ -521,24 +512,15 @@ private extension ERPTable {
     
     // MARK: Floating Button
     func floatingButton(icon: String, action: @escaping () -> Void) -> some View {
-        Group {
-            if #available(iOS 26.0, *) {
-                Button(action: action) {
-                    LucideIcon(icon, size: 20, color: .vtsPrimary)
-                        .font(.headline)
-                        .frame(width: 40, height: 40)
-                }
-                .buttonStyle(.glass)
-            } else {
-                Button(action: action) {
-                    LucideIcon(icon, size: 20, color: .vtsPrimary)
-                        .font(.headline)
-                        .frame(width: 52, height: 52)
-                        .background(.ultraThinMaterial)
-                        .clipShape(Circle())
-                }
-            }
+        Button(action: action) {
+            LucideIcon(icon, size: 20, color: .vtsPrimary)
+                .font(.headline)
+                .frame(width: 44, height: 44)
+                .background(.ultraThinMaterial)
+                .clipShape(Circle())
+                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
         }
+        .buttonStyle(VTSPressButtonStyle())
     }
 }
 

@@ -38,7 +38,7 @@ struct VTSPhotoSourceSheet: View {
                         LucideIcon(.camera, size: 22, color: .vtsPrimary)
                             .font(.system(size: 20))
                             .foregroundColor(.vtsPrimary)
-                            .frame(width: 42, height: 42)
+                            .frame(width: 44, height: 44)
                             .background(Color.vtsPrimary.opacity(0.1))
                             .clipShape(Circle())
                         
@@ -68,7 +68,7 @@ struct VTSPhotoSourceSheet: View {
                         LucideIcon(.image, size: 22, color: Color(hex: "0284C7"))
                             .font(.system(size: 20))
                             .foregroundColor(.vtsPrimary)
-                            .frame(width: 42, height: 42)
+                            .frame(width: 44, height: 44)
                             .background(Color.vtsPrimary.opacity(0.1))
                             .clipShape(Circle())
                         

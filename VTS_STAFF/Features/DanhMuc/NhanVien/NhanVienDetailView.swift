@@ -53,6 +53,7 @@ struct NhanVienDetailView: View {
     @StateObject private var viewModel: NhanVienDetailViewModel
     
     @State private var isEditMode: Bool = false
+    @State private var keyboardHeight: CGFloat = 0
     private let initialEditMode: Bool
     
     // Form fields State
@@ -113,10 +114,13 @@ struct NhanVienDetailView: View {
                         .padding(.horizontal, VTSSpacing.sm)
                         .padding(.vertical, 16)
                     }
+                    .scrollDismissesKeyboard(.interactively)
                     
-                    VTSCompanyFooter()
+                    if keyboardHeight == 0 {
+                        VTSCompanyFooter()
+                    }
                 }
-                .ignoresSafeArea(edges: .bottom)
+                .vtsFormKeyboardAdaptive(keyboardHeight: $keyboardHeight)
                 .onAppear {
                     populateFields(with: details)
                 }

@@ -74,6 +74,7 @@ struct PhieuGiaCongDetailView: View {
     @StateObject private var viewModel: PhieuGiaCongDetailViewModel
     
     @State private var isEditMode: Bool = false
+    @State private var keyboardHeight: CGFloat = 0
     private let initialEditMode: Bool
     
     // Form fields State
@@ -275,10 +276,13 @@ struct PhieuGiaCongDetailView: View {
                         .padding(.horizontal, VTSSpacing.sm)
                         .padding(.vertical, 16)
                     }
+                    .scrollDismissesKeyboard(.interactively)
                     
-                    VTSCompanyFooter()
+                    if keyboardHeight == 0 {
+                        VTSCompanyFooter()
+                    }
                 }
-                .ignoresSafeArea(edges: .bottom)
+                .vtsFormKeyboardAdaptive(keyboardHeight: $keyboardHeight)
                 .onAppear {
                     if let details = details {
                         populateFields(with: details)
@@ -436,7 +440,7 @@ struct PhieuGiaCongDetailView: View {
                             await MainActor.run {
                                 hinh01Text = text
                                 if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
-                                    trongLuongHang = VTSQuantityHelper.formatForInput(qty)
+                                    trongLuongHang = VTSQuantityHelper.format(qty)
                                 }
                             }
                         }
@@ -448,7 +452,7 @@ struct PhieuGiaCongDetailView: View {
                             await MainActor.run {
                                 hinh02Text = text
                                 if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
-                                    trongLuongHang = VTSQuantityHelper.formatForInput(qty)
+                                    trongLuongHang = VTSQuantityHelper.format(qty)
                                 }
                             }
                         }
@@ -460,7 +464,7 @@ struct PhieuGiaCongDetailView: View {
                             await MainActor.run {
                                 hinh03Text = text
                                 if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangGC.trimmingCharacters(in: .whitespaces).isEmpty {
-                                    trongLuongHangGC = VTSQuantityHelper.formatForInput(qty)
+                                    trongLuongHangGC = VTSQuantityHelper.format(qty)
                                 }
                             }
                         }
@@ -472,7 +476,7 @@ struct PhieuGiaCongDetailView: View {
                             await MainActor.run {
                                 hinh04Text = text
                                 if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangGC.trimmingCharacters(in: .whitespaces).isEmpty {
-                                    trongLuongHangGC = VTSQuantityHelper.formatForInput(qty)
+                                    trongLuongHangGC = VTSQuantityHelper.format(qty)
                                 }
                             }
                         }
@@ -484,7 +488,7 @@ struct PhieuGiaCongDetailView: View {
                             await MainActor.run {
                                 hinh05Text = text
                                 if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangTV.trimmingCharacters(in: .whitespaces).isEmpty {
-                                    trongLuongHangTV = VTSQuantityHelper.formatForInput(qty)
+                                    trongLuongHangTV = VTSQuantityHelper.format(qty)
                                 }
                             }
                         }
@@ -496,7 +500,7 @@ struct PhieuGiaCongDetailView: View {
                             await MainActor.run {
                                 hinh06Text = text
                                 if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangTV.trimmingCharacters(in: .whitespaces).isEmpty {
-                                    trongLuongHangTV = VTSQuantityHelper.formatForInput(qty)
+                                    trongLuongHangTV = VTSQuantityHelper.format(qty)
                                 }
                             }
                         }
@@ -534,7 +538,7 @@ struct PhieuGiaCongDetailView: View {
                             await MainActor.run {
                                 hinh01Text = text
                                 if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
-                                    trongLuongHang = VTSQuantityHelper.formatForInput(qty)
+                                    trongLuongHang = VTSQuantityHelper.format(qty)
                                 }
                             }
                         }
@@ -545,7 +549,7 @@ struct PhieuGiaCongDetailView: View {
                             await MainActor.run {
                                 hinh02Text = text
                                 if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHang.trimmingCharacters(in: .whitespaces).isEmpty {
-                                    trongLuongHang = VTSQuantityHelper.formatForInput(qty)
+                                    trongLuongHang = VTSQuantityHelper.format(qty)
                                 }
                             }
                         }
@@ -556,7 +560,7 @@ struct PhieuGiaCongDetailView: View {
                             await MainActor.run {
                                 hinh03Text = text
                                 if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangGC.trimmingCharacters(in: .whitespaces).isEmpty {
-                                    trongLuongHangGC = VTSQuantityHelper.formatForInput(qty)
+                                    trongLuongHangGC = VTSQuantityHelper.format(qty)
                                 }
                             }
                         }
@@ -567,7 +571,7 @@ struct PhieuGiaCongDetailView: View {
                             await MainActor.run {
                                 hinh04Text = text
                                 if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangGC.trimmingCharacters(in: .whitespaces).isEmpty {
-                                    trongLuongHangGC = VTSQuantityHelper.formatForInput(qty)
+                                    trongLuongHangGC = VTSQuantityHelper.format(qty)
                                 }
                             }
                         }
@@ -578,7 +582,7 @@ struct PhieuGiaCongDetailView: View {
                             await MainActor.run {
                                 hinh05Text = text
                                 if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangTV.trimmingCharacters(in: .whitespaces).isEmpty {
-                                    trongLuongHangTV = VTSQuantityHelper.formatForInput(qty)
+                                    trongLuongHangTV = VTSQuantityHelper.format(qty)
                                 }
                             }
                         }
@@ -589,7 +593,7 @@ struct PhieuGiaCongDetailView: View {
                             await MainActor.run {
                                 hinh06Text = text
                                 if let qty = VTSImageOCRHelper.extractQuantity(from: text), trongLuongHangTV.trimmingCharacters(in: .whitespaces).isEmpty {
-                                    trongLuongHangTV = VTSQuantityHelper.formatForInput(qty)
+                                    trongLuongHangTV = VTSQuantityHelper.format(qty)
                                 }
                             }
                         }
@@ -798,7 +802,8 @@ struct PhieuGiaCongDetailView: View {
                         text: $trongLuongHang,
                         keyboardType: VTSQuantityHelper.keyboardType,
                         isReadOnly: !isEditMode,
-                        errorMessage: trongLuongHangError
+                        errorMessage: trongLuongHangError,
+                        isNumber: true
                     )
                     .onChange(of: trongLuongHang) { _, newValue in
                         let sanitized = VTSQuantityHelper.sanitize(newValue)
@@ -849,7 +854,8 @@ struct PhieuGiaCongDetailView: View {
                         label: Strings.fieldSoLuong,
                         text: $trongLuongHangGC,
                         keyboardType: VTSQuantityHelper.keyboardType,
-                        isReadOnly: !isEditMode
+                        isReadOnly: !isEditMode,
+                        isNumber: true
                     )
                     .onChange(of: trongLuongHangGC) { _, newValue in
                         let sanitized = VTSQuantityHelper.sanitize(newValue)
@@ -900,7 +906,8 @@ struct PhieuGiaCongDetailView: View {
                         label: Strings.fieldSoLuong,
                         text: $trongLuongHangTV,
                         keyboardType: VTSQuantityHelper.keyboardType,
-                        isReadOnly: !isEditMode
+                        isReadOnly: !isEditMode,
+                        isNumber: true
                     )
                     .onChange(of: trongLuongHangTV) { _, newValue in
                         let sanitized = VTSQuantityHelper.sanitize(newValue)
@@ -969,7 +976,7 @@ struct PhieuGiaCongDetailView: View {
                             ZStack {
                                 Circle()
                                     .fill(Color.black.opacity(0.7))
-                                    .frame(width: 42, height: 42)
+                                    .frame(width: 44, height: 44)
                                     .overlay(
                                         Circle()
                                             .stroke(Color.white.opacity(0.4), lineWidth: 1)
@@ -986,13 +993,13 @@ struct PhieuGiaCongDetailView: View {
                                 ZStack {
                                     Circle()
                                         .fill(Color(hex: "BA1A1A").opacity(0.85))
-                                        .frame(width: 38, height: 38)
+                                        .frame(width: 44, height: 44)
                                         .overlay(
                                             Circle()
                                                 .stroke(Color.white.opacity(0.3), lineWidth: 1)
                                         )
                                         .shadow(color: Color.black.opacity(0.35), radius: 4, x: 0, y: 2)
-                                    LucideIcon(.trash2, size: 18, color: .white)
+                                    LucideIcon(.trash2, size: 20, color: .white)
                                 }
                             }
                         }
@@ -1112,14 +1119,14 @@ struct PhieuGiaCongDetailView: View {
         }
         
         hangHoa = details.hangHoa
-        trongLuongXe = details.trongLuongXe == 0 ? "" : VTSQuantityHelper.formatForInput(details.trongLuongXe)
-        trongLuongHang = details.trongLuongHang == 0 ? "" : VTSQuantityHelper.formatForInput(details.trongLuongHang)
+        trongLuongXe = details.trongLuongXe == 0 ? "" : VTSQuantityHelper.format(details.trongLuongXe)
+        trongLuongHang = details.trongLuongHang == 0 ? "" : VTSQuantityHelper.format(details.trongLuongHang)
         
         hangHoaGC = details.hangHoaGC ?? ""
-        trongLuongHangGC = details.trongLuongHangGC == 0 ? "" : VTSQuantityHelper.formatForInput(details.trongLuongHangGC)
+        trongLuongHangGC = details.trongLuongHangGC == 0 ? "" : VTSQuantityHelper.format(details.trongLuongHangGC)
         
         hangHoaTV = details.hangHoaTV ?? ""
-        trongLuongHangTV = details.trongLuongHangTV == 0 ? "" : VTSQuantityHelper.formatForInput(details.trongLuongHangTV)
+        trongLuongHangTV = details.trongLuongHangTV == 0 ? "" : VTSQuantityHelper.format(details.trongLuongHangTV)
         
         trangThai = details.trangThai ?? "Moi"
         ghiChu = details.ghiChu ?? ""

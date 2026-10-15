@@ -160,6 +160,7 @@ final class AuthManager: ObservableObject {
         KeychainHelper.shared.delete(forKey: "vts_saved_password")
         UserDefaults.standard.removeObject(forKey: "vts_remember_account")
         UserDefaults.standard.set(false, forKey: "vts_enable_biometrics")
+        UserDefaults.standard.set(true, forKey: "vts_apple_manual_logout")
         
         UserDefaults.standard.removeObject(forKey: "vts_user_hoten")
         UserDefaults.standard.removeObject(forKey: "vts_user_manv")
@@ -210,8 +211,8 @@ final class AuthManager: ObservableObject {
                 throw AuthError.refreshFailed
             }
             
-            self.chucNangPhanQuyens = decoded.chucNangPhanQuyens
-            if let encoded = try? JSONEncoder().encode(decoded.chucNangPhanQuyens) {
+            self.chucNangPhanQuyens = decoded.chucNangPhanQuyens ?? []
+            if let perms = decoded.chucNangPhanQuyens, let encoded = try? JSONEncoder().encode(perms) {
                 UserDefaults.standard.set(encoded, forKey: "vts_user_functions")
             }
             

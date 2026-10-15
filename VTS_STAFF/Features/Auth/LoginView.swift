@@ -7,8 +7,11 @@
 
 import SwiftUI
 import SwiftfulRouting
+import AuthenticationServices
 
 struct LoginView: View {
+    @Environment(\.colorScheme) private var colorScheme
+    
     // MARK: - UI Text Strings
     private enum Strings {
         static let appTitle = "VTS STAFF"
@@ -22,6 +25,7 @@ struct LoginView: View {
         static let termsTitle = "Điều khoản dịch vụ"
         static let termsSheetTitle = "Điều khoản sử dụng"
         static let loginButton = "Đăng nhập"
+        static let appleLoginButton = "Đăng nhập bằng Apple"
         static let version = "Phiên bản 1.0.0 (VTS Tech)"
     }
 
@@ -151,14 +155,14 @@ struct LoginView: View {
                                             await viewModel.loginWithBiometrics()
                                         }
                                     } label: {
-                                        LucideIcon(.scanFace, size: 28, color: .vtsPrimary)
-                                            .font(.system(size: 26))
+                                        LucideIcon(.scanFace, size: 24, color: .vtsPrimary)
+                                            .font(.system(size: 22))
                                             .foregroundColor(.vtsPrimary)
-                                            .frame(width: 52, height: 52)
+                                            .frame(width: 44, height: 44)
                                             .background(Color.white.opacity(0.07))
-                                            .cornerRadius(VTSRadius.lg)
+                                            .cornerRadius(VTSRadius.md)
                                             .overlay(
-                                                RoundedRectangle(cornerRadius: VTSRadius.lg)
+                                                RoundedRectangle(cornerRadius: VTSRadius.md)
                                                     .stroke(Color.vtsPrimary.opacity(0.3), lineWidth: 1)
                                             )
                                     }
@@ -166,6 +170,31 @@ struct LoginView: View {
                                 }
                             }
                             .padding(.top, VTSSpacing.sm)
+                            
+                            // MARK: Apple ID Sign In Button
+                            Button {
+                                isFocused = false
+                                if !viewModel.isAgreedToPrivacyPolicy {
+                                    viewModel.showPrivacyWarning()
+                                } else {
+                                    viewModel.performAppleSignInRequest()
+                                }
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "applelogo")
+                                        .font(.system(size: 20, weight: .semibold))
+                                    Text(Strings.appleLoginButton)
+                                        .font(.system(size: 16, weight: .semibold))
+                                }
+                                .foregroundColor(colorScheme == .dark ? .black : .white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 44)
+                                .background(colorScheme == .dark ? Color.white : Color.black)
+                                .cornerRadius(12)
+                                .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 2)
+                            }
+                            .buttonStyle(VTSPressButtonStyle())
+                            .opacity(viewModel.isAgreedToPrivacyPolicy ? 1.0 : 0.5)
                         }
                     }
                     .padding(.horizontal, VTSSpacing.sm)
@@ -195,6 +224,7 @@ struct LoginView: View {
                 }
                 .padding(VTSSpacing.xl)
             }
+            .scrollDismissesKeyboard(.interactively)
         }
         .environment(\.colorScheme, .light)
         .sheet(isPresented: $showPolicySheet) {
@@ -225,6 +255,8 @@ struct LoginView: View {
                     try? await Task.sleep(nanoseconds: 500_000_000) // 0.5s delay
                     await viewModel.loginWithBiometrics()
                 }
+            } else {
+                viewModel.checkAndAutoLoginAppleIfNeeded()
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in

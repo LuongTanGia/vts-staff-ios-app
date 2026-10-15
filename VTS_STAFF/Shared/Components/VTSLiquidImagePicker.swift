@@ -203,14 +203,14 @@ struct VTSLiquidImageSlot: View {
             ZStack {
                 Circle()
                     .fill(bgColor)
-                    .frame(width: 38, height: 38)
+                    .frame(width: 44, height: 44)
                     .overlay(
                         Circle()
                             .stroke(Color.white.opacity(0.3), lineWidth: 1)
                     )
                     .shadow(color: Color.black.opacity(0.35), radius: 4, x: 0, y: 2)
                 
-                LucideIcon(icon, size: 18, color: .white)
+                LucideIcon(icon, size: 20, color: .white)
             }
         }
         .buttonStyle(VTSPressButtonStyle())

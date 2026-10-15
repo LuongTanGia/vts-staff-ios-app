@@ -115,6 +115,16 @@ final class VTSCommonTests: XCTestCase {
         XCTAssertEqual("123,45".toDouble(), 123.45)
         XCTAssertEqual("123.45".toDouble(), 123.45)
         XCTAssertEqual("1000".toDouble(), 1000.0)
+        XCTAssertEqual("15.000".toDouble(), 15000.0)
+        XCTAssertEqual("1.000.000".toDouble(), 1000000.0)
+        XCTAssertEqual("1.234.567,89".toDouble(), 1234567.89)
+    }
+    
+    func testVTSQuantityHelperFormatting() {
+        XCTAssertEqual(VTSQuantityHelper.format(15000.0), "15.000")
+        XCTAssertEqual(VTSQuantityHelper.format("15000"), "15.000")
+        XCTAssertEqual(VTSQuantityHelper.unformat("15.000"), "15000")
+        XCTAssertEqual(VTSQuantityHelper.sanitize("15.000"), "15.000")
     }
     
     // MARK: - Array Tests

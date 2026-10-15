@@ -22,7 +22,7 @@ struct PhieuXuatListView: View {
         static let cancelBtn = "Hủy"
         static func modalTitle(_ soPhieu: String) -> String { "Phiếu xuất: \(soPhieu)" }
         static let viewDetail = "Xem chi tiết"
-        static let deleteTicket = "Xóa phiếu"
+        static let deleteTicket = "Xóa dữ liệu"
         static let navSubtitle = "Chuyển hàng giao"
         static func totalTickets(_ count: Int) -> String { "Tổng cộng \(count) phiếu" }
         static func deleteError(_ message: String) -> String { "Không thể xóa phiếu: \(message)" }
@@ -32,7 +32,6 @@ struct PhieuXuatListView: View {
     @StateObject private var viewModel: PhieuXuatListViewModel
     @State private var showSearchBar: Bool
     @State private var hasLoadedData = false
-    @State private var selectedModalItem: TPhieuvc_Xuat_DanhSach? = nil
     
     init(fromDate: Date? = nil, toDate: Date? = nil, searchText: String? = nil) {
         let vm = PhieuXuatListViewModel(fromDate: fromDate, toDate: toDate, searchText: searchText)
@@ -178,35 +177,6 @@ struct PhieuXuatListView: View {
                 await viewModel.loadData()
             }
         }
-        .sheet(item: $selectedModalItem) { item in
-            VTSActionModalSheet(
-                title: Strings.modalTitle(item.soPhieu),
-                subtitle: "\(item.tenHangHoa) • \(item.ngay.toUIDateString)",
-                actions: {
-                    var acts: [VTSModalAction] = []
-                    acts.append(VTSModalAction(title: Strings.viewDetail, icon: "eye.fill") {
-                        router.showScreen(.push) { _ in
-                            PhieuXuatDetailView(soPhieu: item.soPhieu, existing: item, onSaveSuccess: {
-                                Task {
-                                    await viewModel.loadData()
-                                }
-                            })
-                        }
-                    })
-                    if hasDeletePermission {
-                        acts.append(VTSModalAction(title: Strings.deleteTicket, icon: "trash.fill", isDestructive: true) {
-                            deleteItem(item)
-                        })
-                    }
-                    return acts
-                }(),
-                onClose: {
-                    selectedModalItem = nil
-                }
-            )
-            .presentationDetents([.fraction(hasDeletePermission ? 0.38 : 0.3), .medium])
-            .presentationDragIndicator(.visible)
-        }
         .customToolbar(
             isPrimaryActionVisible: false,
             title: "",
@@ -248,46 +218,45 @@ struct PhieuXuatListView: View {
         .toolbar(.hidden, for: .tabBar)
     }
     
+    private func navigateToDetail(item: TPhieuvc_Xuat_DanhSach) {
+        router.showScreen(.push) { _ in
+            PhieuXuatDetailView(soPhieu: item.soPhieu, existing: item, onSaveSuccess: {
+                Task {
+                    await viewModel.loadData()
+                }
+            })
+        }
+    }
+    
     @ViewBuilder
     private func cardItemView(item: TPhieuvc_Xuat_DanhSach) -> some View {
-        PhieuXuatCardView(item: item)
+        let card = PhieuXuatCardView(item: item)
             .contentShape(Rectangle())
-            .onLongPressGesture {
-                let haptic = UIImpactFeedbackGenerator(style: .medium)
-                haptic.impactOccurred()
-                if !hasDeletePermission && (permission?.view == true || permission == nil) {
-                    router.showScreen(.push) { _ in
-                        PhieuXuatDetailView(soPhieu: item.soPhieu, existing: item, onSaveSuccess: {
-                            Task {
-                                await viewModel.loadData()
-                            }
-                        })
-                    }
-                } else {
-                    selectedModalItem = item
-                }
+            .onTapGesture {
+                navigateToDetail(item: item)
             }
-            .contextMenu {
+        
+        if hasDeletePermission {
+            card.contextMenu {
                 Button {
-                    router.showScreen(.push) { _ in
-                        PhieuXuatDetailView(soPhieu: item.soPhieu, existing: item, onSaveSuccess: {
-                            Task {
-                                await viewModel.loadData()
-                            }
-                        })
-                    }
+                    navigateToDetail(item: item)
                 } label: {
-                    Label(Strings.viewDetail, systemImage: "eye")
+                    Label(Strings.viewDetail, systemImage: "eye.fill")
                 }
                 
-                if hasDeletePermission {
-                    Button(role: .destructive) {
-                        deleteItem(item)
-                    } label: {
-                        Label(Strings.deleteTicket, systemImage: "trash")
-                    }
+                Button(role: .destructive) {
+                    deleteItem(item)
+                } label: {
+                    Label(Strings.deleteTicket, systemImage: "trash.fill")
                 }
             }
+        } else {
+            card.onLongPressGesture {
+                let haptic = UIImpactFeedbackGenerator(style: .medium)
+                haptic.impactOccurred()
+                navigateToDetail(item: item)
+            }
+        }
     }
 }
 

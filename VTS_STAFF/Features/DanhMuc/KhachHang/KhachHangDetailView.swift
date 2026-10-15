@@ -49,6 +49,7 @@ struct KhachHangDetailView: View {
     @StateObject private var viewModel: KhachHangDetailViewModel
     
     @State private var isEditMode: Bool = false
+    @State private var keyboardHeight: CGFloat = 0
     private let initialEditMode: Bool
     
     @State private var ma: String = ""
@@ -106,10 +107,13 @@ struct KhachHangDetailView: View {
                         .padding(.horizontal, VTSSpacing.sm)
                         .padding(.vertical, 16)
                     }
+                    .scrollDismissesKeyboard(.interactively)
                     
-                    VTSCompanyFooter()
+                    if keyboardHeight == 0 {
+                        VTSCompanyFooter()
+                    }
                 }
-                .ignoresSafeArea(edges: .bottom)
+                .vtsFormKeyboardAdaptive(keyboardHeight: $keyboardHeight)
                 .onAppear {
                     if let details = details {
                         populateFields(with: details)

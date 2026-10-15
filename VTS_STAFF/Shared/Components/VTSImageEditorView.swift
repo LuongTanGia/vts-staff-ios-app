@@ -159,9 +159,9 @@ struct VTSImageEditorView: View {
                     ZStack {
                         Circle()
                             .fill(showPreviewOnly ? Color.vtsPrimary : Color.white.opacity(0.2))
-                            .frame(width: 34, height: 34)
-                        LucideIcon(.eye, size: 18)
-                            .font(.system(size: 15, weight: .bold))
+                            .frame(width: 44, height: 44)
+                        LucideIcon(.eye, size: 20)
+                            .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.white)
                     }
                 }

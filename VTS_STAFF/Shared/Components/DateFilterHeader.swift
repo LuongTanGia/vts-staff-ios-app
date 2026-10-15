@@ -130,10 +130,10 @@ struct SystemDateFilterHeader: View {
                     ZStack {
                         RoundedRectangle(cornerRadius: VTSRadius.sm)
                             .fill(Color.vtsSurface)
-                            .frame(width: 38, height: 38)
+                            .frame(width: 44, height: 44)
                         
                         Image(systemName: "calendar.badge.clock")
-                            .font(.system(size: 17, weight: .bold))
+                            .font(.system(size: 18, weight: .bold))
                             .foregroundColor(.vtsPrimary)
                     }
                 }

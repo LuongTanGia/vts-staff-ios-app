@@ -41,7 +41,9 @@ struct VTSVoucherHeaderProfileCard: View {
                 
                 // Line 2: [TenHangHoa] - [TrongLuongHang]
                 let hh = (tenHangHoa ?? "").trimmingCharacters(in: .whitespaces)
-                let tl = (trongLuongHang ?? "").trimmingCharacters(in: .whitespaces)
+                let rawTl = (trongLuongHang ?? "").trimmingCharacters(in: .whitespaces)
+                let formattedTl = VTSQuantityHelper.format(rawTl)
+                let tl = formattedTl.isEmpty ? rawTl : formattedTl
                 let line2Parts = [hh.isEmpty ? nil : hh, tl.isEmpty ? nil : tl].compactMap { $0 }
                 let line2 = line2Parts.isEmpty ? "---" : line2Parts.joined(separator: " - ")
                 

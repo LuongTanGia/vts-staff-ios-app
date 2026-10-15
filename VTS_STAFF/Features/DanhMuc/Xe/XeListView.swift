@@ -23,7 +23,7 @@ struct XeListView: View {
         static let subtitle = "Xe nhà"
         static func totalCount(_ count: Int) -> String { "Tổng cộng: \(count)" }
         static let viewDetail = "Xem chi tiết"
-        static let deleteVehicle = "Xóa phương tiện"
+        static let deleteVehicle = "Xóa dữ liệu"
         static let deleteConfirmTitle = "Xác nhận xóa"
         static func deleteConfirmSubtitle(_ ten: String, _ ma: String) -> String { "Bạn có chắc chắn muốn xóa phương tiện \(ten) (\(ma))?" }
         static let deleteBtn = "Xóa"
@@ -36,7 +36,15 @@ struct XeListView: View {
     @Environment(\.router) private var router
     @StateObject private var viewModel = XeListViewModel()
     @State private var showSearchBar = false
-    @State private var selectedModalItem: TXe_DanhSach? = nil
+    
+    private var hasDeletePermission: Bool {
+        AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_XE")?.del == true
+    }
+    
+    private var hasViewPermission: Bool {
+        let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_XE")
+        return perm?.view == true || perm == nil
+    }
     
     var body: some View {
         VTSPageContainer {
@@ -133,14 +141,14 @@ struct XeListView: View {
                                     ),
                                 ],
                                 defaultSortKey: "ma",
+                                onRowTap: { row in
+                                    if hasViewPermission {
+                                        navigateToDetail(row: row)
+                                    }
+                                },
                                 onRowLongPress: { row in
-                                    let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_XE")
-                                    if perm?.del != true && (perm?.view == true || perm == nil) {
-                                        router.showScreen(.push) { _ in
-                                            XeDetailView(maXe: row.ma, isEditMode: false)
-                                        }
-                                    } else {
-                                        selectedModalItem = row
+                                    if hasViewPermission {
+                                        navigateToDetail(row: row)
                                     }
                                 },
                                 onRowAction: { action, row in
@@ -148,9 +156,8 @@ struct XeListView: View {
                                 },
                                 actions: {
                                     var list: [VTSRowAction] = []
-                                    let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_XE")
-                                    if perm?.view == true { list.append(.xem) }
-                                    if perm?.del == true { list.append(.xoa) }
+                                    if hasViewPermission { list.append(.xem) }
+                                    if hasDeletePermission { list.append(.xoa) }
                                     return list
                                 }(),
                                 loadDataIfNeeded: {
@@ -182,34 +189,6 @@ struct XeListView: View {
                 }
             }
             .ignoresSafeArea(edges: .bottom)
-        }
-        .sheet(item: $selectedModalItem) { item in
-            VTSActionModalSheet(
-                title: item.ten,
-                subtitle: Strings.subtitleModal(item.ma, item.loai),
-                actions: {
-                    var acts: [VTSModalAction] = []
-                    let perm = AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_XE")
-                    if perm?.view == true || perm == nil {
-                        acts.append(VTSModalAction(title: Strings.viewDetail, icon: "eye.fill") {
-                            router.showScreen(.push) { _ in
-                                XeDetailView(maXe: item.ma, isEditMode: false)
-                            }
-                        })
-                    }
-                    if perm?.del == true {
-                        acts.append(VTSModalAction(title: Strings.deleteVehicle, icon: "trash.fill", isDestructive: true) {
-                            handleRowAction(.xoa, row: item)
-                        })
-                    }
-                    return acts
-                }(),
-                onClose: {
-                    selectedModalItem = nil
-                }
-            )
-            .presentationDetents([.fraction(AuthManager.shared.getPermission(for: "VTSSTAFF_DANHMUC_XE")?.del == true ? 0.38 : 0.3), .medium])
-            .presentationDragIndicator(.visible)
         }
         .task {
             await viewModel.loadData()
@@ -251,12 +230,16 @@ struct XeListView: View {
         .toolbar(.hidden, for: .tabBar)
     }
     
+    private func navigateToDetail(row: TXe_DanhSach) {
+        router.showScreen(.push) { _ in
+            XeDetailView(maXe: row.ma, isEditMode: false)
+        }
+    }
+    
     private func handleRowAction(_ action: VTSRowAction, row: TXe_DanhSach) {
         switch action {
         case .xem:
-            router.showScreen(.push) { _ in
-                XeDetailView(maXe: row.ma, isEditMode: false)
-            }
+            navigateToDetail(row: row)
         case .sua:
             router.showScreen(.push) { _ in
                 XeDetailView(maXe: row.ma, isEditMode: true)

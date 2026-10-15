@@ -226,6 +226,48 @@ struct VTSBase64Image: View {
     }
 }
 
+// MARK: - ============================================================
+//               VTSFormKeyboardAdaptive (Nâng UI form khi mở bàn phím)
+// MARK: - ============================================================
+
+struct VTSFormKeyboardAdaptiveModifier: ViewModifier {
+    @Binding var keyboardHeight: CGFloat
+    
+    func body(content: Content) -> some View {
+        content
+            .padding(.bottom, keyboardHeight)
+            .ignoresSafeArea(edges: .bottom)
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { notification in
+                if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                    let duration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double) ?? 0.25
+                    withAnimation(.easeOut(duration: duration)) {
+                        self.keyboardHeight = keyboardFrame.height
+                    }
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { notification in
+                let duration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double) ?? 0.25
+                withAnimation(.easeOut(duration: duration)) {
+                    self.keyboardHeight = 0
+                }
+            }
+            .onDisappear {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+                withTransaction(transaction) {
+                    self.keyboardHeight = 0
+                }
+            }
+    }
+}
+
+extension View {
+    func vtsFormKeyboardAdaptive(keyboardHeight: Binding<CGFloat>) -> some View {
+        modifier(VTSFormKeyboardAdaptiveModifier(keyboardHeight: keyboardHeight))
+    }
+}
+
 // MARK: - Preview
 #Preview("Screen wrapper") {
     VTSPageContainer {
