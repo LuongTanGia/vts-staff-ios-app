@@ -59,19 +59,24 @@ struct NhanVienListView: View {
                         Task {
                             await viewModel.loadData()
                         }
+                    },
+                    asyncRetry: {
+                        await viewModel.loadData()
                     }
                 ) { _ in
                     let filtered = viewModel.filteredNhanVien
                     
                     VStack(spacing: 0) {
                         if filtered.isEmpty {
-                            Spacer()
-                            VTSEmptyState(
-                                icon: "person.crop.circle.badge.questionmark",
-                                title: Strings.noResultTitle,
-                                subtitle: Strings.noResultSubtitle
-                            )
-                            Spacer()
+                            VTSScrollableStateContainer {
+                                await viewModel.loadData()
+                            } content: {
+                                VTSEmptyState(
+                                    icon: "person.crop.circle.badge.questionmark",
+                                    title: Strings.noResultTitle,
+                                    subtitle: Strings.noResultSubtitle
+                                )
+                            }
                         } else {
                             ERPTable(
                                 dataSource: filtered,

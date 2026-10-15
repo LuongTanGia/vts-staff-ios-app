@@ -81,19 +81,24 @@ struct TruyVanChuyenXeView: View {
                         Task {
                             await viewModel.loadData()
                         }
+                    },
+                    asyncRetry: {
+                        await viewModel.loadData()
                     }
                 ) { _ in
                     let filtered = viewModel.filteredData
                     
                     VStack(spacing: 0) {
                         if filtered.isEmpty {
-                            Spacer()
-                            VTSEmptyState(
-                                icon: "magnifyingglass",
-                                title: Strings.noResultTitle,
-                                subtitle: Strings.noResultSubtitle
-                            )
-                            Spacer()
+                            VTSScrollableStateContainer {
+                                await viewModel.loadData()
+                            } content: {
+                                VTSEmptyState(
+                                    icon: "magnifyingglass",
+                                    title: Strings.noResultTitle,
+                                    subtitle: Strings.noResultSubtitle
+                                )
+                            }
                         } else {
                             let totalValue1 = filtered.sum(by: \.colValue1)
                             let totalValue2 = filtered.sum(by: \.colValue2)

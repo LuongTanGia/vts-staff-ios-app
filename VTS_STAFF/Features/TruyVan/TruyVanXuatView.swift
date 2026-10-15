@@ -130,17 +130,22 @@ struct TruyVanXuatView: View {
                 Task {
                     await viewModel.loadData(for: type)
                 }
+            },
+            asyncRetry: {
+                await viewModel.loadData(for: type)
             }
         ) { _ in
             VStack(spacing: 0) {
                 if filtered.isEmpty {
-                    Spacer()
-                    VTSEmptyState(
-                        icon: "magnifyingglass",
-                        title: Strings.noResultTitle,
-                        subtitle: Strings.noResultSubtitle
-                    )
-                    Spacer()
+                    VTSScrollableStateContainer {
+                        await viewModel.loadData(for: type)
+                    } content: {
+                        VTSEmptyState(
+                            icon: "magnifyingglass",
+                            title: Strings.noResultTitle,
+                            subtitle: Strings.noResultSubtitle
+                        )
+                    }
                 } else {
                     let grandTotal = filtered.filter { $0.colDataType == 0 }.reduce(0.0) { $0 + $1.colValue }
                     

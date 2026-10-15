@@ -98,6 +98,9 @@ struct NhanVienDetailDemoView: View {
                     Task {
                         await viewModel.loadDetails()
                     }
+                },
+                asyncRetry: {
+                    await viewModel.loadDetails()
                 }
             ) { details in
                 VStack(spacing: 0) {

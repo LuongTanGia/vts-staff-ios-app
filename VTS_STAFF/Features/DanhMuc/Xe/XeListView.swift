@@ -74,19 +74,24 @@ struct XeListView: View {
                         Task {
                             await viewModel.loadData()
                         }
+                    },
+                    asyncRetry: {
+                        await viewModel.loadData()
                     }
                 ) { _ in
                     let filtered = viewModel.filteredXe
                     
                     VStack(spacing: 0) {
                         if filtered.isEmpty {
-                            Spacer()
-                            VTSEmptyState(
-                                icon: "doc.text.magnifyingglass",
-                                title: Strings.noResultTitle,
-                                subtitle: Strings.noResultSubtitle
-                            )
-                            Spacer()
+                            VTSScrollableStateContainer {
+                                await viewModel.loadData()
+                            } content: {
+                                VTSEmptyState(
+                                    icon: "doc.text.magnifyingglass",
+                                    title: Strings.noResultTitle,
+                                    subtitle: Strings.noResultSubtitle
+                                )
+                            }
                         } else {
                             ERPTable(
                                 dataSource: filtered,

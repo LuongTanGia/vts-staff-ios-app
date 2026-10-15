@@ -91,6 +91,9 @@ struct XeDetailView: View {
                     Task {
                         await viewModel.loadData()
                     }
+                },
+                asyncRetry: {
+                    await viewModel.loadData()
                 }
             ) { details in
                 VStack(spacing: 0) {

@@ -106,19 +106,24 @@ struct PhieuNhapListView: View {
                         Task {
                             await viewModel.loadData()
                         }
+                    },
+                    asyncRetry: {
+                        await viewModel.loadData()
                     }
                 ) { _ in
                     let filtered = viewModel.filteredPhieu
                     
                     VStack(spacing: 0) {
                         if filtered.isEmpty {
-                            Spacer()
-                            VTSEmptyState(
-                                icon: "doc.text.magnifyingglass",
-                                title: Strings.noResultTitle,
-                                subtitle: Strings.noResultSubtitle
-                            )
-                            Spacer()
+                            VTSScrollableStateContainer {
+                                await viewModel.loadData()
+                            } content: {
+                                VTSEmptyState(
+                                    icon: "doc.text.magnifyingglass",
+                                    title: Strings.noResultTitle,
+                                    subtitle: Strings.noResultSubtitle
+                                )
+                            }
                         } else {
                             ZStack(alignment: .bottomLeading) {
                                 ScrollView {
@@ -138,6 +143,7 @@ struct PhieuNhapListView: View {
                                     .padding(.vertical, 16)
                                     .padding(.bottom, 16)
                                 }
+                                .scrollBounceBehavior(.always, axes: .vertical)
                                 .refreshable {
                                     await viewModel.loadData()
                                 }

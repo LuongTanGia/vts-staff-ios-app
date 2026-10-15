@@ -266,6 +266,7 @@ public struct ERPTable<Data: Identifiable>: View {
                             }
                         }
                     }
+                    .scrollBounceBehavior(.always, axes: .vertical)
                     .refreshable {
                         if let onRefresh = onRefresh {
                             onRefresh()

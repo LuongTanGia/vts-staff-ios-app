@@ -83,6 +83,9 @@ struct HomeView: View {
                                 Task {
                                     await viewModel.loadDashboardData()
                                 }
+                            },
+                            asyncRetry: {
+                                await viewModel.loadDashboardData()
                             }
                         ) { data in
                             
@@ -234,6 +237,7 @@ struct HomeView: View {
                     }
                     .padding(VTSSpacing.sm)
                 }
+                .scrollBounceBehavior(.always, axes: .vertical)
                 .refreshable {
                     await viewModel.loadDashboardData()
                 }

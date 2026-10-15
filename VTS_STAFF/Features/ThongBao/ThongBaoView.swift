@@ -69,24 +69,41 @@ struct ThongBaoView: View {
                         Task {
                             await viewModel.loadNotifications()
                         }
+                    },
+                    asyncRetry: {
+                        await viewModel.loadNotifications()
                     }
                 ) { items in
-                    ScrollView(showsIndicators: false) {
-                        LazyVStack(spacing: 12) {
-                            ForEach(viewModel.filteredNotifications) { item in
-                                ThongBaoCard(item: item) {
-                                    Task {
-                                        await viewModel.markAsRead(ma: item.ma)
-                                        navigateToList(for: item)
+                    let filtered = viewModel.filteredNotifications
+                    if filtered.isEmpty {
+                        VTSScrollableStateContainer {
+                            await viewModel.loadNotifications()
+                        } content: {
+                            VTSEmptyState(
+                                icon: Strings.emptyIcon,
+                                title: Strings.emptyTitle,
+                                subtitle: Strings.emptySubtitle
+                            )
+                        }
+                    } else {
+                        ScrollView(showsIndicators: false) {
+                            LazyVStack(spacing: 12) {
+                                ForEach(filtered) { item in
+                                    ThongBaoCard(item: item) {
+                                        Task {
+                                            await viewModel.markAsRead(ma: item.ma)
+                                            navigateToList(for: item)
+                                        }
                                     }
                                 }
                             }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 14)
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 14)
-                    }
-                    .refreshable {
-                        await viewModel.loadNotifications()
+                        .scrollBounceBehavior(.always, axes: .vertical)
+                        .refreshable {
+                            await viewModel.loadNotifications()
+                        }
                     }
                 }
             }

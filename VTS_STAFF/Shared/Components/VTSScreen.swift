@@ -50,17 +50,20 @@ struct VTSAsyncContent<T, Content: View, Empty: View>: View {
     let emptyView: () -> Empty
     let content: (T) -> Content
     let retry: (() -> Void)?
+    let asyncRetry: (() async -> Void)?
     
     init(
         state: VTSViewState<T>,
         retry: (() -> Void)? = nil,
+        asyncRetry: (() async -> Void)? = nil,
         @ViewBuilder emptyView: @escaping () -> Empty,
         @ViewBuilder content: @escaping (T) -> Content
     ) {
-        self.state     = state
-        self.retry     = retry
-        self.emptyView = emptyView
-        self.content   = content
+        self.state      = state
+        self.retry      = retry
+        self.asyncRetry = asyncRetry
+        self.emptyView  = emptyView
+        self.content    = content
     }
     
     var body: some View {
@@ -72,9 +75,36 @@ struct VTSAsyncContent<T, Content: View, Empty: View>: View {
         case .success(let data):
             content(data)
         case .empty:
-            emptyView()
+            if let asyncRetry {
+                VTSScrollableStateContainer(onRefresh: asyncRetry) {
+                    emptyView()
+                }
+            } else if let retry {
+                VTSScrollableStateContainer(onRefresh: retry) {
+                    emptyView()
+                }
+            } else {
+                emptyView()
+            }
         case .failure(let msg):
-            VTSErrorState(msg, retry: retry)
+            let action: (() -> Void)? = {
+                if let asyncRetry {
+                    return { Task { await asyncRetry() } }
+                }
+                return retry
+            }()
+            
+            if let asyncRetry {
+                VTSScrollableStateContainer(onRefresh: asyncRetry) {
+                    VTSErrorState(msg, retry: action)
+                }
+            } else if let retry {
+                VTSScrollableStateContainer(onRefresh: retry) {
+                    VTSErrorState(msg, retry: action)
+                }
+            } else {
+                VTSErrorState(msg, retry: action)
+            }
         }
     }
 }
@@ -87,17 +117,64 @@ extension VTSAsyncContent where Empty == VTSEmptyState {
         emptySubtitle: String? = nil,
         emptyIcon: String = "tray.fill",
         retry: (() -> Void)? = nil,
+        asyncRetry: (() async -> Void)? = nil,
         @ViewBuilder content: @escaping (T) -> Content
     ) {
         self.init(
             state: state,
             retry: retry,
+            asyncRetry: asyncRetry,
             emptyView: {
                 VTSEmptyState(icon: emptyIcon, title: emptyTitle, subtitle: emptySubtitle,
-                              actionTitle: retry != nil ? "Tải lại" : nil, action: retry)
+                              actionTitle: (retry != nil || asyncRetry != nil) ? "Tải lại" : nil,
+                              action: {
+                    if let asyncRetry {
+                        Task { await asyncRetry() }
+                    } else {
+                        retry?()
+                    }
+                })
             },
             content: content
         )
+    }
+}
+
+// MARK: - ============================================================
+//            VTSScrollableStateContainer (Scrollable Pull-To-Refresh)
+// MARK: - ============================================================
+
+struct VTSScrollableStateContainer<Content: View>: View {
+    let onRefresh: () async -> Void
+    @ViewBuilder let content: () -> Content
+    
+    init(onRefresh: @escaping () async -> Void, @ViewBuilder content: @escaping () -> Content) {
+        self.onRefresh = onRefresh
+        self.content = content
+    }
+    
+    init(onRefresh: (() -> Void)? = nil, @ViewBuilder content: @escaping () -> Content) {
+        self.onRefresh = {
+            onRefresh?()
+        }
+        self.content = content
+    }
+    
+    var body: some View {
+        GeometryReader { geo in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    content()
+                    Spacer(minLength: 0)
+                }
+                .frame(maxWidth: .infinity, minHeight: geo.size.height)
+            }
+            .scrollBounceBehavior(.always, axes: .vertical)
+            .refreshable {
+                await onRefresh()
+            }
+        }
     }
 }
 
